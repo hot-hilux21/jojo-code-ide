@@ -1832,6 +1832,31 @@ body[data-contrast="high"][data-theme="pastel"] {
   outline-offset: 2px;
 }
 
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space-2, 0.5rem) 0;
+}
+.star-rating input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.star-rating label {
+  font-size: 1.8em;
+  color: var(--muted, #888);
+  cursor: pointer;
+  padding: 0 0.15em;
+  line-height: 1;
+}
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #b38e00;
+}
+
 .field select:hover {
   border-color: var(--accent);
 }

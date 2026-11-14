@@ -1330,20 +1330,20 @@
           <label for="feedback-email">{{ t('feedback.email') }}</label>
           <input id="feedback-email" type="email" style="width:100%">
         </div>
-        <fieldset class="field">
-          <legend>{{ t('feedback.rating') }}</legend>
-          <label><input type="radio" name="feedback-rating" value="1"> {{ 1 }}</label>
-          <label><input type="radio" name="feedback-rating" value="2"> {{ 2 }}</label>
-          <label><input type="radio" name="feedback-rating" value="3"> {{ 3 }}</label>
-          <label><input type="radio" name="feedback-rating" value="4"> {{ 4 }}</label>
-          <label><input type="radio" name="feedback-rating" value="5" checked> {{ 5 }}</label>
+        <fieldset class="star-rating" aria-label="{{ t('feedback.rating') }}">
+          <legend class="visually-hidden">{{ t('feedback.rating') }}</legend>
+          <input type="radio" name="feedback-rating" value="5" id="fr5"><label for="fr5">{{ '★' }}</label>
+          <input type="radio" name="feedback-rating" value="4" id="fr4"><label for="fr4">{{ '★' }}</label>
+          <input type="radio" name="feedback-rating" value="3" id="fr3"><label for="fr3">{{ '★' }}</label>
+          <input type="radio" name="feedback-rating" value="2" id="fr2"><label for="fr2">{{ '★' }}</label>
+          <input type="radio" name="feedback-rating" value="1" id="fr1" checked><label for="fr1">{{ '★' }}</label>
         </fieldset>
         <div class="field">
-          <label for="feedback-positive">{{ t('feedback.positive') }}</label>
+          <label for="feedback-positive">{{ 'What did you like about the app?' }}</label>
           <textarea id="feedback-positive" rows="4" style="width:100%"></textarea>
         </div>
         <div class="field">
-          <label for="feedback-negative">{{ t('feedback.negative') }}</label>
+          <label for="feedback-negative">{{ 'What would you improve?' }}</label>
           <textarea id="feedback-negative" rows="4" style="width:100%"></textarea>
         </div>
         <button id="btn-feedback-send" class="btn" type="button">{{ t('output.answer_send') }}</button>
