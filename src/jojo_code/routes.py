@@ -2822,8 +2822,14 @@ def auth_start_api(provider):
     session['oauth_verifier'] = verifier
     session['oauth_next'] = _safe_next(request.args.get('next'))
 
-    scheme = 'https' if on_public_web() else 'http'
-    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme=scheme)
+    if on_public_web():
+        base = os.environ.get('PUBLIC_BASE_URL', '').rstrip('/')
+        if not base:
+            host = request.headers.get('X-Forwarded-Host') or request.headers.get('Host') or request.host
+            base = 'https://' + host
+        redirect_uri = base + '/api/auth/' + provider + '/callback'
+    else:
+        redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme='http')
     return redirect(oauth.authorization_url(provider, redirect_uri, state, verifier))
 
 
@@ -2847,8 +2853,14 @@ def auth_callback_api(provider):
     if not code or not verifier:
         return redirect('/?auth_error=missing_code')
 
-    scheme = 'https' if on_public_web() else 'http'
-    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme=scheme)
+    if on_public_web():
+        base = os.environ.get('PUBLIC_BASE_URL', '').rstrip('/')
+        if not base:
+            host = request.headers.get('X-Forwarded-Host') or request.headers.get('Host') or request.host
+            base = 'https://' + host
+        redirect_uri = base + '/api/auth/' + provider + '/callback'
+    else:
+        redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme='http')
     tokens, token_error = oauth.exchange_code(provider, code, redirect_uri, verifier)
     if token_error is not None or not tokens or 'access_token' not in tokens:
         return redirect('/?auth_error=token_exchange_failed')
