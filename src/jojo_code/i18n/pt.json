@@ -443,5 +443,10 @@
   "feedback.title": "Feedback",
   "feedback.message": "Message",
   "pane.cleanup": "Clean up",
-  "cleanup.done": "Added a space after # in comments."
+  "cleanup.done": "Added a space after # in comments.",
+  "feedback.name": "Name",
+  "feedback.email": "Email",
+  "feedback.rating": "Rating",
+  "feedback.positive": "Positive",
+  "feedback.negative": "Negative"
 }

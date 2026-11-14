@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Feedback</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; line-height: 1.5; }
+    .entry { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+    .meta { color: #555; font-size: 0.9rem; }
+    .stars { color: #b38e00; }
+  </style>
+</head>
+<body>
+  <h1>Feedback</h1>
+  <p><a href="/">Back to app</a></p>
+  {% if items %}
+    {% for item in items %}
+      <div class="entry">
+        <div class="meta">
+          {{ item.name }} |
+          {% if item.email %}{{ item.email }} |{% endif %}
+          {{ item.ts|round(0)|int }} |
+          <span class="stars">{% for i in range(item.rating) %}★{% endfor %}</span>
+        </div>
+        {% if item.positive %}<p><strong>Positive:</strong> {{ item.positive }}</p>{% endif %}
+        {% if item.negative %}<p><strong>Negative:</strong> {{ item.negative }}</p>{% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No feedback yet.</p>
+  {% endif %}
+</body>
+</html>

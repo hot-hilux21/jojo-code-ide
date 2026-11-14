@@ -37,6 +37,15 @@ PROVIDERS = {
         "profile_url": "https://graph.microsoft.com/v1.0/me",
         "scope": "openid email profile User.Read",
     },
+    "github": {
+        "name": "GitHub",
+        "client_id_env": "GITHUB_CLIENT_ID",
+        "client_secret_env": "GITHUB_CLIENT_SECRET",
+        "authorize_url": "https://github.com/login/oauth/authorize",
+        "token_url": "https://github.com/login/oauth/access_token",
+        "profile_url": "https://api.github.com/user",
+        "scope": "read:user user:email",
+    },
 }
 
 
@@ -170,6 +179,14 @@ def fetch_profile(provider, access_token):
             "email": data.get("email", ""),
             "name": data.get("name", "") or data.get("email", ""),
             "subject": data.get("sub", ""),
+            "login": data.get("email", ""),
+        }, None
+    if provider == "github":
+        return {
+            "email": data.get("email", "") or "",
+            "name": data.get("name", "") or data.get("login", ""),
+            "subject": str(data.get("id", "")),
+            "login": data.get("login", ""),
         }, None
     # Microsoft Graph
     email = data.get("mail") or data.get("userPrincipalName", "")
@@ -177,6 +194,7 @@ def fetch_profile(provider, access_token):
         "email": email,
         "name": data.get("displayName", "") or email,
         "subject": data.get("id", ""),
+        "login": email,
     }, None
 
 

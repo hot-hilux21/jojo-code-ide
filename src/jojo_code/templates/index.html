@@ -1323,8 +1323,28 @@
       </header>
       <div class="settings-body">
         <div class="field">
-          <label for="feedback-text">{{ t('feedback.message') }}</label>
-          <textarea id="feedback-text" rows="6" style="width:100%"></textarea>
+          <label for="feedback-name">{{ t('feedback.name') }}</label>
+          <input id="feedback-name" type="text" style="width:100%">
+        </div>
+        <div class="field">
+          <label for="feedback-email">{{ t('feedback.email') }}</label>
+          <input id="feedback-email" type="email" style="width:100%">
+        </div>
+        <fieldset class="field">
+          <legend>{{ t('feedback.rating') }}</legend>
+          <label><input type="radio" name="feedback-rating" value="1"> {{ 1 }}</label>
+          <label><input type="radio" name="feedback-rating" value="2"> {{ 2 }}</label>
+          <label><input type="radio" name="feedback-rating" value="3"> {{ 3 }}</label>
+          <label><input type="radio" name="feedback-rating" value="4"> {{ 4 }}</label>
+          <label><input type="radio" name="feedback-rating" value="5" checked> {{ 5 }}</label>
+        </fieldset>
+        <div class="field">
+          <label for="feedback-positive">{{ t('feedback.positive') }}</label>
+          <textarea id="feedback-positive" rows="4" style="width:100%"></textarea>
+        </div>
+        <div class="field">
+          <label for="feedback-negative">{{ t('feedback.negative') }}</label>
+          <textarea id="feedback-negative" rows="4" style="width:100%"></textarea>
         </div>
         <button id="btn-feedback-send" class="btn" type="button">{{ t('output.answer_send') }}</button>
         <p id="feedback-status" aria-live="polite"></p>

@@ -174,7 +174,10 @@
   var btnFeedbackClose = document.getElementById('btn-feedback-close');
   var btnFeedbackSend = document.getElementById('btn-feedback-send');
   var feedbackDialog = document.getElementById('feedback-dialog');
-  var feedbackText = document.getElementById('feedback-text');
+  var feedbackName = document.getElementById('feedback-name');
+  var feedbackEmail = document.getElementById('feedback-email');
+  var feedbackPositive = document.getElementById('feedback-positive');
+  var feedbackNegative = document.getElementById('feedback-negative');
   var feedbackStatus = document.getElementById('feedback-status');
   var feedbackOpener = null;
   var glossarySearch = document.getElementById('glossary-search');
@@ -1582,17 +1585,28 @@
   if (btnFeedbackSend) {
     btnFeedbackSend.addEventListener('click', function (event) {
       event.preventDefault();
-      var text = feedbackText ? feedbackText.value.trim() : '';
-      if (!text) return;
+      var ratingEl = document.querySelector('input[name="feedback-rating"]:checked');
+      var rating = ratingEl ? parseInt(ratingEl.value, 10) : 0;
+      var payload = {
+        name: feedbackName ? feedbackName.value.trim() : '',
+        email: feedbackEmail ? feedbackEmail.value.trim() : '',
+        rating: rating,
+        positive: feedbackPositive ? feedbackPositive.value.trim() : '',
+        negative: feedbackNegative ? feedbackNegative.value.trim() : '',
+      };
+      if (!payload.positive && !payload.negative) return;
       fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify(payload),
       }).then(function (response) {
         if (feedbackStatus) {
           feedbackStatus.textContent = response.ok ? t('settings.saved') : t('settings.save_failed');
         }
-        if (response.ok && feedbackText) feedbackText.value = '';
+        if (response.ok) {
+          if (feedbackPositive) feedbackPositive.value = '';
+          if (feedbackNegative) feedbackNegative.value = '';
+        }
       }).catch(function () {
         if (feedbackStatus) feedbackStatus.textContent = t('settings.save_failed');
       });
@@ -5491,7 +5505,7 @@
           bar.appendChild(title);
           bar.appendChild(controls);
           var help = document.createElement('div');
-          help.textContent = 'Controls: arrows move, Ctrl fire, Space open doors, Shift run, Alt strafe, 1-7 weapons, Esc menu.';
+          help.textContent = 'Controls: arrows move, Ctrl fire, Space open doors, Shift run, Alt strafe, 1-7 weapons, Esc menu';
           help.style.background = '#1a1a1a';
           help.style.color = '#ccc';
           help.style.fontSize = '12px';

@@ -2713,6 +2713,46 @@ def profile_apply_api():
     return jsonify({'success': True, 'config': config})
 
 
+def is_admin():
+    """True only for the configured GitHub admin account."""
+    from flask import session
+    allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
+    if not allowed:
+        return False
+    try:
+        return session.get('admin_github') == allowed
+    except RuntimeError:
+        return False
+
+
+@main_bp.route('/admin')
+def admin_panel():
+    from flask import session, redirect
+    allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
+    if allowed and not is_admin():
+        return redirect('/api/auth/github/start?next=/admin')
+    if allowed and not os.environ.get('GITHUB_CLIENT_ID'):
+        return "GitHub OAuth not configured", 503
+
+    path = CONFIG_DIR / 'feedback.jsonl'
+    items = []
+    if path.exists():
+        try:
+            with open(path, 'r', encoding='utf-8') as handle:
+                for line in handle:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        items.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+        except OSError:
+            pass
+    items = list(reversed(items))[:200]
+    return render_template('admin.html', items=items)
+
+
 @main_bp.route('/api/auth/status', methods=['GET'])
 def auth_status_api():
     """Which providers can be used and who is connected."""
@@ -2754,6 +2794,7 @@ def auth_callback_api(provider):
     """Handle the provider's redirect back here."""
     from flask import session, url_for, redirect
 
+    from flask import session
     error = request.args.get('error')
     if error:
         return redirect('/?auth_error=' + urllib.parse.quote(error))
@@ -2781,13 +2822,25 @@ def auth_callback_api(provider):
         'provider': provider,
         'email': profile.get('email', ''),
         'name': profile.get('name', ''),
+        'login': profile.get('login', ''),
         'subject': profile.get('subject', ''),
         'connected_at': int(time.time()),
         'access_token': tokens.get('access_token', ''),
         'refresh_token': tokens.get('refresh_token', ''),
         'expires_at': int(time.time()) + int(tokens.get('expires_in', 3600)),
     }
+
+    # GitHub is used as the admin gate. Only the configured account gets in;
+    # anyone else is turned away before a token is even stored.
+    if provider == 'github':
+        allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
+        if allowed and profile.get('login', '') != allowed:
+            return redirect('/?auth_error=not_admin')
+
     oauth.save_account(account)
+
+    if provider == 'github':
+        session['admin_github'] = profile.get('login', '')
 
     next_path = session.pop('oauth_next', '/') or '/'
     return redirect(next_path)
@@ -2841,15 +2894,33 @@ def feedback_api():
     data = request.get_json(silent=True) or {}
     if not access_code_ok(data):
         return jsonify({'success': False, 'error': 'access required'}), 403
-    message = data.get('message')
-    if not isinstance(message, str) or not message.strip():
+
+    name = str(data.get('name') or '').strip()[:100]
+    email = str(data.get('email') or '').strip()[:200]
+    positive = str(data.get('positive') or '').strip()[:4000]
+    negative = str(data.get('negative') or '').strip()[:4000]
+    try:
+        rating = int(data.get('rating', 0))
+    except (TypeError, ValueError):
+        rating = 0
+    if rating < 1 or rating > 5:
+        rating = 0
+
+    if not (positive or negative):
         return jsonify({'success': False, 'error': 'message required'}), 400
-    if len(message) > 4000:
-        return jsonify({'success': False, 'error': 'message too long'}), 400
+
+    entry = {
+        'ts': time.time(),
+        'name': name or 'Anonymous',
+        'email': email,
+        'rating': rating,
+        'positive': positive,
+        'negative': negative,
+    }
     try:
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         with open(CONFIG_DIR / 'feedback.jsonl', 'a', encoding='utf-8') as handle:
-            handle.write(json.dumps({'ts': time.time(), 'message': message}) + '\n')
+            handle.write(json.dumps(entry) + '\n')
     except Exception:
         return jsonify({'success': False, 'error': 'could not save feedback'}), 500
     return jsonify({'success': True})
@@ -2864,8 +2935,13 @@ def feedback_list_api():
     Protected by the same access code as everything else on the hosted copy,
     so a visitor cannot browse other readers' messages.
     """
-    if not access_code_ok(request.args.to_dict()):
-        return jsonify({'success': False, 'error': 'access required'}), 403
+    allowed_admin = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
+    if allowed_admin:
+        if not is_admin():
+            return jsonify({'success': False, 'error': 'admin required'}), 403
+    else:
+        if not access_code_ok(request.args.to_dict()):
+            return jsonify({'success': False, 'error': 'access required'}), 403
 
     path = CONFIG_DIR / 'feedback.jsonl'
     items = []
