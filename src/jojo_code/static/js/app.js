@@ -1613,6 +1613,12 @@
     });
   }
 
+  var signOutBtn = document.getElementById('sign-out-btn');
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', function () {
+      fetch('/api/auth/disconnect', { method: 'POST' }).then(function () { window.location.reload(); });
+    });
+  }
   var cloudPush = document.getElementById('cloud-push');
   var cloudPull = document.getElementById('cloud-pull');
   var cloudStatus = document.getElementById('cloud-status');
