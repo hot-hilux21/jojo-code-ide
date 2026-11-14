@@ -2726,21 +2726,10 @@ def is_admin():
 
 
 def admin_authorized():
-    """Access gate for the maintainer's dashboard."""
-    from flask import session
-    from . import users
-    # Admin by email account
-    email = session.get('user_email')
-    if email and users.is_admin_email(email):
-        return True
-    # Access code gate
+    """Access-code gate for the maintainer's dashboard."""
     if not ACCESS_CODE:
-        # If no access code configured, still allow GitHub admin
-        from . import oauth
-        allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
-        if allowed and session.get('admin_github') == allowed:
-            return True
-        return False
+        return True
+    from flask import session
     if session.get('admin_access'):
         return True
     given = request.args.get('code', '')

@@ -9,49 +9,20 @@
     .box { background: var(--panel, #1a1a1a); border: 1px solid var(--panel-border, #333); border-radius: var(--radius-sm, 8px); padding: 2rem; width: 360px; }
     .field { margin-bottom: 1rem; }
     input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
-    .sep { margin: 1.5rem 0; border-top: 1px solid var(--panel-border, #333); }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>Admin</h1>
     {% if error %}<p style="color:#ff6b6b">{{ error }}</p>{% endif %}
-    <form id="admin-email-form">
-      <div class="field">
-        <label for="admin-email">Email</label>
-        <input id="admin-email" type="email" autocomplete="username">
-      </div>
-      <div class="field">
-        <label for="admin-password">Password</label>
-        <input id="admin-password" type="password" autocomplete="current-password">
-      </div>
-      <button class="btn" type="button" id="admin-email-submit">Log in with email</button>
-    </form>
-    <div class="sep"></div>
     <form method="post" action="/admin">
       <div class="field">
         <label for="code">Access code</label>
         <input id="code" name="code" type="password" autocomplete="off">
       </div>
-      <button class="btn" type="submit">Log in with code</button>
+      <button class="btn" type="submit">Log in</button>
     </form>
     <p><a href="/">Back to app</a></p>
   </div>
-  <script>
-    document.getElementById('admin-email-submit').addEventListener('click', async function () {
-      const email = document.getElementById('admin-email').value;
-      const password = document.getElementById('admin-password').value;
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password }),
-      });
-      if (res.ok) {
-        window.location.href = '/admin';
-      } else {
-        alert('Login failed');
-      }
-    });
-  </script>
 </body>
 </html>
