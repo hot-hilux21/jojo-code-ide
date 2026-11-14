@@ -26,7 +26,7 @@ PROVIDERS = {
         "authorize_url": "https://accounts.google.com/o/oauth2/v2/auth",
         "token_url": "https://oauth2.googleapis.com/token",
         "profile_url": "https://openidconnect.googleapis.com/v1/userinfo",
-        "scope": "openid email profile",
+        "scope": "openid email profile https://www.googleapis.com/auth/drive.appdata",
     },
     "microsoft": {
         "name": "Microsoft",

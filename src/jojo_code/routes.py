@@ -24,6 +24,7 @@ from .shell import ShellError, ShellTimeout
 from .shell import registry as shell_registry
 from .utils import colour
 from . import oauth
+from . import cloud
 main_bp = Blueprint('main', __name__)
 
 # A run is allowed to print this much before it is cut off. Enough for any
@@ -2922,6 +2923,40 @@ def _safe_next(value):
     if not isinstance(value, str) or not value.startswith('/') or value.startswith('//'):
         return '/'
     return value
+
+
+@main_bp.route('/api/cloud/status', methods=['GET'])
+def cloud_status_api():
+    return jsonify(cloud.status())
+
+
+@main_bp.route('/api/cloud/push', methods=['POST'])
+def cloud_push_api():
+    data = request.get_json(silent=True) or {}
+    if not access_code_ok(data):
+        return jsonify({'success': False, 'error': 'access required'}), 403
+    from . import oauth
+    account = oauth.load_account()
+    if not account or account.get('provider') != 'google':
+        return jsonify({'success': False, 'error': 'google not connected'}), 400
+    ok, msg = cloud.push(load_config())
+    return jsonify({'success': ok, 'message': msg})
+
+
+@main_bp.route('/api/cloud/pull', methods=['POST'])
+def cloud_pull_api():
+    data = request.get_json(silent=True) or {}
+    if not access_code_ok(data):
+        return jsonify({'success': False, 'error': 'access required'}), 403
+    pulled, err = cloud.pull()
+    if err:
+        return jsonify({'success': False, 'error': err}), 400
+    if not isinstance(pulled, dict):
+        return jsonify({'success': False, 'error': 'bad data'}), 400
+    config = load_config()
+    config.update(pulled)
+    save_config(config)
+    return jsonify({'success': True, 'config': config})
 
 
 @main_bp.route('/api/analytics', methods=['GET'])

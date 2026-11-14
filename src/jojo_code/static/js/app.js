@@ -1613,6 +1613,29 @@
     });
   }
 
+  var cloudPush = document.getElementById('cloud-push');
+  var cloudPull = document.getElementById('cloud-pull');
+  var cloudStatus = document.getElementById('cloud-status');
+  function cloudCall(url) {
+    if (cloudStatus) cloudStatus.textContent = '...';
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ access_code: accessCode }),
+    }).then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (cloudStatus) cloudStatus.textContent = d.success ? 'Done.' : (d.error || d.message || 'Failed.');
+        if (d.success && d.config) {
+          // Reload to apply pulled settings.
+          window.location.reload();
+        }
+      }).catch(function () {
+        if (cloudStatus) cloudStatus.textContent = t('settings.save_failed');
+      });
+  }
+  if (cloudPush) cloudPush.addEventListener('click', function () { cloudCall('/api/cloud/push'); });
+  if (cloudPull) cloudPull.addEventListener('click', function () { cloudCall('/api/cloud/pull'); });
+
   if (settingsDialog) {
     settingsDialog.addEventListener('click', function (event) {
       if (event.target === settingsDialog) closeSettings();

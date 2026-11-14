@@ -1257,6 +1257,12 @@
             <a class="btn btn-small" href="/api/auth/microsoft/start">{{ 'Microsoft' }}</a>
             <a class="btn btn-small" href="/api/auth/github/start">{{ 'GitHub' }}</a>
           </p>
+          <div class="field">
+            <p class="settings-hint">{{ 'Experimental: sync settings to Google Drive (app data).' }}</p>
+            <button id="cloud-push" class="btn btn-small" type="button">{{ 'Push to cloud' }}</button>
+            <button id="cloud-pull" class="btn btn-small" type="button">{{ 'Pull from cloud' }}</button>
+            <p id="cloud-status" aria-live="polite"></p>
+          </div>
         </fieldset>
 
         <fieldset class="settings-group" id="group-reset">
