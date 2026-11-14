@@ -2946,9 +2946,6 @@ def cloud_status_api():
 
 @main_bp.route('/api/cloud/push', methods=['POST'])
 def cloud_push_api():
-    data = request.get_json(silent=True) or {}
-    if not access_code_ok(data):
-        return jsonify({'success': False, 'error': 'access required'}), 403
     from . import oauth
     account = oauth.load_account()
     if not account or account.get('provider') != 'google':
@@ -2959,9 +2956,6 @@ def cloud_push_api():
 
 @main_bp.route('/api/cloud/pull', methods=['POST'])
 def cloud_pull_api():
-    data = request.get_json(silent=True) or {}
-    if not access_code_ok(data):
-        return jsonify({'success': False, 'error': 'access required'}), 403
     pulled, err = cloud.pull()
     if err:
         return jsonify({'success': False, 'error': err}), 400
