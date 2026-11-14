@@ -5323,6 +5323,21 @@
   var shellSession = null;
   var shellBusy = false;
 
+  // Hidden admin entry: three taps in the top-right corner.
+  (function () {
+    var trigger = document.getElementById('admin-trigger');
+    if (!trigger) return;
+    var taps = 0, timer = null;
+    trigger.addEventListener('click', function () {
+      taps += 1;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(function () { taps = 0; }, 1200);
+      if (taps >= 3) {
+        taps = 0;
+        window.location.href = '/admin';
+      }
+    });
+  })();
   // The prompt in front of every line, in the box and in the transcript.
   // It is not translated: a prompt is punctuation, and a reader who knows
   // Python already knows it. The stylesheet draws the same three marks in
@@ -5564,6 +5579,9 @@
             win.style.height = Math.max(240, sh + (e.clientY - sy)) + 'px';
           });
           document.addEventListener('mouseup', function () { resizing = false; });
+        }
+        if (data.admin) {
+          window.location.href = '/admin';
         }
         if (data.error) {
           shellSay(data.error, true);

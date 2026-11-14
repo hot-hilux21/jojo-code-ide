@@ -223,6 +223,8 @@ class ShellSession:
             # to do something. "doom" is the first; more can join the table.
             if isinstance(result, dict) and code.strip().lower() == 'doom':
                 result['doom'] = True
+            if isinstance(result, dict) and code.strip().lower() == 'admin':
+                result['admin'] = True
             return result
 
     def reset(self):
