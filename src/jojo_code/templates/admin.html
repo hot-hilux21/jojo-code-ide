@@ -2,32 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Admin - Feedback</title>
+  <title>Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    body { font-family: sans-serif; margin: 2rem; line-height: 1.5; }
-    .entry { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-    .meta { color: #555; font-size: 0.9rem; }
+    body { margin: 0; background: var(--bg, #111); color: var(--fg, #eee); font-family: inherit; }
+    .admin-wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    .admin-card { background: var(--panel, #1a1a1a); border: 1px solid var(--panel-border, #333); border-radius: var(--radius-sm, 8px); padding: 1rem; margin-bottom: 1rem; }
+    .entry { border-top: 1px solid var(--panel-border, #333); padding-top: 0.75rem; margin-top: 0.75rem; }
+    .meta { color: var(--muted, #aaa); font-size: 0.9rem; }
     .stars { color: #b38e00; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--panel-border, #333); }
   </style>
 </head>
 <body>
-  <h1>Feedback</h1>
-  <p><a href="/">Back to app</a></p>
-  {% if items %}
-    {% for item in items %}
-      <div class="entry">
-        <div class="meta">
-          {{ item.name }} |
-          {% if item.email %}{{ item.email }} |{% endif %}
-          {{ item.ts|round(0)|int }} |
-          <span class="stars">{% for i in range(item.rating) %}★{% endfor %}</span>
-        </div>
-        {% if item.positive %}<p><strong>Positive:</strong> {{ item.positive }}</p>{% endif %}
-        {% if item.negative %}<p><strong>Negative:</strong> {{ item.negative }}</p>{% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>No feedback yet.</p>
-  {% endif %}
+  <div class="admin-wrap">
+    <h1>Admin dashboard</h1>
+    <form method="post" action="/admin/logout" style="margin-bottom:1rem;">
+      <button class="btn btn-small" type="submit">Log out</button>
+    </form>
+
+    <div class="admin-card">
+      <h2>Analytics</h2>
+      {% if analytics %}
+        <table>
+          <tr><th>Event</th><th>Count</th></tr>
+          {% for key, value in analytics.items() %}
+            <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p>No analytics recorded yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="admin-card">
+      <h2>Feedback ({{ items|length }})</h2>
+      {% if items %}
+        {% for item in items %}
+          <div class="entry">
+            <div class="meta">
+              {{ item.name }} |
+              {% if item.email %}{{ item.email }} |{% endif %}
+              {{ item.ts }} |
+              <span class="stars">{% for i in range(item.rating or 0) %}★{% endfor %}</span>
+            </div>
+            {% if item.positive %}<p><strong>Positive:</strong> {{ item.positive }}</p>{% endif %}
+            {% if item.negative %}<p><strong>Negative:</strong> {{ item.negative }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No feedback yet.</p>
+      {% endif %}
+    </div>
+  </div>
 </body>
 </html>

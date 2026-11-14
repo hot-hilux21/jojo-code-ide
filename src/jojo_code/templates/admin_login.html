@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body { margin: 0; background: var(--bg, #111); color: var(--fg, #eee); font-family: inherit; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .box { background: var(--panel, #1a1a1a); border: 1px solid var(--panel-border, #333); border-radius: var(--radius-sm, 8px); padding: 2rem; width: 320px; }
+    .field { margin-bottom: 1rem; }
+    input { width: 100%; padding: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Admin</h1>
+    {% if error %}<p style="color:#ff6b6b">{{ error }}</p>{% endif %}
+    <form method="post" action="/admin">
+      <div class="field">
+        <label for="code">Access code</label>
+        <input id="code" name="code" type="password" autocomplete="off">
+      </div>
+      <button class="btn" type="submit">Log in</button>
+    </form>
+    <p><a href="/">Back to app</a></p>
+  </div>
+</body>
+</html>

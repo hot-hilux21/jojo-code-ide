@@ -1790,7 +1790,7 @@ body[data-contrast="high"][data-theme="pastel"] {
    The search box in the dictionary is in this list for the same reason. It
    is the same defect, and a search box whose text cannot be seen is a
    dictionary that cannot be searched. */
-.field :where(input[type="text"], input[type="search"], input[type="email"], textarea) {
+.field :where(input[type="text"], input[type="search"]) {
   font-family: inherit;
   font-size: 1em;
   min-height: 44px;
@@ -1801,11 +1801,32 @@ body[data-contrast="high"][data-theme="pastel"] {
   border-radius: var(--radius-sm);
 }
 
-.field :where(input[type="text"], input[type="search"], input[type="email"], textarea):hover {
+.field :where(input[type="email"], textarea) {
+  font-family: inherit;
+  font-size: 1em;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  color: var(--fg);
+  border: 2px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+}
+
+.field :where(input[type="text"], input[type="search"]):hover {
   border-color: var(--accent);
 }
 
-.field :where(input[type="text"], input[type="search"], input[type="email"], textarea):focus-visible {
+.field :where(input[type="text"], input[type="search"]):focus-visible {
+  border-color: var(--accent);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.field :where(input[type="email"], textarea):hover {
+  border-color: var(--accent);
+}
+
+.field :where(input[type="email"], textarea):focus-visible {
   border-color: var(--accent);
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;

@@ -2726,15 +2726,35 @@ def is_admin():
         return False
 
 
-@main_bp.route('/admin')
+def admin_authorized():
+    """Access-code gate for the maintainer's dashboard."""
+    if not ACCESS_CODE:
+        return True
+    from flask import session
+    if session.get('admin_access'):
+        return True
+    given = request.args.get('code', '')
+    if isinstance(given, str) and given and hmac.compare_digest(
+            given.encode('utf-8'), ACCESS_CODE.encode('utf-8')):
+        session['admin_access'] = True
+        return True
+    return False
+
+
+@main_bp.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     from flask import session, redirect
-    allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
-    if allowed and not is_admin():
-        return redirect('/api/auth/github/start?next=/admin')
-    if allowed and not os.environ.get('GITHUB_CLIENT_ID'):
-        return "GitHub OAuth not configured", 503
+    if request.method == 'POST':
+        code = (request.form.get('code') or '').strip()
+        if ACCESS_CODE and hmac.compare_digest(code.encode('utf-8'), ACCESS_CODE.encode('utf-8')):
+            session['admin_access'] = True
+            return redirect('/admin')
+        return render_template('admin_login.html', error='Wrong code.')
 
+    if not admin_authorized():
+        return render_template('admin_login.html', error=None)
+
+    # Feedback
     path = CONFIG_DIR / 'feedback.jsonl'
     items = []
     if path.exists():
@@ -2751,8 +2771,24 @@ def admin_panel():
         except OSError:
             pass
     items = list(reversed(items))[:200]
-    return render_template('admin.html', items=items)
 
+    # Analytics
+    analytics = {}
+    apath = CONFIG_DIR / 'analytics.json'
+    if apath.exists():
+        try:
+            analytics = json.loads(apath.read_text(encoding='utf-8'))
+        except Exception:
+            analytics = {}
+
+    return render_template('admin.html', items=items, analytics=analytics)
+
+
+@main_bp.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    from flask import session
+    session.pop('admin_access', None)
+    return redirect('/admin')
 
 @main_bp.route('/api/auth/status', methods=['GET'])
 def auth_status_api():
@@ -2936,13 +2972,8 @@ def feedback_list_api():
     Protected by the same access code as everything else on the hosted copy,
     so a visitor cannot browse other readers' messages.
     """
-    allowed_admin = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
-    if allowed_admin:
-        if not is_admin():
-            return jsonify({'success': False, 'error': 'admin required'}), 403
-    else:
-        if not access_code_ok(request.args.to_dict()):
-            return jsonify({'success': False, 'error': 'access required'}), 403
+    if not admin_authorized():
+        return jsonify({'success': False, 'error': 'admin required'}), 403
 
     path = CONFIG_DIR / 'feedback.jsonl'
     items = []
