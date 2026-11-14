@@ -2726,10 +2726,21 @@ def is_admin():
 
 
 def admin_authorized():
-    """Access-code gate for the maintainer's dashboard."""
-    if not ACCESS_CODE:
-        return True
+    """Access gate for the maintainer's dashboard."""
     from flask import session
+    from . import users
+    # Admin by email account
+    email = session.get('user_email')
+    if email and users.is_admin_email(email):
+        return True
+    # Access code gate
+    if not ACCESS_CODE:
+        # If no access code configured, still allow GitHub admin
+        from . import oauth
+        allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
+        if allowed and session.get('admin_github') == allowed:
+            return True
+        return False
     if session.get('admin_access'):
         return True
     given = request.args.get('code', '')
@@ -2885,8 +2896,37 @@ def auth_callback_api(provider):
 @main_bp.route('/api/auth/disconnect', methods=['POST'])
 def auth_disconnect_api():
     oauth.clear_account()
+    from flask import session
+    session.pop('user_email', None)
+    session.pop('admin_access', None)
     return jsonify({'success': True})
 
+
+@main_bp.route('/api/auth/register', methods=['POST'])
+def auth_register_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    email = data.get('email', '')
+    password = data.get('password', '')
+    ok, reason = users.register(email, password)
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    from flask import session
+    session['user_email'] = (email or '').strip().lower()
+    return jsonify({'success': True, 'email': session['user_email']})
+
+
+@main_bp.route('/api/auth/login', methods=['POST'])
+def auth_login_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    email = data.get('email', '')
+    password = data.get('password', '')
+    if not users.verify(email, password):
+        return jsonify({'success': False, 'error': 'invalid credentials'}), 403
+    from flask import session
+    session['user_email'] = (email or '').strip().lower()
+    return jsonify({'success': True, 'email': session['user_email']})
 
 def _safe_next(value):
     """Only allow a local path as the post-login destination."""
