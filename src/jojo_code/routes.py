@@ -2822,7 +2822,8 @@ def auth_start_api(provider):
     session['oauth_verifier'] = verifier
     session['oauth_next'] = _safe_next(request.args.get('next'))
 
-    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True)
+    scheme = 'https' if on_public_web() else 'http'
+    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme=scheme)
     return redirect(oauth.authorization_url(provider, redirect_uri, state, verifier))
 
 
@@ -2846,7 +2847,8 @@ def auth_callback_api(provider):
     if not code or not verifier:
         return redirect('/?auth_error=missing_code')
 
-    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True)
+    scheme = 'https' if on_public_web() else 'http'
+    redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme=scheme)
     tokens, token_error = oauth.exchange_code(provider, code, redirect_uri, verifier)
     if token_error is not None or not tokens or 'access_token' not in tokens:
         return redirect('/?auth_error=token_exchange_failed')
