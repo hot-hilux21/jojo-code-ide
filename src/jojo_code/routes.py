@@ -1,7 +1,7 @@
 """
 Main routes for Jojo Code.
 """
-from flask import Blueprint, render_template, request, jsonify, make_response, redirect, send_from_directory, has_request_context
+from flask import Blueprint, render_template, request, jsonify, make_response, redirect, session, send_from_directory, has_request_context
 import urllib.parse
 import hmac
 import subprocess
@@ -1682,7 +1682,8 @@ def index():
                           stop_keys=STOP_KEYS,
                           t=i18n.make_translator(locale),
                           hosted=on_public_web(),
-                          account=oauth.public_account())
+                          account=oauth.public_account(),
+                          current_user=session.get('user_email'))
 
 def _runner_env():
     """The environment for a one-shot run, with the packages folder added.
@@ -2999,6 +3000,29 @@ def privacy_page():
 @main_bp.route('/terms')
 def terms_page():
     return render_template('terms.html')
+
+
+@main_bp.route('/api/auth/me', methods=['GET'])
+def auth_me_api():
+    from flask import session
+    return jsonify({'email': session.get('user_email')})
+
+
+@main_bp.route('/api/user/code', methods=['GET', 'POST'])
+def user_code_api():
+    from flask import session
+    from . import users
+    email = session.get('user_email')
+    if not email:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    if request.method == 'GET':
+        return jsonify({'success': True, 'code': users.load_code(email)})
+    data = request.get_json(silent=True) or {}
+    code = data.get('code', '')
+    if not isinstance(code, str):
+        code = ''
+    users.save_code(email, code)
+    return jsonify({'success': True})
 
 
 @main_bp.route('/api/analytics', methods=['GET'])

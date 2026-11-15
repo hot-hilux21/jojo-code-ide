@@ -77,6 +77,22 @@ def reset_password(email):
     return True, 'ok'
 
 
+def save_code(email, code):
+    email = (email or '').strip().lower()
+    users = load_users()
+    record = users.get(email, {})
+    record['code'] = code or ''
+    users[email] = record
+    save_users(users)
+
+
+def load_code(email):
+    email = (email or '').strip().lower()
+    users = load_users()
+    record = users.get(email, {})
+    return record.get('code', '')
+
+
 def is_admin_email(email):
     import os
     allowed = os.environ.get('ADMIN_EMAIL', '').strip().lower()

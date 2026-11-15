@@ -293,6 +293,28 @@
     } catch (e) {}
   })();
 
+   // Cloud autosave for logged-in users (experimental).
+   (function () {
+     if (!window.CURRENT_USER) return;
+     var timer = null;
+     function pushCode() {
+       fetch('/api/user/code', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ code: editor.getValue() }),
+       }).catch(function () {});
+     }
+     editor.on('change', function () {
+       if (timer) clearTimeout(timer);
+       timer = setTimeout(pushCode, 2000);
+     });
+     fetch('/api/user/code').then(function (r) { return r.json(); }).then(function (d) {
+       if (d && d.success && typeof d.code === 'string' && d.code.trim()) {
+         editor.setValue(d.code);
+       }
+     }).catch(function () {});
+   })();
+
   // ---------- Indentation helpers ----------
   var indentAddBtn = document.getElementById('pane-indent-add');
   var indentFixBtn = document.getElementById('pane-indent-fix');
