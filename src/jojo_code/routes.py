@@ -2938,12 +2938,10 @@ def auth_reset_password_api():
     from . import users
     data = request.get_json(silent=True) or {}
     email = data.get('email', '')
-    answer = data.get('security_answer', '')
-    new_password = data.get('new_password', '')
-    ok, reason = users.reset_password(email, answer, new_password)
+    ok, reason = users.reset_password(email)
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
 
 
 @main_bp.route('/api/auth/login', methods=['POST'])

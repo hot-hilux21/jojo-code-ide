@@ -41,18 +41,17 @@ def save_users(users):
         pass
 
 
-def register(email, password, security_question='', security_answer=''):
+DEFAULT_RESET_PASSWORD = 'jojocode27'
+
+
+def register(email, password):
     email = (email or '').strip().lower()
     if not email or not password:
         return False, 'missing'
     users = load_users()
     if email in users:
         return False, 'exists'
-    users[email] = {
-        'password_hash': generate_password_hash(password),
-        'security_question': (security_question or '').strip(),
-        'security_answer_hash': generate_password_hash((security_answer or '').strip().lower()),
-    }
+    users[email] = {'password_hash': generate_password_hash(password)}
     save_users(users)
     return True, 'ok'
 
@@ -66,26 +65,13 @@ def verify(email, password):
     return check_password_hash(record.get('password_hash', ''), password or '')
 
 
-def get_security_question(email):
-    email = (email or '').strip().lower()
-    users = load_users()
-    record = users.get(email)
-    if not record:
-        return None
-    return record.get('security_question') or None
-
-
-def reset_password(email, security_answer, new_password):
+def reset_password(email):
     email = (email or '').strip().lower()
     users = load_users()
     record = users.get(email)
     if not record:
         return False, 'no_user'
-    if not check_password_hash(record.get('security_answer_hash', ''), (security_answer or '').strip().lower()):
-        return False, 'bad_answer'
-    if not new_password:
-        return False, 'missing'
-    record['password_hash'] = generate_password_hash(new_password)
+    record['password_hash'] = generate_password_hash(DEFAULT_RESET_PASSWORD)
     users[email] = record
     save_users(users)
     return True, 'ok'
