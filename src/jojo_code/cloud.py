@@ -103,7 +103,11 @@ def push(config):
             resp.read()
         return True, 'ok'
     except urllib.error.HTTPError as exc:
-        return False, 'http_' + str(exc.code)
+        try:
+            detail = exc.read().decode('utf-8', errors='replace')[:300]
+        except Exception:
+            detail = ''
+        return False, 'http_' + str(exc.code) + ': ' + detail
     except Exception as exc:
         return False, str(exc)
 
@@ -123,6 +127,10 @@ def pull():
             data = json.loads(resp.read().decode('utf-8'))
         return data, None
     except urllib.error.HTTPError as exc:
-        return None, 'http_' + str(exc.code)
+        try:
+            detail = exc.read().decode('utf-8', errors='replace')[:300]
+        except Exception:
+            detail = ''
+        return None, 'http_' + str(exc.code) + ': ' + detail
     except Exception as exc:
         return None, str(exc)
