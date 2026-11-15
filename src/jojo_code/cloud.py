@@ -76,28 +76,20 @@ def push(config):
     token = _token()
     if not token:
         return False, 'not_connected'
-    file_id = _find_file(token)
+    boundary = 'jojo_boundary_123'
+    meta = json.dumps({'name': FILE_NAME, 'parents': ['appDataFolder']})
     payload = json.dumps(config).encode('utf-8')
-    if file_id:
-        url = ('https://www.googleapis.com/upload/drive/v3/files/'
-               + file_id + '?uploadType=media')
-        req = urllib.request.Request(url, data=payload, method='PATCH')
-    else:
-        boundary = 'jojo_boundary_123'
-        meta = json.dumps({'name': FILE_NAME, 'parents': ['appDataFolder']})
-        body = (
-            '--' + boundary + '\r\n'
-            'Content-Type: application/json; charset=UTF-8\r\n\r\n'
-            + meta + '\r\n'
-            '--' + boundary + '\r\n'
-            'Content-Type: application/json\r\n\r\n'
-        ).encode('utf-8') + payload + ('\r\n--' + boundary + '--').encode('utf-8')
-        url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'
-        req = urllib.request.Request(url, data=body, method='POST')
-        req.add_header('Content-Type', 'multipart/related; boundary=' + boundary)
+    body = (
+        '--' + boundary + '\r\n'
+        'Content-Type: application/json; charset=UTF-8\r\n\r\n'
+        + meta + '\r\n'
+        '--' + boundary + '\r\n'
+        'Content-Type: application/json\r\n\r\n'
+    ).encode('utf-8') + payload + ('\r\n--' + boundary + '--').encode('utf-8')
+    url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'
+    req = urllib.request.Request(url, data=body, method='POST')
+    req.add_header('Content-Type', 'multipart/related; boundary=' + boundary)
     req.add_header('Authorization', 'Bearer ' + token)
-    if 'Content-Type' not in [h[0] for h in req.header_items()]:
-        req.add_header('Content-Type', 'application/json')
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             resp.read()
