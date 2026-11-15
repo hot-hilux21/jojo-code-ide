@@ -9,7 +9,7 @@ import time
 import urllib.error
 import urllib.request
 
-FILE_NAME = 'jojo-code-settings.json'
+FILE_NAME = 'jojo-code-settings-v2.json'
 
 
 def _account():
