@@ -1683,7 +1683,7 @@ def index():
                           t=i18n.make_translator(locale),
                           hosted=on_public_web(),
                           account=oauth.public_account(),
-                          current_user=session.get('user_email'))
+                          current_user=session.get('user_username'))
 
 def _runner_env():
     """The environment for a one-shot run, with the packages folder added.
@@ -2902,7 +2902,7 @@ def auth_callback_api(provider):
 def auth_disconnect_api():
     oauth.clear_account()
     from flask import session
-    session.pop('user_email', None)
+    session.pop('user_username', None)
     session.pop('admin_access', None)
     return jsonify({'success': True})
 
@@ -2911,51 +2911,39 @@ def auth_disconnect_api():
 def auth_register_api():
     from . import users
     data = request.get_json(silent=True) or {}
-    email = data.get('email', '')
+    username = data.get('username', '')
     password = data.get('password', '')
-    question = data.get('security_question', '')
-    answer = data.get('security_answer', '')
-    ok, reason = users.register(email, password, question, answer)
+    ok, reason = users.register(username, password)
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
     from flask import session
-    session['user_email'] = (email or '').strip().lower()
-    return jsonify({'success': True, 'email': session['user_email']})
-
-
-@main_bp.route('/api/auth/security-question', methods=['POST'])
-def auth_security_question_api():
-    from . import users
-    data = request.get_json(silent=True) or {}
-    email = data.get('email', '')
-    q = users.get_security_question(email)
-    if q is None:
-        return jsonify({'success': False, 'error': 'no_user'}), 404
-    return jsonify({'success': True, 'question': q})
-
-
-@main_bp.route('/api/auth/reset-password', methods=['POST'])
-def auth_reset_password_api():
-    from . import users
-    data = request.get_json(silent=True) or {}
-    email = data.get('email', '')
-    ok, reason = users.reset_password(email)
-    if not ok:
-        return jsonify({'success': False, 'error': reason}), 400
-    return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
+    session['user_username'] = (username or '').strip().lower()
+    return jsonify({'success': True, 'username': session['user_username']})
 
 
 @main_bp.route('/api/auth/login', methods=['POST'])
 def auth_login_api():
     from . import users
     data = request.get_json(silent=True) or {}
-    email = data.get('email', '')
+    username = data.get('username', '')
     password = data.get('password', '')
-    if not users.verify(email, password):
+    if not users.verify(username, password):
         return jsonify({'success': False, 'error': 'invalid credentials'}), 403
     from flask import session
-    session['user_email'] = (email or '').strip().lower()
-    return jsonify({'success': True, 'email': session['user_email']})
+    session['user_username'] = (username or '').strip().lower()
+    return jsonify({'success': True, 'username': session['user_username']})
+
+
+@main_bp.route('/api/auth/reset-password', methods=['POST'])
+def auth_reset_password_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    username = data.get('username', '')
+    ok, reason = users.reset_password(username)
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
+
 
 def _safe_next(value):
     """Only allow a local path as the post-login destination."""
@@ -3012,16 +3000,16 @@ def auth_me_api():
 def user_code_api():
     from flask import session
     from . import users
-    email = session.get('user_email')
-    if not email:
+    username = session.get('user_username')
+    if not username:
         return jsonify({'success': False, 'error': 'not logged in'}), 403
     if request.method == 'GET':
-        return jsonify({'success': True, 'code': users.load_code(email)})
+        return jsonify({'success': True, 'code': users.load_code(username)})
     data = request.get_json(silent=True) or {}
     code = data.get('code', '')
     if not isinstance(code, str):
         code = ''
-    users.save_code(email, code)
+    users.save_code(username, code)
     return jsonify({'success': True})
 
 

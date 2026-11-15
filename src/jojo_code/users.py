@@ -44,22 +44,22 @@ def save_users(users):
 DEFAULT_RESET_PASSWORD = 'jojocode27'
 
 
-def register(email, password):
-    email = (email or '').strip().lower()
-    if not email or not password:
+def register(username, password):
+    username = (username or '').strip().lower()
+    if not username or not password:
         return False, 'missing'
     users = load_users()
-    if email in users:
+    if username in users:
         return False, 'exists'
-    users[email] = {'password_hash': generate_password_hash(password)}
+    users[username] = {'password_hash': generate_password_hash(password)}
     save_users(users)
     return True, 'ok'
 
 
-def verify(email, password):
-    email = (email or '').strip().lower()
+def verify(username, password):
+    username = (username or '').strip().lower()
     users = load_users()
-    record = users.get(email)
+    record = users.get(username)
     if not record:
         return False
     return check_password_hash(record.get('password_hash', ''), password or '')
@@ -77,19 +77,19 @@ def reset_password(email):
     return True, 'ok'
 
 
-def save_code(email, code):
-    email = (email or '').strip().lower()
+def save_code(username, code):
+    username = (username or '').strip().lower()
     users = load_users()
-    record = users.get(email, {})
+    record = users.get(username, {})
     record['code'] = code or ''
-    users[email] = record
+    users[username] = record
     save_users(users)
 
 
-def load_code(email):
-    email = (email or '').strip().lower()
+def load_code(username):
+    username = (username or '').strip().lower()
     users = load_users()
-    record = users.get(email, {})
+    record = users.get(username, {})
     return record.get('code', '')
 
 

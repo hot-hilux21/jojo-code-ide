@@ -1641,7 +1641,7 @@
       fetch('/api/auth/disconnect', { method: 'POST' }).then(function () { window.location.reload(); });
     });
   }
-  var acctEmail = document.getElementById('acct-email');
+  var acctUsername = document.getElementById('acct-username');
   var acctPassword = document.getElementById('acct-password');
   var acctQuestion = null;
   var acctAnswer = null;
@@ -1652,7 +1652,7 @@
   }
   var acctLogin = document.getElementById('acct-login');
   if (acctLogin) acctLogin.addEventListener('click', function () {
-    acctPost('/api/auth/login', { email: acctEmail.value, password: acctPassword.value })
+    acctPost('/api/auth/login', { email: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
         if (acctStatus) acctStatus.textContent = r.ok ? 'Logged in.' : (r.data.error || 'Failed.');
         if (r.ok) window.location.reload();
@@ -1660,7 +1660,7 @@
   });
   var acctRegister = document.getElementById('acct-register');
   if (acctRegister) acctRegister.addEventListener('click', function () {
-    acctPost('/api/auth/register', { email: acctEmail.value, password: acctPassword.value })
+    acctPost('/api/auth/register', { email: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
         if (acctStatus) acctStatus.textContent = r.ok ? 'Registered.' : (r.data.error || 'Failed.');
         if (r.ok) window.location.reload();
@@ -1668,7 +1668,7 @@
   });
   var acctReset = document.getElementById('acct-reset');
   if (acctReset) acctReset.addEventListener('click', function () {
-    acctPost('/api/auth/reset-password', { email: acctEmail.value })
+    acctPost('/api/auth/reset-password', { email: acctUsername.value })
       .then(function (r) {
         if (acctStatus) acctStatus.textContent = r.ok ? ('Password reset to ' + (r.data.password || 'default') + '.') : (r.data.error || 'Failed.');
       });
