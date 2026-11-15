@@ -280,6 +280,13 @@
     value: '# Welcome to Jojo Code!\n# Write Python code and press Run (or Ctrl+Enter).\n\nprint("Hello, world!")\n\nfor i in range(3):\n    print("Counting:", i)\n'
   });
   // Autosave: keep the last edited code so a refresh or crash does not lose it.
+  var autosaveEnabled = (function () {
+    try { return localStorage.getItem('jojo_code_autosave_enabled') !== 'off'; } catch (e) { return true; }
+  })();
+  function setAutosaveEnabled(value) {
+    autosaveEnabled = value;
+    try { localStorage.setItem('jojo_code_autosave_enabled', value ? 'on' : 'off'); } catch (e) {}
+  }
   (function () {
     var AUTOSAVE_KEY = 'jojo_code_autosave';
     try {
@@ -295,7 +302,7 @@
 
    // Cloud autosave for logged-in users (experimental).
    (function () {
-     if (!window.CURRENT_USER) return;
+     if (!window.CURRENT_USER || !autosaveEnabled) return;
      var timer = null;
      function pushCode() {
        fetch('/api/user/code', {
@@ -1654,7 +1661,7 @@
   if (acctLogin) acctLogin.addEventListener('click', function () {
     acctPost('/api/auth/login', { username: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? 'Logged in.' : (r.data.error || 'Failed.');
+        if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_logged_in') : (r.data.error || t('account.failed'));
         if (r.ok) window.location.reload();
       });
   });
@@ -1662,15 +1669,16 @@
   if (acctRegister) acctRegister.addEventListener('click', function () {
     acctPost('/api/auth/register', { username: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? 'Registered.' : (r.data.error || 'Failed.');
+        if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_registered') : (r.data.error || t('account.failed'));
         if (r.ok) window.location.reload();
       });
   });
-  var acctReset = document.getElementById('acct-reset');
-  if (acctReset) acctReset.addEventListener('click', function () {
+  var acctForgot = document.getElementById('acct-forgot');
+  if (acctForgot) acctForgot.addEventListener('click', function (e) {
+    e.preventDefault();
     acctPost('/api/auth/reset-password', { username: acctUsername.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? ('Password reset to ' + (r.data.password || 'default') + '.') : (r.data.error || 'Failed.');
+        if (acctStatus) acctStatus.textContent = r.ok ? t('account.password_reset', r.data.password || 'default') : (r.data.error || t('account.failed'));
       });
   });
   var cloudPush = document.getElementById('cloud-push');
@@ -3569,6 +3577,15 @@
   }
 
   btnSave.addEventListener('click', saveFile);
+
+  var btnUndo = document.getElementById('btn-undo');
+  var btnRedo = document.getElementById('btn-redo');
+  var btnAutoSave = document.getElementById('btn-autosave');
+  if (btnUndo) btnUndo.addEventListener('click', function () { if (editor) editor.undo(); });
+  if (btnRedo) btnRedo.addEventListener('click', function () { if (editor) editor.redo(); });
+  if (btnAutoSave) btnAutoSave.addEventListener('click', function () {
+    setAutosaveEnabled(!autosaveEnabled);
+  });
 
   btnOpen.addEventListener('click', openFile);
 
