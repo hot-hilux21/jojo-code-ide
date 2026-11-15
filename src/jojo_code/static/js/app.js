@@ -1705,6 +1705,21 @@
   if (cloudPush) cloudPush.addEventListener('click', function () { cloudCall('/api/cloud/push'); });
   if (cloudPull) cloudPull.addEventListener('click', function () { cloudCall('/api/cloud/pull'); });
 
+  var accountBtn = document.getElementById('account-btn');
+  var accountModal = document.getElementById('account-modal');
+  var accountClose = document.getElementById('account-close');
+  if (accountBtn && accountModal) {
+    accountBtn.addEventListener('click', function () { accountModal.style.display = 'flex'; });
+  }
+  if (accountClose && accountModal) {
+    accountClose.addEventListener('click', function () { accountModal.style.display = 'none'; });
+  }
+  if (accountModal) {
+    accountModal.addEventListener('click', function (e) {
+      if (e.target === accountModal) accountModal.style.display = 'none';
+    });
+  }
+
   if (settingsDialog) {
     settingsDialog.addEventListener('click', function (event) {
       if (event.target === settingsDialog) closeSettings();
