@@ -1771,11 +1771,11 @@
   <script src="{{ url_for('static', filename='js/active-line.js') }}"></script>
   <script src="{{ url_for('static', filename='js/tint.js') }}"></script>
   <p style="text-align:center;font-size:0.85rem;margin:1rem 0;">
-    <a href="/privacy">{{ 'Privacy' }}</a> · <a href="/terms">{{ 'Terms' }}</a>
+    <a href="/privacy" style="color:var(--accent);text-decoration:underline;">{{ 'Privacy' }}</a> · <a href="/terms" style="color:var(--accent);text-decoration:underline;">{{ 'Terms' }}</a>
   </p>
   <script>window.CURRENT_USER = {{ (current_user or '')|tojson }};</script>
   <button id="account-btn" type="button"
-          style="position:fixed;top:8px;right:8px;z-index:9998;" class="btn btn-small">{{ 'LOGIN' }}</button>
+          style="position:fixed;top:8px;right:8px;z-index:9998;" class="btn btn-small">{{ 'login' }}</button>
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1.5rem;border-radius:8px;max-width:420px;width:90%;max-height:90vh;overflow:auto;">
       <h2>{{ 'Account' }}</h2>
@@ -1791,10 +1791,10 @@
         </a>
       </p>
       <details style="margin-top:0.5rem;">
-        <summary>{{ 'Email login (optional)' }}</summary>
+        <summary>{{ 'Username login (optional)' }}</summary>
         <div class="field">
-          <label for="acct-email">{{ 'Email' }}</label>
-          <input id="acct-email" type="email" style="width:100%">
+          <label for="acct-username">{{ 'Username' }}</label>
+          <input id="acct-username" type="text" style="width:100%">
         </div>
         <div class="field">
           <label for="acct-password">{{ 'Password' }}</label>
