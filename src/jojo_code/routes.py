@@ -2912,12 +2912,38 @@ def auth_register_api():
     data = request.get_json(silent=True) or {}
     email = data.get('email', '')
     password = data.get('password', '')
-    ok, reason = users.register(email, password)
+    question = data.get('security_question', '')
+    answer = data.get('security_answer', '')
+    ok, reason = users.register(email, password, question, answer)
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
     from flask import session
     session['user_email'] = (email or '').strip().lower()
     return jsonify({'success': True, 'email': session['user_email']})
+
+
+@main_bp.route('/api/auth/security-question', methods=['POST'])
+def auth_security_question_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    email = data.get('email', '')
+    q = users.get_security_question(email)
+    if q is None:
+        return jsonify({'success': False, 'error': 'no_user'}), 404
+    return jsonify({'success': True, 'question': q})
+
+
+@main_bp.route('/api/auth/reset-password', methods=['POST'])
+def auth_reset_password_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    email = data.get('email', '')
+    answer = data.get('security_answer', '')
+    new_password = data.get('new_password', '')
+    ok, reason = users.reset_password(email, answer, new_password)
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True})
 
 
 @main_bp.route('/api/auth/login', methods=['POST'])

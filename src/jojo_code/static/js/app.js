@@ -1619,6 +1619,38 @@
       fetch('/api/auth/disconnect', { method: 'POST' }).then(function () { window.location.reload(); });
     });
   }
+  var acctEmail = document.getElementById('acct-email');
+  var acctPassword = document.getElementById('acct-password');
+  var acctQuestion = document.getElementById('acct-question');
+  var acctAnswer = document.getElementById('acct-answer');
+  var acctStatus = document.getElementById('acct-status');
+  function acctPost(url, body) {
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
+  }
+  var acctLogin = document.getElementById('acct-login');
+  if (acctLogin) acctLogin.addEventListener('click', function () {
+    acctPost('/api/auth/login', { email: acctEmail.value, password: acctPassword.value })
+      .then(function (r) {
+        if (acctStatus) acctStatus.textContent = r.ok ? 'Logged in.' : (r.data.error || 'Failed.');
+        if (r.ok) window.location.reload();
+      });
+  });
+  var acctRegister = document.getElementById('acct-register');
+  if (acctRegister) acctRegister.addEventListener('click', function () {
+    acctPost('/api/auth/register', { email: acctEmail.value, password: acctPassword.value, security_question: acctQuestion.value, security_answer: acctAnswer.value })
+      .then(function (r) {
+        if (acctStatus) acctStatus.textContent = r.ok ? 'Registered.' : (r.data.error || 'Failed.');
+        if (r.ok) window.location.reload();
+      });
+  });
+  var acctReset = document.getElementById('acct-reset');
+  if (acctReset) acctReset.addEventListener('click', function () {
+    acctPost('/api/auth/reset-password', { email: acctEmail.value, security_answer: acctAnswer.value, new_password: acctPassword.value })
+      .then(function (r) {
+        if (acctStatus) acctStatus.textContent = r.ok ? 'Password reset.' : (r.data.error || 'Failed.');
+      });
+  });
   var cloudPush = document.getElementById('cloud-push');
   var cloudPull = document.getElementById('cloud-pull');
   var cloudStatus = document.getElementById('cloud-status');
