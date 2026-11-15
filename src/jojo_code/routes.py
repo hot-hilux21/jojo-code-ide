@@ -2967,6 +2967,16 @@ def cloud_pull_api():
     return jsonify({'success': True, 'config': config})
 
 
+@main_bp.route('/privacy')
+def privacy_page():
+    return render_template('privacy.html')
+
+
+@main_bp.route('/terms')
+def terms_page():
+    return render_template('terms.html')
+
+
 @main_bp.route('/api/analytics', methods=['GET'])
 def analytics_get_api():
     path = CONFIG_DIR / 'analytics.json'
