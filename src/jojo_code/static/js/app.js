@@ -3197,6 +3197,10 @@
   }
 
   // ---------- Save / Open files ----------
+  function updateLastSaved() {
+    var el = document.getElementById('last-saved-time');
+    if (el) el.textContent = t('nav.last_saved', new Date().toLocaleTimeString());
+  }
   function saveFile() {
     var content = editor.getValue();
     var suggestedName = 'my_code.py';
@@ -3214,6 +3218,7 @@
           savedSnapshot = content;
           outputEl.textContent = t('output.saved');
           errorPanel.hidden = true;
+          updateLastSaved();
         })
         .catch(function (err) {
           if (err.name !== 'AbortError') {
@@ -3234,6 +3239,7 @@
       savedSnapshot = content;
       outputEl.textContent = t('output.downloaded');
       errorPanel.hidden = true;
+      updateLastSaved();
     }
   }
 

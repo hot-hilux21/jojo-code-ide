@@ -177,18 +177,6 @@
                 aria-label="{{ t('nav.open') }}">
           <span class="btn-icon" aria-hidden="true">{{ icon('folder-open') }}</span><span class="btn-label">{{ t('nav.open') }}</span>
         </button>
-        <button id="btn-undo" class="btn btn-toggle" title="{{ t('nav.undo_title') }}"
-                aria-label="{{ t('nav.undo') }}">
-          <span class="btn-icon" aria-hidden="true">{{ icon('rotate-ccw') }}</span><span class="btn-label">{{ t('nav.undo') }}</span>
-        </button>
-        <button id="btn-redo" class="btn btn-toggle" title="{{ t('nav.redo_title') }}"
-                aria-label="{{ t('nav.redo') }}">
-          <span class="btn-icon" aria-hidden="true">{{ icon('rotate-cw') }}</span><span class="btn-label">{{ t('nav.redo') }}</span>
-        </button>
-        <button id="btn-autosave" class="btn btn-toggle" title="{{ t('nav.autosave_title') }}"
-                aria-label="{{ t('nav.autosave') }}">
-          <span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span>
-        </button>
       </div>
 
       <div class="tool-group">
@@ -261,6 +249,13 @@
              title="{{ t('pane.fix_indent') }}">{{ t('pane.fix_indent') }}</button>
       <button type="button" class="btn btn-small pane-indent" id="pane-cleanup"
               title="{{ t('pane.cleanup') }}">{{ t('pane.cleanup') }}</button>
+      <button type="button" class="btn btn-small pane-indent" id="btn-undo"
+              title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}">{{ icon('rotate-ccw') }} {{ t('nav.undo') }}</button>
+      <button type="button" class="btn btn-small pane-indent" id="btn-redo"
+              title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}">{{ icon('rotate-cw') }} {{ t('nav.redo') }}</button>
+      <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
+              title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}">{{ icon('save') }} {{ t('nav.autosave') }}</button>
+      <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
     {% endif %}
     <div class="pane-mini-panel" id="mini-{{ pane }}-panel" role="group"
          aria-label="{{ label }}" hidden>

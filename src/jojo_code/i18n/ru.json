@@ -157,6 +157,8 @@
   "nav.autosave_title": "Сохранить код на сервере",
   "nav.clear": "Clear",
   "nav.clear_title": "Clear all",
+  "nav.last_saved": "Последнее сохранение: {0}",
+  "nav.last_saved_never": "Никогда не сохранялось",
   "nav.open": "Открыть",
   "nav.open_title": "Открыть файл Python",
   "nav.quit": "Выйти из Jojo Code",
