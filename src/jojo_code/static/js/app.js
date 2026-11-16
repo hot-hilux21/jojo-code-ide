@@ -3489,6 +3489,14 @@
       return;
     }
 
+    // Ctrl+S (or Cmd+S) saves the code to a file.
+    if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
+      event.preventDefault();
+      event.stopPropagation();
+      saveFile();
+      return;
+    }
+
     if (event.key === 'Escape' && currentStopKey() === 'Escape Escape') {
       var now = Date.now();
       if (now - lastEscape > DOUBLE_ESCAPE_MS) {
