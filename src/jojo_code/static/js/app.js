@@ -3396,6 +3396,16 @@
       'translate(' + traceOffset.x + 'px, ' + traceOffset.y + 'px)';
   }
 
+  // The button's highlight is the state of the window: lit when the table is
+  // open, plain when it is closed. It is one answer told two ways, the class
+  // for the reader who can see it and aria-expanded for the one who cannot.
+  function paintTraceButton() {
+    if (!traceButton) return;
+    var open = !!(traceWindow && traceWindow.open);
+    traceButton.classList.toggle('active', open);
+    traceButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
   function rememberTrace(trace) {
     lastTrace = trace && trace.available ? trace : null;
     if (!traceButton || !traceWindow) return;
@@ -3414,6 +3424,7 @@
         renderTrace();
       }
     }
+    paintTraceButton();
   }
 
   function renderTrace() {
@@ -3464,6 +3475,7 @@
     // code, so the page behind it has to stay readable and reachable.
     traceWindow.show();
     traceWindow.focus();
+    paintTraceButton();
   }
 
   if (traceButton && traceWindow && traceRows && traceGrip && traceCloseBtn) {
@@ -3474,6 +3486,7 @@
     });
 
     traceWindow.addEventListener('close', function () {
+      paintTraceButton();
       if (!traceButton.disabled) traceButton.focus();
     });
 
