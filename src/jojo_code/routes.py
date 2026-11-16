@@ -3135,6 +3135,13 @@ def feedback_api():
         'positive': positive,
         'negative': negative,
     }
+    # The account is taken from the session, never from the form. A reader
+    # cannot claim somebody else's name by typing it in, and feedback from
+    # a signed-in reader is attributed to the account it came from.
+    from flask import session
+    username = (session.get('user_username') or '').strip().lower()
+    if username:
+        entry['username'] = username
     try:
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         with open(CONFIG_DIR / 'feedback.jsonl', 'a', encoding='utf-8') as handle:

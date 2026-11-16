@@ -1663,26 +1663,42 @@
 
   var acctUsername = document.getElementById('acct-username');
   var acctPassword = document.getElementById('acct-password');
-  var acctQuestion = null;
-  var acctAnswer = null;
   var acctStatus = document.getElementById('acct-status');
+  var acctHeading = document.getElementById('account-heading');
+  var acctLoginBtn = document.getElementById('acct-login');
+  var acctCreate = document.getElementById('acct-create');
+  var signUp = false;
+
+  // One box, two jobs. The link below the fields switches between signing
+  // in and creating an account: the heading and the button both say which
+  // one is about to happen.
+  function setAccountMode(toSignUp) {
+    signUp = !!toSignUp;
+    if (acctHeading) acctHeading.textContent = signUp ? t('account.sign_up') : t('account.login');
+    if (acctLoginBtn) acctLoginBtn.textContent = signUp ? t('account.sign_up') : t('account.login');
+    if (acctCreate) acctCreate.textContent = signUp ? t('account.have_account') : t('account.create_account');
+    if (acctStatus) acctStatus.textContent = '';
+  }
+
+  if (acctCreate) {
+    acctCreate.addEventListener('click', function (e) {
+      e.preventDefault();
+      setAccountMode(!signUp);
+    });
+  }
   function acctPost(url, body) {
     return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); });
   }
+  // One button, two endpoints. Which one it calls is decided by the mode
+  // the reader is in, not by a second button that duplicates the fields.
   var acctLogin = document.getElementById('acct-login');
   if (acctLogin) acctLogin.addEventListener('click', function () {
-    acctPost('/api/auth/login', { username: acctUsername.value, password: acctPassword.value })
+    var url = signUp ? '/api/auth/register' : '/api/auth/login';
+    var success = signUp ? 'account.status_registered' : 'account.status_logged_in';
+    acctPost(url, { username: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_logged_in') : (r.data.error || t('account.failed'));
-        if (r.ok) window.location.reload();
-      });
-  });
-  var acctRegister = document.getElementById('acct-register');
-  if (acctRegister) acctRegister.addEventListener('click', function () {
-    acctPost('/api/auth/register', { username: acctUsername.value, password: acctPassword.value })
-      .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_registered') : (r.data.error || t('account.failed'));
+        if (acctStatus) acctStatus.textContent = r.ok ? t(success) : (r.data.error || t('account.failed'));
         if (r.ok) window.location.reload();
       });
   });

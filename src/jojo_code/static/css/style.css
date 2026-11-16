@@ -630,6 +630,13 @@ body[data-show-shortcut-label="true"] .btn-shortcut {
   color: var(--accent);
 }
 
+/* The primary button is painted in the accent, so an icon that turns the
+   same colour on hover vanishes into the background. On that button the
+   icon follows its text instead. */
+.btn-primary:hover .btn-icon svg {
+  color: var(--accent-fg);
+}
+
 .btn:active {
   transform: translateY(1px);
 }

@@ -1827,15 +1827,15 @@
 
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
-      <h2>{{ t('account.title') }}</h2>
+      <h2 id="account-heading">{{ t('account.login') }}</h2>
       <div class="field">
         <label for="acct-username">{{ t('account.username') }}</label>
         <input id="acct-username" type="text" style="width:100%">
         <label for="acct-password">{{ t('account.password') }}</label>
         <input id="acct-password" type="password" style="width:100%">
         <button class="btn btn-small" type="button" id="acct-login">{{ t('account.login') }}</button>
-        <button class="btn btn-small" type="button" id="acct-register">{{ t('account.register') }}</button>
         <p id="acct-status" aria-live="polite"></p>
+        <p class="settings-hint"><a href="#" id="acct-create">{{ t('account.create_account') }}</a></p>
       </div>
       <button class="btn btn-small" type="button" id="account-close">{{ t('account.close') }}</button>
       <p class="settings-hint"><a href="#" id="acct-forgot">{{ t('account.forgot') }}</a></p>
