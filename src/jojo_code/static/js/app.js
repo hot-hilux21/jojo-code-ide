@@ -3821,6 +3821,20 @@
   if (btnUndo) btnUndo.addEventListener('click', function () { if (editor) editor.undo(); });
   if (btnRedo) btnRedo.addEventListener('click', function () { if (editor) editor.redo(); });
   if (btnAutoSave) btnAutoSave.addEventListener('click', function () {
+    // Autosave writes to a named file on the server, so a name is needed
+    // before it can be turned on. Without one the button opens the account
+    // box on that field rather than switching on something that saves
+    // nowhere.
+    if (autosaveEnabled && !autosaveName) {
+      // already on but nothing to save: turn it off again
+      setAutosaveEnabled(false);
+      return;
+    }
+    if (!autosaveEnabled && !autosaveName) {
+      if (accountModal) accountModal.style.display = 'flex';
+      if (acctAutosaveName) acctAutosaveName.focus();
+      return;
+    }
     setAutosaveEnabled(!autosaveEnabled);
   });
 
