@@ -1909,11 +1909,24 @@
       packagesModal.style.display = 'none';
     });
   }
-  if (packagesModal) {
-    packagesModal.addEventListener('click', function (e) {
-      if (e.target === packagesModal) packagesModal.style.display = 'none';
+  // A click on the backdrop closes a modal, but only if the press started
+  // there too. Dragging a selection inside the box and releasing over the
+  // backdrop fires a click on the backdrop as well; without the second
+  // check that drag would throw the box away mid-selection.
+  function wireBackdropDismiss(modal) {
+    if (!modal) return;
+    var pressStartedOutside = false;
+    modal.addEventListener('pointerdown', function (event) {
+      pressStartedOutside = event.target === modal;
+    });
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal && pressStartedOutside) {
+        modal.style.display = 'none';
+      }
+      pressStartedOutside = false;
     });
   }
+  wireBackdropDismiss(packagesModal);
   if (pkgInstall) {
     pkgInstall.addEventListener('click', function () {
       if (pkgStatus) pkgStatus.textContent = t('packages.installing');
@@ -2026,19 +2039,11 @@
   if (filesClose && filesModal) {
     filesClose.addEventListener('click', function () { filesModal.style.display = 'none'; });
   }
-  if (filesModal) {
-    filesModal.addEventListener('click', function (e) {
-      if (e.target === filesModal) filesModal.style.display = 'none';
-    });
-  }
+  wireBackdropDismiss(filesModal);
   if (profileClose && profileModal) {
     profileClose.addEventListener('click', function () { profileModal.style.display = 'none'; });
   }
-  if (profileModal) {
-    profileModal.addEventListener('click', function (e) {
-      if (e.target === profileModal) profileModal.style.display = 'none';
-    });
-  }
+  wireBackdropDismiss(profileModal);
 
   // The picture the reader chose, kept on the server with the account.
   function showAccountAvatar(dataUrl) {
@@ -2098,11 +2103,7 @@
   if (accountClose && accountModal) {
     accountClose.addEventListener('click', function () { accountModal.style.display = 'none'; });
   }
-  if (accountModal) {
-    accountModal.addEventListener('click', function (e) {
-      if (e.target === accountModal) accountModal.style.display = 'none';
-    });
-  }
+  wireBackdropDismiss(accountModal);
 
   if (settingsDialog) {
     settingsDialog.addEventListener('click', function (event) {
