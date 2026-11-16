@@ -122,7 +122,7 @@ def on_public_web():
 
 # Access code for the web version. If set, /api/run and /api/config POST
 # require it. If NOT set, the code runner is disabled (maintenance mode).
-ACCESS_CODE = os.environ.get('ACCESS_CODE', 'jojo12345')
+ACCESS_CODE = os.environ.get('ACCESS_CODE', '')
 # Sandbox the code runner on the web. The desktop exe runs full Python.
 SANDBOX = on_public_web()
 

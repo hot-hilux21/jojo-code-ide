@@ -1182,6 +1182,8 @@ body[data-focus-mode="fade"] .settings[open] {
      code that has no business being mirrored. */
   direction: ltr;
   text-align: left;
+  color: var(--fg, #e6e6e6);
+  background: var(--bg, #1a1a1a);
   font-family: var(--font-code) !important;
   font-size: var(--font-size) !important;
   font-weight: var(--font-weight) !important;
@@ -1197,6 +1199,7 @@ body[data-focus-mode="fade"] .settings[open] {
    Letter-spacing must NOT apply here, or the numbers drift
    and overlap the code. */
 .CodeMirror-gutters {
+  background: var(--panel-bg);
   border-right: 1px solid var(--panel-border);
   letter-spacing: normal !important;
 }
