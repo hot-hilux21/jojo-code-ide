@@ -1787,6 +1787,7 @@
   <script>window.CURRENT_USER = {{ (current_user or '')|tojson }};</script>
   <button id="account-btn" type="button"
           style="position:fixed;top:8px;right:8px;z-index:9998;" class="btn btn-small">{{ 'login' }}</button>
+  <a href="/faq" class="btn btn-small" style="position:fixed;top:8px;right:90px;z-index:9998;text-decoration:none;">{{ 'FAQ' }}</a>
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.title') }}</h2>

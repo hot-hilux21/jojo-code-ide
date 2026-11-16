@@ -2990,6 +2990,11 @@ def terms_page():
     return render_template('terms.html')
 
 
+@main_bp.route('/faq')
+def faq_page():
+    return render_template('faq.html')
+
+
 @main_bp.route('/api/auth/me', methods=['GET'])
 def auth_me_api():
     from flask import session
