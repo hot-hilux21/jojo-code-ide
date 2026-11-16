@@ -15,11 +15,12 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
         with:
           host: 132.145.69.213
           username: opc
           key: ${{ secrets.ORACLE_SSH_KEY }}
-          envs: SMTP_USER,SMTP_PASS,MAIL_FROM,SECRET_KEY
+          envs: SMTP_USER,SMTP_PASS,MAIL_FROM,SECRET_KEY,ACCESS_CODE
           script: |
             set -euo pipefail
             cd /home/opc/jojo-code-ide
@@ -38,15 +39,15 @@ jobs:
               # Keep every line we do not manage. Only replace our own keys.
               tmp=$(mktemp)
               if [ -f .env ]; then
-                grep -Ev '^(SMTP_USER|SMTP_PASS|SMTP_HOST|SMTP_PORT|MAIL_FROM)=' .env > "$tmp" || true
+                grep -Ev '^(SMTP_USER|SMTP_PASS|SMTP_HOST|SMTP_PORT|MAIL_FROM|ACCESS_CODE|ADMIN_EMAIL|TRUST_PROXY|FLASK_DEBUG|PORT)=' .env > "$tmp" || true
               fi
               if [ -n "$SECRET_KEY" ]; then
                 grep -Ev '^SECRET_KEY=' "$tmp" > "$tmp.new" || true
                 mv "$tmp.new" "$tmp"
               fi
               {
-                printf 'SMTP_USER=%s\nSMTP_PASS=%s\nMAIL_FROM=%s\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\n' \
-                  "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM"
+                printf 'SMTP_USER=%s\nSMTP_PASS=%s\nMAIL_FROM=%s\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\nACCESS_CODE=%s\nADMIN_EMAIL=thunderphantom99@gmail.com\nTRUST_PROXY=1\nFLASK_DEBUG=0\nPORT=3000\n' \
+                  "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM" "$ACCESS_CODE"
                 if [ -n "$SECRET_KEY" ]; then
                   printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
                 fi
