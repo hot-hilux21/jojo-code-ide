@@ -588,7 +588,6 @@ body[data-show-shortcut-label="true"] .btn-shortcut {
    the glyph. */
 .btn:hover .btn-icon svg {
   color: var(--accent);
-  text-shadow: 0 0 4px var(--accent);
 }
 
 .btn:active {

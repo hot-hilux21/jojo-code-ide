@@ -78,11 +78,21 @@ _ICONS = {
     'rotate-ccw': (
         '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" />'
     ),
-    'rotate-cw': (
-        '<path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 16" /> <path d="M21 21v-5h-5" />'
+    # Undo and redo are arrows that travel, not circular arrows. A circular
+    # arrow for one and the other means the reader has to work out which way
+    # round goes back and which goes forward; an arrow pointing left or right
+    # says it on its own.
+    'undo': (
+        '<path d="M3 7v6h6" /> <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />'
     ),
-    'rotate-cw': (
-        '<path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 16" /> <path d="M21 21v-5h-5" />'
+    'redo': (
+        '<path d="M21 7v6h-6" /> <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />'
+    ),
+    'help-circle': (
+        '<circle cx="12" cy="12" r="10" /> <path d="M9.09 9a3 3 0 0 1 5.83 1 3 3 0 0 0-2 2.83" /> <path d="M12 17h.01" />'
+    ),
+    'package': (
+        '<path d="M16.5 9.4 7.5 4.21" /> <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /> <polyline points="3.27 6.96 12 12.01 20.73 6.96" /> <line x1="12" x2="12" y1="22.08" y2="12" />'
     ),
     'download': (
         '<path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" />'
@@ -121,8 +131,12 @@ _ICONS = {
 ICON_NAMES = frozenset(_ICONS)
 
 _SVG = (
+    # 1.75 rather than Lucide's default 2. The default is right for a
+    # marketing page and too heavy for a control a reader looks at all
+    # day: a thinner stroke keeps the shape readable without the glyph
+    # fighting the word beside it for attention.
     '<svg class="icon icon-{name}" viewBox="0 0 24 24" width="{size}" '
-    'height="{size}" fill="none" stroke="currentColor" stroke-width="2" '
+    'height="{size}" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round" '
     'aria-hidden="true" focusable="false">{body}</svg>'
 )

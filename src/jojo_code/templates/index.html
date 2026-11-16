@@ -324,9 +324,9 @@
     </span>
     <span class="pane-fade-sliders" id="pane-fade-actions">
       <button type="button" class="btn btn-small pane-indent" id="btn-undo"
-              title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('rotate-ccw') }}</span><span class="btn-label">{{ t('nav.undo') }}</span></button>
+              title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('undo') }}</span><span class="btn-label">{{ t('nav.undo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-redo"
-              title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('rotate-cw') }}</span><span class="btn-label">{{ t('nav.redo') }}</span></button>
+              title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('redo') }}</span><span class="btn-label">{{ t('nav.redo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
               title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span></button>
       <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
@@ -1783,10 +1783,11 @@
     <a href="/privacy" style="color:var(--accent);text-decoration:underline;">{{ 'Privacy' }}</a>{{ ' · ' }}<a href="/terms" style="color:var(--accent);text-decoration:underline;">{{ 'Terms' }}</a>
   </p>
   <script>window.CURRENT_USER = {{ (current_user or '')|tojson }};</script>
-  <button id="account-btn" type="button"
-          style="position:fixed;top:8px;right:8px;z-index:9998;" class="btn btn-small">{{ 'login' }}</button>
-  <a href="/faq" class="btn btn-small" style="position:fixed;top:8px;right:90px;z-index:9998;text-decoration:none;">{{ 'FAQ' }}</a>
-  {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="position:fixed;top:8px;right:160px;z-index:9998;">{{ 'Packages' }}</button>{% endif %}
+  <div style="position:fixed;top:8px;right:8px;z-index:9998;display:flex;gap:0.4rem;align-items:center;">
+    <a href="/faq" class="btn btn-small" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('help-circle') }} {{ 'FAQ' }}</a>
+    {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('package') }} {{ 'Packages' }}</button>{% endif %}
+    <button id="account-btn" type="button" class="btn btn-small">{{ 'login' }}</button>
+  </div>
   <div id="packages-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('packages.title') }}</h2>
