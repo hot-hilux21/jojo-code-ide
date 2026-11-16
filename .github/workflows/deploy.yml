@@ -14,11 +14,12 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         with:
           host: 132.145.69.213
           username: opc
           key: ${{ secrets.ORACLE_SSH_KEY }}
-          envs: SMTP_USER,SMTP_PASS,MAIL_FROM
+          envs: SMTP_USER,SMTP_PASS,MAIL_FROM,SECRET_KEY
           script: |
             set -euo pipefail
             cd /home/opc/jojo-code-ide
@@ -34,8 +35,23 @@ jobs:
             # without anyone hand-editing .env. Missing secrets leave the
             # existing .env alone instead of deploying an empty one.
             if [ -n "$SMTP_USER" ] && [ -n "$SMTP_PASS" ] && [ -n "$MAIL_FROM" ]; then
-              printf 'SMTP_USER=%s\nSMTP_PASS=%s\nMAIL_FROM=%s\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\n' \
-                "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM" > .env
+              # Keep every line we do not manage. Only replace our own keys.
+              tmp=$(mktemp)
+              if [ -f .env ]; then
+                grep -Ev '^(SMTP_USER|SMTP_PASS|SMTP_HOST|SMTP_PORT|MAIL_FROM)=' .env > "$tmp" || true
+              fi
+              if [ -n "$SECRET_KEY" ]; then
+                grep -Ev '^SECRET_KEY=' "$tmp" > "$tmp.new" || true
+                mv "$tmp.new" "$tmp"
+              fi
+              {
+                printf 'SMTP_USER=%s\nSMTP_PASS=%s\nMAIL_FROM=%s\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\n' \
+                  "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM"
+                if [ -n "$SECRET_KEY" ]; then
+                  printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
+                fi
+              } >> "$tmp"
+              mv "$tmp" .env
               chmod 600 .env
             fi
             source venv/bin/activate
