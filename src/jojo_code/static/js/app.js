@@ -6192,11 +6192,46 @@
 
   var current = pickNext();
   var chars = Array.from(current);
+  var rtl = isRtl(current);
+
+  // Right-to-left text cannot be typed one character at a time the way
+  // left-to-right text can. A partial Arabic string is re-ordered by the
+  // browser every time a character is added, so the words jump around and
+  // the cursor lands on the wrong side. The whole line is shown at once
+  // instead, which is how a title in Arabic should read anyway.
+  function isRtl(text) {
+    return /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u08A0-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(text);
+  }
+
+  function setCurrent(next) {
+    current = next;
+    chars = Array.from(current);
+    rtl = isRtl(current);
+    if (rtl) {
+      // Shown whole, and left up for a while rather than blinked away.
+      pos = chars.length;
+      deleting = false;
+      pause = 60;
+    } else {
+      pos = 0;
+      deleting = false;
+    }
+  }
 
   function tick() {
     if (document.hidden) {
       document.title = absentMsg;
       timer = setTimeout(tick, 1200);
+      return;
+    }
+    if (rtl) {
+      document.title = current;
+      if (pause > 0) {
+        pause -= 1;
+      } else {
+        setCurrent(pickNext());
+      }
+      timer = setTimeout(tick, 120);
       return;
     }
     if (!deleting) {
@@ -6214,8 +6249,7 @@
         if (pos > 0) document.title = chars.slice(0, pos).join("") + "\u258C";
         if (pos <= 0) {
           deleting = false;
-          current = pickNext();
-          chars = Array.from(current);
+          setCurrent(pickNext());
         }
       }
     }
@@ -6225,10 +6259,7 @@
 
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) {
-      pos = 0;
-      deleting = false;
-      current = pickNext();
-      chars = Array.from(current);
+      setCurrent(pickNext());
     }
   });
 

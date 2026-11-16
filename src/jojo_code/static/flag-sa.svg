@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" width="60" height="40" role="img" aria-label="Flag of Saudi Arabia">
+  <!-- The flag of Saudi Arabia: a green field, the shahada in white, and
+       the sword beneath it. The text is drawn as text rather than as an
+       outline so it shapes correctly in Arabic, and so the whole flag stays
+       readable at the size it is used at. -->
+  <rect width="60" height="40" fill="#006C35"/>
+  <g fill="#ffffff" font-family="'Noto Naskh Arabic', 'Segoe UI', 'Tahoma', serif" text-anchor="middle" direction="rtl">
+    <text x="30" y="15" font-size="8.5">لا إله إلا الله</text>
+    <text x="30" y="24" font-size="8.5">محمد رسول الله</text>
+  </g>
+  <g stroke="#ffffff" stroke-width="1.4" stroke-linecap="round">
+    <line x1="12" y1="32" x2="48" y2="32"/>
+    <line x1="46" y1="29.5" x2="48" y2="32" stroke-width="1.8"/>
+    <line x1="44" y1="29.5" x2="46" y2="32" stroke-width="1.8"/>
+  </g>
+</svg>

@@ -6,4 +6,4 @@ Cursor lonely
 Bugs friendly
 Semicolons plotting
 Come back 👀
-🇸🇦 يا واد؟ يا بت؟
+يا واد؟ يا بت؟

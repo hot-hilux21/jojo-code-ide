@@ -1,21 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ config.locale if config.locale else 'en' }}">
 <head>
-  <meta charset="utf-8">
-  <title>FAQ - Jojo Code</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequently Asked Questions - Jojo Code</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ version }}-{{ build_commit }}">
+  <style>
+    {% for face in font_faces %}
+    @font-face {
+      font-family: '{{ face.family }}';
+      src: url('{{ face.url }}') format('truetype');
+      font-weight: {{ face.weight }};
+      font-display: swap;
+    }
+    {% endfor %}
+  </style>
 </head>
-<body>
-  <main style="max-width:760px;margin:2rem auto;padding:0 1rem;line-height:1.6;">
+<body data-theme="{{ theme }}"
+      style="--font-family: {{ font_family }}; {% if page_bg %}--bg: {{ page_bg }};{% endif %}{% if page_fg %}--fg: {{ page_fg }};{% endif %}min-height: 100vh;">
+  <main style="max-width:760px;margin:0 auto;padding:2rem 1rem;flex:1;">
     <h1>Frequently Asked Questions</h1>
     <h2>How do I save my code?</h2>
-    <p>Use the Save button in the editor strip, or press Ctrl+S. If you are logged in with a username account, turn on Autosave to push code to the server automatically.</p>
+    <p>Use the Save button in the toolbar, or press Ctrl+S. If you are logged in with a username account, turn on Autosave to push code to the server automatically.</p>
     <h2>How do I undo or redo?</h2>
-    <p>Use the Undo and Redo buttons in the editor strip, or Ctrl+Z / Ctrl+Y.</p>
+    <p>Use the Undo and Redo buttons in the editor strip, or Ctrl+Z and Ctrl+Y.</p>
     <h2>How do I log in?</h2>
     <p>Click the login button (top right). You can sign in with Google or GitHub, or create a username and password account.</p>
     <h2>How do I change the font or theme?</h2>
-    <p>Open Settings (top right) and pick a font, theme, and colours. Changes save as you make them.</p>
+    <p>Open Settings (top right) and pick a font, theme and colours. Changes save as you make them.</p>
     <h2>How does text-to-speech work?</h2>
     <p>Turn on "Read results aloud" in Settings. The app reads output and errors after you run code.</p>
     <h2>Is my code private?</h2>

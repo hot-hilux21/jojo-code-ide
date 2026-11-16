@@ -1,7 +1,7 @@
 """
 Main routes for Jojo Code.
 """
-from flask import Blueprint, render_template, request, jsonify, make_response, redirect, session, send_from_directory, has_request_context
+from flask import Blueprint, render_template, request, jsonify, make_response, redirect, session, send_from_directory, has_request_context, url_for
 import urllib.parse
 import hmac
 import subprocess
@@ -3044,7 +3044,89 @@ def packages_install_api():
 
 @main_bp.route('/faq')
 def faq_page():
-    return render_template('faq.html')
+    """The FAQ page, in the reader's own font and theme.
+
+    The page is drawn by the server and has no script of its own, so the
+    font and the colours have to be named here. The app asks the browser
+    for them at runtime; a static page has no runtime to ask in.
+    """
+    config = load_config()
+    key = config.get('font', 'OpenDyslexic')
+    fonts = _all_fonts()
+    family = fonts.get(key, {}).get('family') or FONTS['OpenDyslexic']['family']
+    theme = config.get('theme', 'dark')
+    page_bg = ''
+    page_fg = ''
+    if theme == 'custom':
+        # The custom theme's colours live in the config, and the app
+        # paints them with script. A static page has to be given them.
+        theme = 'dark'
+        page_bg = config.get('theme_custom_page', '')
+        page_fg = config.get('theme_custom_fg', '')
+    return render_template(
+        'faq.html',
+        config=config,
+        theme=theme,
+        page_bg=page_bg,
+        page_fg=page_fg,
+        font_family=family,
+        font_faces=_font_faces(key),
+        version=_package_version(),
+        build_commit=_build_commit(),
+    )
+
+
+def _font_faces(chosen):
+    """The @font-face rules the FAQ page needs.
+
+    The chosen font, plus the script fallbacks every stack carries, so a
+    reader who picked a Latin-only font still gets readable Cyrillic,
+    Devanagari and Arabic. Without them the browser quietly substitutes
+    the system font, which is the failure this page must not have.
+
+    The family and the weight are read from the font table rather than
+    written out again, so a face cannot be declared here with a name the
+    file does not carry.
+    """
+    faces = []
+    wanted = [chosen, 'Nunito', 'Mukta', 'Almarai', 'Andika']
+    user_fonts = _user_fonts()
+    for key in wanted:
+        if key in user_fonts:
+            font = user_fonts[key]
+            faces.append({
+                'family': font['name'],
+                'weight': '100 900',
+                'url': url_for('main.serve_user_font', filename=font['files'][0]),
+            })
+            continue
+        entry = FONTS.get(key)
+        if not entry or not entry['files']:
+            continue
+        family = entry['family'].split(',')[0].strip().strip('"')
+        for filename in entry['files']:
+            faces.append({
+                'family': family,
+                'weight': _font_weight(filename),
+                'url': url_for('main.serve_font', filename=filename),
+            })
+    return faces
+
+
+def _font_weight(filename):
+    """The weight a font file carries, from its name.
+
+    The names are the convention the shipped files follow, and reading
+    them is what keeps a face declared at the wrong weight from being
+    silently ignored by the browser.
+    """
+    if 'Variable' in filename:
+        return '100 900'
+    if 'SemiBold' in filename:
+        return '600'
+    if 'Bold' in filename:
+        return 'bold'
+    return 'normal'
 
 
 @main_bp.route('/api/auth/me', methods=['GET'])
