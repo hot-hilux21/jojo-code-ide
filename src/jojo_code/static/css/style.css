@@ -326,6 +326,46 @@ body[data-gradient='off'] {
   background: var(--bg);
 }
 
+/* The profile menu. It hangs from the profile button in the top right, so
+   it is positioned by the page rather than by its own offsets. */
+.account-menu {
+  position: fixed;
+  top: 56px;
+  right: 8px;
+  z-index: 9999;
+  min-width: 180px;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
+}
+
+.account-menu[hidden] {
+  display: none;
+}
+
+.account-menu button {
+  font: inherit;
+  text-align: start;
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  background: none;
+  color: var(--fg);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.account-menu button:hover,
+.account-menu button:focus-visible {
+  background: var(--bg);
+  color: var(--accent);
+}
+
 /* ---------- Accessibility helpers ---------- */
 .visually-hidden {
   position: absolute;

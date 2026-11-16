@@ -219,3 +219,29 @@ def delete_file(username, name):
     except OSError:
         return False
     return True
+
+
+def avatar_path(username):
+    return user_dir(username) / 'avatar.txt'
+
+
+def load_avatar(username):
+    """The picture the reader chose, as a data URL, or an empty string."""
+    path = avatar_path(username)
+    if not path.is_file():
+        return ''
+    try:
+        return path.read_text(encoding='utf-8').strip()
+    except OSError:
+        return ''
+
+
+def save_avatar(username, data_url):
+    folder = user_dir(username)
+    folder.mkdir(parents=True, exist_ok=True)
+    path = avatar_path(username)
+    path.write_text(data_url or '', encoding='utf-8')
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass

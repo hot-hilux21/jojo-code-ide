@@ -15,6 +15,12 @@
       font-display: swap;
     }
     {% endfor %}
+    /* The page is as tall as the text, not as tall as the window, so the
+       background has to cover the whole of it. The app's own rule sets a
+       fixed height for the body, which would leave the colour stopping
+       partway down a long page. */
+    html, body { height: auto; }
+    body { min-height: 100vh; }
   </style>
 </head>
 <body data-theme="{{ theme }}"

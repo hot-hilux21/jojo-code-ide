@@ -1785,8 +1785,30 @@
   <div style="position:fixed;top:8px;right:8px;z-index:9998;display:flex;gap:0.4rem;align-items:center;">
     <a href="/faq" class="btn btn-small" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('help-circle') }} {{ 'FAQ' }}</a>
     {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('package') }} {{ 'Packages' }}</button>{% endif %}
-    <button id="account-btn" type="button" class="btn btn-small" title="{{ t('account.title') }}" aria-label="{{ t('account.title') }}" style="display:inline-flex;align-items:center;gap:0.3rem;padding:var(--space-1) var(--space-3);">{{ icon('user') }}</button>
+    <button id="account-btn" type="button" class="btn btn-small" title="{{ t('account.title') }}"
+            aria-label="{{ t('account.title') }}" aria-haspopup="true" aria-expanded="false"
+            style="display:inline-flex;align-items:center;gap:0.3rem;padding:var(--space-1) var(--space-3);">
+      <span class="btn-icon" aria-hidden="true">{{ icon('user') }}</span>
+      <img id="account-avatar" alt="" width="18" height="18" style="display:none;border-radius:50%;object-fit:cover;">
+    </button>
   </div>
+  {# The profile menu. Signed out it offers the way in; signed in it offers
+     the files, the account settings and the way out. Every item is drawn
+     always and the ones that do not apply are hidden, so the script can
+     look them up whatever state the reader is in. #}
+  <div id="account-menu" class="account-menu" role="menu" hidden>
+    {% if current_user %}
+    <button type="button" id="menu-files" role="menuitem">{{ t('account.my_files') }}</button>
+    <button type="button" id="menu-profile" role="menuitem">{{ t('account.account_settings') }}</button>
+    <button type="button" id="menu-signout" role="menuitem">{{ t('account.sign_out') }}</button>
+    {% else %}
+    <button type="button" id="menu-signin" role="menuitem">{{ t('account.sign_in') }}</button>
+    <button type="button" id="menu-files" role="menuitem" hidden>{{ t('account.my_files') }}</button>
+    <button type="button" id="menu-profile" role="menuitem" hidden>{{ t('account.account_settings') }}</button>
+    <button type="button" id="menu-signout" role="menuitem" hidden>{{ t('account.sign_out') }}</button>
+    {% endif %}
+  </div>
+
   <div id="packages-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('packages.title') }}</h2>
@@ -1802,12 +1824,10 @@
       <button class="btn btn-small" type="button" id="packages-close">{{ t('settings.close') }}</button>
     </div>
   </div>
+
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.title') }}</h2>
-
-      <h3>{{ t('account.my_account') }}</h3>
-      {% if current_user %}<p>{{ t('account.signed_in_as_user', current_user) }}</p>{% endif %}
       <div class="field">
         <label for="acct-username">{{ t('account.username') }}</label>
         <input id="acct-username" type="text" style="width:100%">
@@ -1817,28 +1837,47 @@
         <button class="btn btn-small" type="button" id="acct-register">{{ t('account.register') }}</button>
         <p id="acct-status" aria-live="polite"></p>
       </div>
-      <div class="field" id="acct-server" {% if not current_user %}hidden{% endif %}>
-        <label for="acct-autosave-name">{{ t('account.autosave_name') }}</label>
-        <input id="acct-autosave-name" type="text" style="width:100%" placeholder="my_code.py">
-        <p class="field-help">{{ t('account.autosave_name_help') }}</p>
-        <button class="btn btn-small" type="button" id="acct-autosave-name-save">{{ t('account.autosave_name_save') }}</button>
-        <button class="btn btn-small" type="button" id="acct-settings-save">{{ t('account.settings_save') }}</button>
-        <button class="btn btn-small" type="button" id="acct-settings-load">{{ t('account.settings_load') }}</button>
-        <p id="acct-server-status" aria-live="polite"></p>
-      </div>
-      <button class="btn btn-small" type="button" id="sign-out-btn">{{ t('account.sign_out') }}</button>
+      <button class="btn btn-small" type="button" id="account-close">{{ t('account.close') }}</button>
+      <p class="settings-hint"><a href="#" id="acct-forgot">{{ t('account.forgot') }}</a></p>
+    </div>
+  </div>
 
-      <h3>{{ t('account.my_files') }}</h3>
-      <div class="field" id="acct-files" {% if not current_user %}hidden{% endif %}>
+  <div id="files-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
+      <h2>{{ t('account.my_files') }}</h2>
+      <div class="field">
         <label for="acct-file-name">{{ t('account.file_name') }}</label>
         <input id="acct-file-name" type="text" style="width:100%">
         <button class="btn btn-small" type="button" id="acct-file-save">{{ t('account.file_save') }}</button>
         <ul id="acct-file-list"></ul>
         <p id="acct-files-empty" class="settings-hint" hidden>{{ t('account.files_empty') }}</p>
+        <p id="acct-files-status" class="acct-status" aria-live="polite"></p>
       </div>
+      <button class="btn btn-small" type="button" id="files-close">{{ t('account.close') }}</button>
+    </div>
+  </div>
 
-      <button class="btn btn-small" type="button" id="account-close">{{ t('account.close') }}</button>
-      <p class="settings-hint"><a href="#" id="acct-forgot">{{ t('account.forgot') }}</a></p>
+  <div id="profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
+      <h2>{{ t('account.account_settings') }}</h2>
+      <div class="field">
+        <label for="acct-picture">{{ t('account.picture') }}</label>
+        <input id="acct-picture" type="file" accept="image/*">
+        <p class="field-help">{{ t('account.picture_help') }}</p>
+        <p id="acct-picture-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="acct-autosave-name">{{ t('account.autosave_name') }}</label>
+        <input id="acct-autosave-name" type="text" style="width:100%" placeholder="my_code.py">
+        <p class="field-help">{{ t('account.autosave_name_help') }}</p>
+        <button class="btn btn-small" type="button" id="acct-autosave-name-save">{{ t('account.autosave_name_save') }}</button>
+      </div>
+      <div class="field">
+        <button class="btn btn-small" type="button" id="acct-settings-save">{{ t('account.settings_save') }}</button>
+        <button class="btn btn-small" type="button" id="acct-settings-load">{{ t('account.settings_load') }}</button>
+        <p id="acct-server-status" class="acct-status" aria-live="polite"></p>
+      </div>
+      <button class="btn btn-small" type="button" id="profile-close">{{ t('account.close') }}</button>
     </div>
   </div>
   <script src="{{ url_for('static', filename='js/app.js') }}?v={{ version }}-{{ build_commit }}"></script>

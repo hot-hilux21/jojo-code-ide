@@ -1661,12 +1661,6 @@
     });
   }
 
-  var signOutBtn = document.getElementById('sign-out-btn');
-  if (signOutBtn) {
-    signOutBtn.addEventListener('click', function () {
-      fetch('/api/auth/disconnect', { method: 'POST' }).then(function () { window.location.reload(); });
-    });
-  }
   var acctUsername = document.getElementById('acct-username');
   var acctPassword = document.getElementById('acct-password');
   var acctQuestion = null;
@@ -1703,7 +1697,6 @@
   // ---------- What the account keeps on the server ----------
   // The settings the reader chose and the files they saved, both held
   // against their account so they can be fetched back on any machine.
-  var acctServer = document.getElementById('acct-server');
   var acctFileName = document.getElementById('acct-file-name');
   var acctFileSave = document.getElementById('acct-file-save');
   var acctFileList = document.getElementById('acct-file-list');
@@ -1712,14 +1705,14 @@
   var acctSettingsLoad = document.getElementById('acct-settings-load');
   var acctAutosaveName = document.getElementById('acct-autosave-name');
   var acctAutosaveNameSave = document.getElementById('acct-autosave-name-save');
-  var acctServerStatus = document.getElementById('acct-server-status');
 
-  // The name the autosave uses is read at the top of this file, before the
-  // autosave itself starts, because the first thing it does is look for a
-  // file to load.
-
+  // The status line. There is one in each box that says something, and the
+  // message goes to whichever of them is on screen.
   function sayServerStatus(text) {
-    if (acctServerStatus) acctServerStatus.textContent = text || '';
+    var lines = document.querySelectorAll('.acct-status');
+    for (var i = 0; i < lines.length; i++) {
+      lines[i].textContent = text || '';
+    }
   }
 
   function loadAccountFiles() {
@@ -1930,20 +1923,162 @@
     });
   }
 
+  // ---------- The profile menu ----------
+  // The profile button opens a menu rather than a box: signed out it offers
+  // the way in, signed in it offers the files, the account settings and the
+  // way out. The login box itself stays a login box.
   var accountBtn = document.getElementById('account-btn');
   var accountModal = document.getElementById('account-modal');
   var accountClose = document.getElementById('account-close');
-  if (accountBtn && accountModal) {
-    accountBtn.addEventListener('click', function () {
-      accountModal.style.display = 'flex';
-      // The saved files are only there for a signed-in reader, so they are
-      // asked for when the account box opens rather than at page load.
-      if (window.CURRENT_USER) {
-        loadAccountFiles();
-        if (acctAutosaveName) acctAutosaveName.value = autosaveName;
+  var accountMenu = document.getElementById('account-menu');
+  var menuSignIn = document.getElementById('menu-signin');
+  var menuFiles = document.getElementById('menu-files');
+  var menuProfile = document.getElementById('menu-profile');
+  var menuSignOut = document.getElementById('menu-signout');
+  var filesModal = document.getElementById('files-modal');
+  var filesClose = document.getElementById('files-close');
+  var profileModal = document.getElementById('profile-modal');
+  var profileClose = document.getElementById('profile-close');
+  var accountPicture = document.getElementById('acct-picture');
+  var accountPictureStatus = document.getElementById('acct-picture-status');
+  var accountAvatar = document.getElementById('account-avatar');
+
+  function closeAccountMenu() {
+    if (!accountMenu) return;
+    accountMenu.hidden = true;
+    if (accountBtn) accountBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function openAccountMenu() {
+    if (!accountMenu) return;
+    accountMenu.hidden = false;
+    if (accountBtn) accountBtn.setAttribute('aria-expanded', 'true');
+    var first = accountMenu.querySelector('button');
+    if (first) first.focus();
+  }
+
+  if (accountBtn && accountMenu) {
+    accountBtn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      if (accountMenu.hidden) openAccountMenu(); else closeAccountMenu();
+    });
+    // A click anywhere else closes it, and Escape closes it too.
+    document.addEventListener('click', function (event) {
+      if (accountMenu.hidden) return;
+      if (accountMenu.contains(event.target) || (accountBtn && accountBtn.contains(event.target))) return;
+      closeAccountMenu();
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && !accountMenu.hidden) {
+        closeAccountMenu();
+        if (accountBtn) accountBtn.focus();
       }
     });
   }
+
+  if (menuSignIn && accountModal) {
+    menuSignIn.addEventListener('click', function () {
+      closeAccountMenu();
+      accountModal.style.display = 'flex';
+    });
+  }
+
+  if (menuFiles && filesModal) {
+    menuFiles.addEventListener('click', function () {
+      closeAccountMenu();
+      filesModal.style.display = 'flex';
+      loadAccountFiles();
+    });
+  }
+
+  if (menuProfile && profileModal) {
+    menuProfile.addEventListener('click', function () {
+      closeAccountMenu();
+      profileModal.style.display = 'flex';
+      if (acctAutosaveName) acctAutosaveName.value = autosaveName;
+    });
+  }
+
+  if (menuSignOut) {
+    menuSignOut.addEventListener('click', function () {
+      closeAccountMenu();
+      fetch('/api/auth/disconnect', { method: 'POST' })
+        .then(function () { window.location.reload(); });
+    });
+  }
+
+  if (filesClose && filesModal) {
+    filesClose.addEventListener('click', function () { filesModal.style.display = 'none'; });
+  }
+  if (filesModal) {
+    filesModal.addEventListener('click', function (e) {
+      if (e.target === filesModal) filesModal.style.display = 'none';
+    });
+  }
+  if (profileClose && profileModal) {
+    profileClose.addEventListener('click', function () { profileModal.style.display = 'none'; });
+  }
+  if (profileModal) {
+    profileModal.addEventListener('click', function (e) {
+      if (e.target === profileModal) profileModal.style.display = 'none';
+    });
+  }
+
+  // The picture the reader chose, kept on the server with the account.
+  function showAccountAvatar(dataUrl) {
+    if (!accountAvatar) return;
+    if (dataUrl) {
+      accountAvatar.src = dataUrl;
+      accountAvatar.style.display = '';
+    } else {
+      accountAvatar.removeAttribute('src');
+      accountAvatar.style.display = 'none';
+    }
+  }
+
+  function loadAccountAvatar() {
+    if (!window.CURRENT_USER) return;
+    fetch('/api/user/avatar').then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.success && d.avatar) showAccountAvatar(d.avatar);
+    }).catch(function () {});
+  }
+
+  if (accountPicture) {
+    accountPicture.addEventListener('change', function () {
+      var file = accountPicture.files && accountPicture.files[0];
+      if (!file) return;
+      if (file.size > 300000) {
+        if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_too_big');
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        var dataUrl = reader.result;
+        fetch('/api/user/avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar: dataUrl }),
+        }).then(function (r) { return r.json(); }).then(function (d) {
+          if (!d || !d.success) {
+            if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+            return;
+          }
+          showAccountAvatar(dataUrl);
+          if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_saved');
+        }).catch(function () {
+          if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+        });
+      };
+      reader.onerror = function () {
+        if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+      };
+      reader.readAsDataURL(file);
+      accountPicture.value = '';
+    });
+  }
+
+  loadAccountAvatar();
+
   if (accountClose && accountModal) {
     accountClose.addEventListener('click', function () { accountModal.style.display = 'none'; });
   }

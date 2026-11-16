@@ -3012,6 +3012,30 @@ def user_settings_api():
     return jsonify({'success': True})
 
 
+@main_bp.route('/api/user/avatar', methods=['GET', 'POST'])
+def user_avatar_api():
+    """The picture the reader chose for their account.
+
+    A data URL, kept as it was given, so the browser can show it without a
+    second request. Small by design: a profile picture is not a photograph.
+    """
+    from flask import session
+    from . import users
+    username = session.get('user_username')
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    if request.method == 'GET':
+        return jsonify({'success': True, 'avatar': users.load_avatar(username)})
+    data = request.get_json(silent=True) or {}
+    avatar = data.get('avatar', '')
+    if not isinstance(avatar, str) or not avatar.startswith('data:image/'):
+        return jsonify({'success': False, 'error': 'bad image'}), 400
+    if len(avatar) > 400000:
+        return jsonify({'success': False, 'error': 'image too large'}), 400
+    users.save_avatar(username, avatar)
+    return jsonify({'success': True})
+
+
 @main_bp.route('/api/user/files', methods=['GET', 'POST'])
 def user_files_api():
     """The files this account keeps on the server.
