@@ -1681,37 +1681,142 @@
         if (acctStatus) acctStatus.textContent = r.ok ? t('account.password_reset', r.data.password || 'default') : (r.data.error || t('account.failed'));
       });
   });
-  var cloudPush = document.getElementById('cloud-push');
-  var cloudPull = document.getElementById('cloud-pull');
-  var cloudStatus = document.getElementById('cloud-status');
-  function cloudCall(url) {
-    if (cloudStatus) cloudStatus.textContent = '...';
-    function attempt() {
-      return fetch(url, {
+  // ---------- What the account keeps on the server ----------
+  // The settings the reader chose and the files they saved, both held
+  // against their account so they can be fetched back on any machine.
+  var acctServer = document.getElementById('acct-server');
+  var acctFileName = document.getElementById('acct-file-name');
+  var acctFileSave = document.getElementById('acct-file-save');
+  var acctFileList = document.getElementById('acct-file-list');
+  var acctFilesEmpty = document.getElementById('acct-files-empty');
+  var acctSettingsSave = document.getElementById('acct-settings-save');
+  var acctSettingsLoad = document.getElementById('acct-settings-load');
+  var acctServerStatus = document.getElementById('acct-server-status');
+
+  function sayServerStatus(text) {
+    if (acctServerStatus) acctServerStatus.textContent = text || '';
+  }
+
+  function loadAccountFiles() {
+    if (!acctFileList) return;
+    fetch('/api/user/files').then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.success) {
+        sayServerStatus((d && d.error) || t('account.failed'));
+        return;
+      }
+      acctFileList.innerHTML = '';
+      var files = d.files || [];
+      if (acctFilesEmpty) acctFilesEmpty.hidden = files.length > 0;
+      files.forEach(function (file) {
+        var item = document.createElement('li');
+        var name = document.createElement('span');
+        name.textContent = file.name;
+        item.appendChild(name);
+
+        var open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'btn btn-small';
+        open.textContent = t('account.file_open');
+        open.addEventListener('click', function () {
+          fetch('/api/user/files/' + encodeURIComponent(file.name))
+            .then(function (r) { return r.json(); })
+            .then(function (answer) {
+              if (!answer || !answer.success) {
+                sayServerStatus((answer && answer.error) || t('account.failed'));
+                return;
+              }
+              if (editor) editor.setValue(answer.code || '');
+              sayServerStatus(t('account.file_opened'));
+            }).catch(function () { sayServerStatus(t('account.failed')); });
+        });
+        item.appendChild(open);
+
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'btn btn-small';
+        remove.textContent = t('account.file_delete');
+        remove.addEventListener('click', function () {
+          fetch('/api/user/files/' + encodeURIComponent(file.name), { method: 'DELETE' })
+            .then(function (r) { return r.json(); })
+            .then(function (answer) {
+              if (!answer || !answer.success) {
+                sayServerStatus((answer && answer.error) || t('account.failed'));
+                return;
+              }
+              loadAccountFiles();
+              sayServerStatus(t('account.file_deleted'));
+            }).catch(function () { sayServerStatus(t('account.failed')); });
+        });
+        item.appendChild(remove);
+
+        acctFileList.appendChild(item);
+      });
+    }).catch(function () { sayServerStatus(t('account.failed')); });
+  }
+
+  if (acctFileSave) {
+    acctFileSave.addEventListener('click', function () {
+      var name = acctFileName ? acctFileName.value.trim() : '';
+      if (!name) {
+        sayServerStatus(t('account.failed'));
+        return;
+      }
+      fetch('/api/user/files', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ access_code: accessCode }),
-      }).then(function (r) {
-        if (r.status === 403) {
-          if (promptForAccessCode()) {
-            return attempt();
-          }
+        body: JSON.stringify({ name: name, code: editor ? editor.getValue() : '' }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || !d.success) {
+          sayServerStatus((d && d.error) || t('account.failed'));
+          return;
         }
-        return r.json();
-      });
-    }
-    attempt().then(function (d) {
-      if (!d) return;
-      if (cloudStatus) cloudStatus.textContent = d.success ? 'Done.' : (d.error || d.message || 'Failed.');
-      if (d.success && d.config) {
-        window.location.reload();
-      }
-    }).catch(function () {
-      if (cloudStatus) cloudStatus.textContent = t('settings.save_failed');
+        if (acctFileName) acctFileName.value = '';
+        loadAccountFiles();
+        sayServerStatus(t('account.file_saved'));
+      }).catch(function () { sayServerStatus(t('account.failed')); });
     });
   }
-  if (cloudPush) cloudPush.addEventListener('click', function () { cloudCall('/api/cloud/push'); });
-  if (cloudPull) cloudPull.addEventListener('click', function () { cloudCall('/api/cloud/pull'); });
+
+  if (acctSettingsSave) {
+    acctSettingsSave.addEventListener('click', function () {
+      // The app's own settings are the source of truth; this saves a copy
+      // against the account so it can be fetched back later.
+      fetch('/api/config').then(function (r) { return r.json(); }).then(function (config) {
+        return fetch('/api/user/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings: config }),
+        });
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        sayServerStatus(d && d.success ? t('account.settings_saved') : t('account.failed'));
+      }).catch(function () { sayServerStatus(t('account.failed')); });
+    });
+  }
+
+  if (acctSettingsLoad) {
+    acctSettingsLoad.addEventListener('click', function () {
+      fetch('/api/user/settings').then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || !d.success) {
+          sayServerStatus((d && d.error) || t('account.failed'));
+          return;
+        }
+        var settings = d.settings || {};
+        if (!Object.keys(settings).length) {
+          sayServerStatus(t('account.failed'));
+          return;
+        }
+        // The saved copy is written back over the app's own settings, and
+        // the page reloads so every control is drawn from the new values.
+        saveConfig(settings).then(function (result) {
+          if (result && result.ok) {
+            window.location.reload();
+            return;
+          }
+          sayServerStatus(t('account.failed'));
+        });
+      }).catch(function () { sayServerStatus(t('account.failed')); });
+    });
+  }
 
   // ---------- Package manager (desktop build only) ----------
   // The button is not drawn on the hosted copy, so these lookups come back
@@ -1782,7 +1887,12 @@
   var accountModal = document.getElementById('account-modal');
   var accountClose = document.getElementById('account-close');
   if (accountBtn && accountModal) {
-    accountBtn.addEventListener('click', function () { accountModal.style.display = 'flex'; });
+    accountBtn.addEventListener('click', function () {
+      accountModal.style.display = 'flex';
+      // The saved files are only there for a signed-in reader, so they are
+      // asked for when the account box opens rather than at page load.
+      if (window.CURRENT_USER) loadAccountFiles();
+    });
   }
   if (accountClose && accountModal) {
     accountClose.addEventListener('click', function () { accountModal.style.display = 'none'; });

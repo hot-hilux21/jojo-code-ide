@@ -23,8 +23,7 @@ from . import trace_runner
 from .shell import ShellError, ShellTimeout
 from .shell import registry as shell_registry
 from .utils import colour
-from . import oauth
-from . import cloud
+from . import users
 main_bp = Blueprint('main', __name__)
 
 # A run is allowed to print this much before it is cut off. Enough for any
@@ -1686,7 +1685,6 @@ def index():
                           stop_keys=STOP_KEYS,
                           t=i18n.make_translator(locale),
                           hosted=on_public_web(),
-                          account=oauth.public_account(),
                           current_user=session.get('user_username'))
 
 def _runner_env():
@@ -2719,18 +2717,6 @@ def profile_apply_api():
     return jsonify({'success': True, 'config': config})
 
 
-def is_admin():
-    """True only for the configured GitHub admin account."""
-    from flask import session
-    allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
-    if not allowed:
-        return False
-    try:
-        return session.get('admin_github') == allowed
-    except RuntimeError:
-        return False
-
-
 def admin_authorized():
     """Access-code gate for the maintainer's dashboard."""
     if not ACCESS_CODE:
@@ -2795,116 +2781,8 @@ def admin_logout():
     session.pop('admin_access', None)
     return redirect('/admin')
 
-@main_bp.route('/api/auth/status', methods=['GET'])
-def auth_status_api():
-    """Which providers can be used and who is connected."""
-    account = oauth.load_account()
-    return jsonify({
-        'providers': [
-            {
-                'id': name,
-                'name': oauth.PROVIDERS[name]['name'],
-                'available': oauth.is_available(name),
-            }
-            for name in oauth.PROVIDERS
-        ],
-        'account': oauth.public_account(account),
-    })
-
-
-@main_bp.route('/api/auth/<provider>/start', methods=['GET'])
-def auth_start_api(provider):
-    """Send the reader to the provider's consent screen."""
-    if provider not in oauth.PROVIDERS or not oauth.is_available(provider):
-        return jsonify({'success': False, 'error': 'provider not configured'}), 503
-
-    from flask import session, url_for
-
-    state = oauth.make_state()
-    verifier = oauth.make_pkce()[0]
-    session['oauth_state'] = state
-    session['oauth_provider'] = provider
-    session['oauth_verifier'] = verifier
-    session['oauth_next'] = _safe_next(request.args.get('next'))
-
-    if on_public_web():
-        base = os.environ.get('PUBLIC_BASE_URL', '').rstrip('/')
-        if not base:
-            host = request.headers.get('X-Forwarded-Host') or request.headers.get('Host') or request.host
-            base = 'https://' + host
-        redirect_uri = base + '/api/auth/' + provider + '/callback'
-    else:
-        redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme='http')
-    return redirect(oauth.authorization_url(provider, redirect_uri, state, verifier))
-
-
-@main_bp.route('/api/auth/<provider>/callback', methods=['GET'])
-def auth_callback_api(provider):
-    """Handle the provider's redirect back here."""
-    from flask import session, url_for, redirect
-
-    from flask import session
-    error = request.args.get('error')
-    if error:
-        return redirect('/?auth_error=' + urllib.parse.quote(error))
-
-    state = request.args.get('state', '')
-    code = request.args.get('code', '')
-    if (not state or state != session.pop('oauth_state', None)
-            or provider != session.pop('oauth_provider', None)):
-        return redirect('/?auth_error=state_mismatch')
-
-    verifier = session.pop('oauth_verifier', '')
-    if not code or not verifier:
-        return redirect('/?auth_error=missing_code')
-
-    if on_public_web():
-        base = os.environ.get('PUBLIC_BASE_URL', '').rstrip('/')
-        if not base:
-            host = request.headers.get('X-Forwarded-Host') or request.headers.get('Host') or request.host
-            base = 'https://' + host
-        redirect_uri = base + '/api/auth/' + provider + '/callback'
-    else:
-        redirect_uri = url_for('main.auth_callback_api', provider=provider, _external=True, _scheme='http')
-    tokens, token_error = oauth.exchange_code(provider, code, redirect_uri, verifier)
-    if token_error is not None or not tokens or 'access_token' not in tokens:
-        return redirect('/?auth_error=token_exchange_failed')
-
-    profile, profile_error = oauth.fetch_profile(provider, tokens['access_token'])
-    if profile_error is not None:
-        profile = {'email': '', 'name': '', 'subject': ''}
-
-    account = {
-        'provider': provider,
-        'email': profile.get('email', ''),
-        'name': profile.get('name', ''),
-        'login': profile.get('login', ''),
-        'subject': profile.get('subject', ''),
-        'connected_at': int(time.time()),
-        'access_token': tokens.get('access_token', ''),
-        'refresh_token': tokens.get('refresh_token', ''),
-        'expires_at': int(time.time()) + int(tokens.get('expires_in', 3600)),
-    }
-
-    # GitHub is used as the admin gate. Only the configured account gets in;
-    # anyone else is turned away before a token is even stored.
-    if provider == 'github':
-        allowed = os.environ.get('GITHUB_ADMIN_LOGIN', '').strip()
-        if allowed and profile.get('login', '') != allowed:
-            return redirect('/?auth_error=not_admin')
-
-    oauth.save_account(account)
-
-    if provider == 'github':
-        session['admin_github'] = profile.get('login', '')
-
-    next_path = session.pop('oauth_next', '/') or '/'
-    return redirect(next_path)
-
-
 @main_bp.route('/api/auth/disconnect', methods=['POST'])
 def auth_disconnect_api():
-    oauth.clear_account()
     from flask import session
     session.pop('user_username', None)
     session.pop('admin_access', None)
@@ -2947,41 +2825,6 @@ def auth_reset_password_api():
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
     return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
-
-
-def _safe_next(value):
-    """Only allow a local path as the post-login destination."""
-    if not isinstance(value, str) or not value.startswith('/') or value.startswith('//'):
-        return '/'
-    return value
-
-
-@main_bp.route('/api/cloud/status', methods=['GET'])
-def cloud_status_api():
-    return jsonify(cloud.status())
-
-
-@main_bp.route('/api/cloud/push', methods=['POST'])
-def cloud_push_api():
-    from . import oauth
-    account = oauth.load_account()
-    if not account or account.get('provider') != 'google':
-        return jsonify({'success': False, 'error': 'google not connected'}), 400
-    ok, msg = cloud.push(load_config())
-    return jsonify({'success': ok, 'message': msg})
-
-
-@main_bp.route('/api/cloud/pull', methods=['POST'])
-def cloud_pull_api():
-    pulled, err = cloud.pull()
-    if err:
-        return jsonify({'success': False, 'error': err}), 400
-    if not isinstance(pulled, dict):
-        return jsonify({'success': False, 'error': 'bad data'}), 400
-    config = load_config()
-    config.update(pulled)
-    save_config(config)
-    return jsonify({'success': True, 'config': config})
 
 
 @main_bp.route('/privacy')
@@ -3150,6 +2993,70 @@ def user_code_api():
         code = ''
     users.save_code(username, code)
     return jsonify({'success': True})
+
+
+@main_bp.route('/api/user/settings', methods=['GET', 'POST'])
+def user_settings_api():
+    """The settings this account keeps on the server.
+
+    GET returns the saved copy, POST stores one. The settings themselves
+    still live in the app's own config; this is the copy that travels
+    with the account, so a reader can bring their choices back.
+    """
+    from flask import session
+    from . import users
+    username = session.get('user_username')
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    if request.method == 'GET':
+        return jsonify({'success': True, 'settings': users.load_settings(username)})
+    data = request.get_json(silent=True) or {}
+    settings = data.get('settings')
+    if not isinstance(settings, dict):
+        return jsonify({'success': False, 'error': 'bad settings'}), 400
+    users.save_settings(username, settings)
+    return jsonify({'success': True})
+
+
+@main_bp.route('/api/user/files', methods=['GET', 'POST'])
+def user_files_api():
+    """The files this account keeps on the server.
+
+    GET lists them, POST saves one under the name given.
+    """
+    from flask import session
+    from . import users
+    username = session.get('user_username')
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    if request.method == 'GET':
+        return jsonify({'success': True, 'files': users.list_files(username)})
+    data = request.get_json(silent=True) or {}
+    code = data.get('code', '')
+    if not isinstance(code, str):
+        code = ''
+    stored = users.save_file(username, data.get('name', ''), code)
+    if not stored:
+        return jsonify({'success': False, 'error': 'bad file name'}), 400
+    return jsonify({'success': True, 'name': stored})
+
+
+@main_bp.route('/api/user/files/<path:name>', methods=['GET', 'DELETE'])
+def user_file_api(name):
+    """One saved file: GET reads it, DELETE removes it."""
+    from flask import session
+    from . import users
+    username = session.get('user_username')
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    if request.method == 'DELETE':
+        if not users.delete_file(username, name):
+            return jsonify({'success': False, 'error': 'no such file'}), 404
+        return jsonify({'success': True})
+    code = users.read_file(username, name)
+    if code is None:
+        return jsonify({'success': False, 'error': 'no such file'}), 404
+    return jsonify({'success': True, 'name': users.safe_file_name(name), 'code': code})
 
 
 @main_bp.route('/api/analytics', methods=['GET'])
