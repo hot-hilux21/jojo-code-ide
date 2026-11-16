@@ -13,14 +13,82 @@
     .stars { color: #b38e00; }
     table { width: 100%; border-collapse: collapse; }
     th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--panel-border, #333); }
+    caption { text-align: left; padding-bottom: 0.5rem; color: var(--muted, #aaa); }
+    .admin-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .admin-actions form { margin: 0; }
+    .admin-form label { display: block; margin-top: 0.5rem; }
+    .admin-form input { display: block; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
   <div class="admin-wrap">
     <h1>Admin dashboard</h1>
+    <p id="admin-status" role="status">{{ message }}</p>
     <form method="post" action="/admin/logout" style="margin-bottom:1rem;">
       <button class="btn btn-small" type="submit">Log out</button>
     </form>
+
+    <div class="admin-card">
+      <h2>My password</h2>
+      <form class="admin-form" method="post" action="/admin/password">
+        <label for="admin-current">Current password</label>
+        <input id="admin-current" name="current" type="password" autocomplete="current-password" required>
+        <label for="admin-new">New password</label>
+        <input id="admin-new" name="new" type="password" autocomplete="new-password" minlength="8" required>
+        <button class="btn btn-small" type="submit">Change password</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <h2>Accounts</h2>
+      <ul class="admin-stats">
+        <li><strong>{{ stats.accounts }}</strong> registered accounts</li>
+        <li><strong>{{ stats.new_week }}</strong> signed up in the last 7 days</li>
+        <li><strong>{{ stats.files }}</strong> saved files</li>
+        <li><strong>{{ stats.feedback }}</strong> feedback messages</li>
+      </ul>
+      <table>
+        <caption>Registered accounts</caption>
+        <thead>
+          <tr>
+            <th scope="col">Account</th>
+            <th scope="col">Email</th>
+            <th scope="col">Signed up</th>
+            <th scope="col">Files</th>
+            <th scope="col">Settings saved</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for account in accounts %}
+            <tr>
+              <td>{{ account.username }}{% if account.admin %} (admin){% endif %}</td>
+              <td>{% if account.email %}{{ account.email }}{% if account.verified %} (verified){% endif %}{% else %}None{% endif %}</td>
+              <td>{{ account.joined or 'Unknown' }}</td>
+              <td>{{ account.files }}</td>
+              <td>{{ 'Yes' if account.settings else 'No' }}</td>
+              <td>
+                <div class="admin-actions">
+                  <form method="post" action="/admin/accounts/reset-password">
+                    <input type="hidden" name="username" value="{{ account.username }}">
+                    <button class="btn btn-small" type="submit">Reset password</button>
+                  </form>
+                  {% if not account.admin %}
+                    <form method="post" action="/admin/accounts/delete" onsubmit="return confirm('Delete this account and all its files?');">
+                      <input type="hidden" name="username" value="{{ account.username }}">
+                      <button class="btn btn-small" type="submit">Delete</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6">No accounts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
     <div class="admin-card">
       <h2>Analytics</h2>

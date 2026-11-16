@@ -1829,12 +1829,25 @@
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2 id="account-heading">{{ t('account.login') }}</h2>
       <div class="field">
-        <label for="acct-username">{{ t('account.username') }}</label>
+        <label for="acct-username" id="acct-username-label">{{ t('account.username_or_email') }}</label>
         <input id="acct-username" type="text" style="width:100%">
+        <div id="acct-email-row" hidden>
+          <label for="acct-email">{{ t('feedback.email') }}</label>
+          <input id="acct-email" type="email" style="width:100%" autocomplete="email">
+        </div>
         <label for="acct-password">{{ t('account.password') }}</label>
         <input id="acct-password" type="password" style="width:100%">
         <button class="btn btn-small" type="button" id="acct-login">{{ t('account.login') }}</button>
         <p id="acct-status" aria-live="polite"></p>
+        <div id="acct-otp-row" hidden>
+          <label for="acct-code">{{ t('account.code') }}</label>
+          <input id="acct-code" type="text" inputmode="numeric" autocomplete="one-time-code" style="width:100%">
+          <div id="acct-reset-password-row" hidden>
+            <label for="acct-reset-password">{{ t('account.new_password') }}</label>
+            <input id="acct-reset-password" type="password" style="width:100%" autocomplete="new-password">
+          </div>
+          <button class="btn btn-small" type="button" id="acct-otp-confirm">{{ t('account.confirm_code') }}</button>
+        </div>
         <p class="settings-hint"><a href="#" id="acct-create">{{ t('account.create_account') }}</a></p>
       </div>
       <button class="btn btn-small" type="button" id="account-close">{{ t('account.close') }}</button>
@@ -1861,10 +1874,26 @@
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.account_settings') }}</h2>
       <div class="field">
+        <label for="acct-new-username">{{ t('account.username') }}</label>
+        <input id="acct-new-username" type="text" style="width:100%" autocomplete="username">
+        <button class="btn btn-small" type="button" id="acct-username-save">{{ t('account.autosave_name_save') }}</button>
+        <p id="acct-username-status" class="acct-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
         <label for="acct-picture">{{ t('account.picture') }}</label>
         <input id="acct-picture" type="file" accept="image/*">
         <p class="field-help">{{ t('account.picture_help') }}</p>
         <p id="acct-picture-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <h3>{{ t('account.change_password') }}</h3>
+        <p class="field-help">{{ t('account.change_password_help') }}</p>
+        <label for="acct-current-password">{{ t('account.current_password') }}</label>
+        <input id="acct-current-password" type="password" style="width:100%" autocomplete="current-password">
+        <label for="acct-new-password">{{ t('account.new_password') }}</label>
+        <input id="acct-new-password" type="password" style="width:100%" autocomplete="new-password">
+        <button class="btn btn-small" type="button" id="acct-password-change">{{ t('account.change_password') }}</button>
+        <p id="acct-password-status" class="acct-status" aria-live="polite"></p>
       </div>
       <div class="field">
         <label for="acct-autosave-name">{{ t('account.autosave_name') }}</label>

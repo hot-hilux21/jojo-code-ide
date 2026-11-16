@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "Змінити пароль",
+  "account.change_password_help": "Використовуйте після створення акаунта або скидання пароля. Оберіть новий пароль, який запам'ятаєте.",
+  "account.current_password": "Поточний пароль",
+  "account.new_password": "Новий пароль",
+  "account.password_changed": "Пароль змінено.",
+  "account.password_short": "Використовуйте щонайменше 8 символів.",
+  "account.password_wrong": "Це не ваш поточний пароль.",
+  "account.code": "Код з електронної пошти",
+  "account.code_sent": "Код надіслано. Перевірте пошту.",
+  "account.code_wrong": "Неправильний код або термін дії минув.",
+  "account.confirm_code": "Підтвердити код",
+  "account.username_or_email": "Ім'я користувача або електронна пошта"
 }

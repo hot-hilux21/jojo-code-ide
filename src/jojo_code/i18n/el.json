@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "Αλλαγή κωδικού",
+  "account.change_password_help": "Χρησιμοποιήστε το αφού δημιουργήσετε τον λογαριασμό ή επαναφέρετε τον κωδικό. Επιλέξτε έναν νέο κωδικό που θα θυμάστε.",
+  "account.current_password": "Τρέχων κωδικός",
+  "account.new_password": "Νέος κωδικός",
+  "account.password_changed": "Ο κωδικός άλλαξε.",
+  "account.password_short": "Χρησιμοποιήστε τουλάχιστον 8 χαρακτήρες.",
+  "account.password_wrong": "Αυτός δεν είναι ο τρέχων κωδικός σας.",
+  "account.code": "Κωδικός από το email",
+  "account.code_sent": "Ο κωδικός στάλθηκε. Ελέγξτε το email σας.",
+  "account.code_wrong": "Ο κωδικός είναι λάθος ή έχει λήξει.",
+  "account.confirm_code": "Επιβεβαίωση κωδικού",
+  "account.username_or_email": "Όνομα χρήστη ή email"
 }

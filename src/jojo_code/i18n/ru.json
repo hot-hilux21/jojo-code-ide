@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "Изменить пароль",
+  "account.change_password_help": "Используйте после создания учётной записи или сброса пароля. Придумайте новый пароль, который запомните.",
+  "account.current_password": "Текущий пароль",
+  "account.new_password": "Новый пароль",
+  "account.password_changed": "Пароль изменён.",
+  "account.password_short": "Не менее 8 символов.",
+  "account.password_wrong": "Это не ваш текущий пароль.",
+  "account.code": "Код из электронной почты",
+  "account.code_sent": "Код отправлен. Проверьте почту.",
+  "account.code_wrong": "Неверный код или истёк срок действия.",
+  "account.confirm_code": "Подтвердить код",
+  "account.username_or_email": "Имя пользователя или электронная почта"
 }

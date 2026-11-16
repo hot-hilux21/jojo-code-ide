@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "修改密码",
+  "account.change_password_help": "在创建账号或重置密码后使用。选一个你记得住的新密码。",
+  "account.current_password": "当前密码",
+  "account.new_password": "新密码",
+  "account.password_changed": "密码已修改。",
+  "account.password_short": "至少输入 8 个字符。",
+  "account.password_wrong": "这不是你的当前密码。",
+  "account.code": "邮件中的验证码",
+  "account.code_sent": "验证码已发送。请查看邮件。",
+  "account.code_wrong": "验证码错误或已过期。",
+  "account.confirm_code": "确认验证码",
+  "account.username_or_email": "用户名或邮箱"
 }

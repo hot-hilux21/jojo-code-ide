@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "تغيير كلمة المرور",
+  "account.change_password_help": "استخدم هذا بعد إنشاء الحساب أو إعادة تعيين كلمة المرور. اختر كلمة مرور جديدة تتذكرها.",
+  "account.current_password": "كلمة المرور الحالية",
+  "account.new_password": "كلمة المرور الجديدة",
+  "account.password_changed": "تم تغيير كلمة المرور.",
+  "account.password_short": "استخدم 8 أحرف على الأقل.",
+  "account.password_wrong": "هذه ليست كلمة المرور الحالية.",
+  "account.code": "الرمز من البريد الإلكتروني",
+  "account.code_sent": "تم إرسال الرمز. تحقق من بريدك الإلكتروني.",
+  "account.code_wrong": "الرمز غير صحيح أو منتهي الصلاحية.",
+  "account.confirm_code": "تأكيد الرمز",
+  "account.username_or_email": "اسم المستخدم أو البريد الإلكتروني"
 }

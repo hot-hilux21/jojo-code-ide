@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "पासवर्ड बदलें",
+  "account.change_password_help": "खाता बनाने या पासवर्ड रीसेट करने के बाद इसका इस्तेमाल करें। ऐसा नया पासवर्ड चुनें जो आपको याद रहे।",
+  "account.current_password": "वर्तमान पासवर्ड",
+  "account.new_password": "नया पासवर्ड",
+  "account.password_changed": "पासवर्ड बदल गया।",
+  "account.password_short": "कम से कम 8 अक्षर लगाएँ।",
+  "account.password_wrong": "यह आपका वर्तमान पासवर्ड नहीं है।",
+  "account.code": "कोड ईमेल से",
+  "account.code_sent": "कोड भेज गया। अपना ईमेल देखें।",
+  "account.code_wrong": "यह कोड गलत है या समाप्त हो गया।",
+  "account.confirm_code": "कोड की पुष्टि करें",
+  "account.username_or_email": "उपयोगकर्ता नाम या ईमेल"
 }

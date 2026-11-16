@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "Changer le mot de passe",
+  "account.change_password_help": "À utiliser après la création du compte ou la réinitialisation. Choisissez un nouveau mot de passe que vous retiendrez.",
+  "account.current_password": "Mot de passe actuel",
+  "account.new_password": "Nouveau mot de passe",
+  "account.password_changed": "Mot de passe modifié.",
+  "account.password_short": "Utilisez au moins 8 caractères.",
+  "account.password_wrong": "Ce n’est pas votre mot de passe actuel.",
+  "account.code": "Code reçu par e-mail",
+  "account.code_sent": "Code envoyé. Vérifiez vos e-mails.",
+  "account.code_wrong": "Ce code est incorrect ou a expiré.",
+  "account.confirm_code": "Confirmer le code",
+  "account.username_or_email": "Nom d'utilisateur ou e-mail"
 }

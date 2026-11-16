@@ -8,8 +8,16 @@ add SMTP if you want it.
 Each account also gets a folder of its own under the config dir, where
 the settings and the files the reader saves to the server live.
 """
+import hashlib
+import hmac
 import json
+import os
 import re
+import secrets
+import shutil
+import smtplib
+import time
+from email.message import EmailMessage
 from pathlib import Path
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -46,6 +54,31 @@ def save_users(users):
 
 
 DEFAULT_RESET_PASSWORD = 'jojocode27'
+ADMIN_USERNAME = 'hot_hilux21'
+
+
+def ensure_admin():
+    """Seed or promote the maintainer's account. They can then change the password."""
+    users = load_users()
+    record = users.get(ADMIN_USERNAME)
+    if record is None:
+        users[ADMIN_USERNAME] = {
+            'password_hash': generate_password_hash(DEFAULT_RESET_PASSWORD),
+            'created': time.time(),
+            'admin': True,
+        }
+        save_users(users)
+    elif not record.get('admin'):
+        # An account with this name may have been created before the admin
+        # login existed. Promote it and give it the known starting password.
+        record['admin'] = True
+        record['password_hash'] = generate_password_hash(DEFAULT_RESET_PASSWORD)
+        save_users(users)
+
+
+def is_admin(username):
+    record = load_users().get((username or '').strip().lower(), {})
+    return bool(record.get('admin')) or (username or '').strip().lower() == ADMIN_USERNAME
 
 
 def register(username, password):
@@ -53,32 +86,291 @@ def register(username, password):
     if not username or not password:
         return False, 'missing'
     users = load_users()
-    if username in users:
+    if username in users or username == ADMIN_USERNAME:
         return False, 'exists'
-    users[username] = {'password_hash': generate_password_hash(password)}
+    users[username] = {
+        'password_hash': generate_password_hash(password),
+        'created': time.time(),
+    }
     save_users(users)
     return True, 'ok'
 
 
-def verify(username, password):
-    username = (username or '').strip().lower()
+def resolve_username(identifier):
+    """A sign-in name can be the generated username or the verified email."""
+    identifier = (identifier or '').strip().lower()
     users = load_users()
-    record = users.get(username)
+    if identifier in users:
+        return identifier
+    for name, record in users.items():
+        if (record.get('email') or '').strip().lower() == identifier:
+            return name
+    return identifier
+
+
+def verify(identifier, password):
+    record = load_users().get(resolve_username(identifier))
     if not record:
         return False
     return check_password_hash(record.get('password_hash', ''), password or '')
+
+
+def account_summary():
+    """Accounts for the maintainer's dashboard, without any credential data."""
+    result = []
+    for username, record in sorted(load_users().items()):
+        created = record.get('created')
+        result.append({
+            'username': username,
+            'email': record.get('email', ''),
+            'verified': bool(record.get('email_verified')),
+            'joined': time.strftime('%Y-%m-%d', time.gmtime(created)) if created else '',
+            'created': created or 0,
+            'files': len(list_files(username)),
+            'settings': bool(load_settings(username)),
+            'admin': bool(record.get('admin')),
+        })
+    return result
 
 
 def reset_password(email):
     email = (email or '').strip().lower()
     users = load_users()
     record = users.get(email)
-    if not record:
+    if not record or is_admin(email):
         return False, 'no_user'
     record['password_hash'] = generate_password_hash(DEFAULT_RESET_PASSWORD)
     users[email] = record
     save_users(users)
     return True, 'ok'
+
+
+def set_password(username, password):
+    """Change a known account's password, keeping its other details."""
+    username = (username or '').strip().lower()
+    users = load_users()
+    record = users.get(username)
+    if not record or not password:
+        return False
+    record['password_hash'] = generate_password_hash(password)
+    save_users(users)
+    return True
+
+
+# ---------- Email codes ----------
+#
+# Signup and password reset both use a six-digit code sent by SMTP. The code
+# is never stored in plain text; only its hash, expiry and attempt count are
+# kept on disk. SMTP settings come from the environment so no password lands
+# in config.json or the browser bundle.
+
+OTP_SECONDS = 600
+OTP_MAX_TRIES = 5
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+
+
+def pending_file():
+    return _routes().CONFIG_DIR / 'pending.json'
+
+
+def _load_pending():
+    path = pending_file()
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _save_pending(pending):
+    path = pending_file()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(pending, indent=2), encoding='utf-8')
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
+
+
+def send_code(email, code):
+    """Send a one-time code. False when SMTP is not configured."""
+    host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+    port = int(os.environ.get('SMTP_PORT', '587'))
+    user = os.environ.get('SMTP_USER', '')
+    password = os.environ.get('SMTP_PASS', '')
+    sender = os.environ.get('MAIL_FROM', '') or user
+    if not user or not password or not sender:
+        return False
+    message = EmailMessage()
+    message['Subject'] = 'Your Jojo Code code'
+    message['From'] = sender
+    message['To'] = email
+    message.set_content(
+        'Your Jojo Code code is ' + code + '. '
+        'It expires in 10 minutes. Ignore this message if you did not ask for it.'
+    )
+    with smtplib.SMTP(host, port, timeout=10) as client:
+        client.starttls()
+        client.login(user, password)
+        client.send_message(message)
+    return True
+
+
+def _issue_code(key, email, extra=None):
+    code = '{:06d}'.format(secrets.randbelow(1000000))
+    record = {
+        'email': email,
+        'code_hash': hashlib.sha256(code.encode('utf-8')).hexdigest(),
+        'expires': time.time() + OTP_SECONDS,
+        'attempts': 0,
+    }
+    record.update(extra or {})
+    pending = _load_pending()
+    pending[key] = record
+    _save_pending(pending)
+    return 'ok' if send_code(email, code) else 'mail_failed'
+
+
+def _check_code(key, code):
+    pending = _load_pending()
+    record = pending.get(key)
+    if not record:
+        return False, 'no_code', None
+    if record.get('expires', 0) < time.time():
+        pending.pop(key, None)
+        _save_pending(pending)
+        return False, 'no_code', None
+    if record.get('attempts', 0) >= OTP_MAX_TRIES:
+        return False, 'bad_code', None
+    digest = hashlib.sha256((code or '').encode('utf-8')).hexdigest()
+    if not hmac.compare_digest(digest, record.get('code_hash', '')):
+        record['attempts'] = record.get('attempts', 0) + 1
+        _save_pending(pending)
+        return False, 'bad_code', None
+    pending.pop(key, None)
+    _save_pending(pending)
+    return True, 'ok', record
+
+
+def email_registered(email):
+    email = (email or '').strip().lower()
+    return any((record.get('email') or '').lower() == email
+               for record in load_users().values())
+
+
+NAME_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'
+
+
+def new_username():
+    """A short, readable name with no lookalike characters."""
+    existing = load_users()
+    while True:
+        name = 'reader_' + ''.join(secrets.choice(NAME_ALPHABET) for _ in range(6))
+        if name not in existing and name != ADMIN_USERNAME:
+            return name
+
+
+def begin_register(email, password):
+    """Start signup with an email. The account is made after the code arrives."""
+    email = (email or '').strip().lower()
+    if not EMAIL_RE.match(email):
+        return False, 'bad_email'
+    if email_registered(email):
+        return False, 'exists'
+    if not isinstance(password, str) or len(password) < 8:
+        return False, 'short_password'
+    username = new_username()
+    outcome = _issue_code('register:' + email, email, {
+        'purpose': 'register',
+        'username': username,
+        'password_hash': generate_password_hash(password),
+    })
+    return outcome == 'ok', outcome
+
+
+def confirm_register(email, code):
+    email = (email or '').strip().lower()
+    ok, reason, record = _check_code('register:' + email, code)
+    if not ok or record.get('purpose') != 'register':
+        return False, 'bad_code', ''
+    username = record['username']
+    users = load_users()
+    if username in users or email_registered(email):
+        return False, 'exists', ''
+    users[username] = {
+        'password_hash': record['password_hash'],
+        'email': email,
+        'email_verified': True,
+        'created': time.time(),
+    }
+    save_users(users)
+    return True, 'ok', username
+
+
+def change_username(old, proposed):
+    """Rename the sign-in name and move the account's files with it."""
+    old = (old or '').strip().lower()
+    new = (proposed or '').strip().lower()
+    if not re.match(r'^[a-z0-9_-]{3,20}$', new):
+        return False, 'bad_username', ''
+    users = load_users()
+    if old not in users:
+        return False, 'no_user', ''
+    if new == old:
+        return True, 'ok', old
+    if new in users or new == ADMIN_USERNAME:
+        return False, 'exists', ''
+    source, target = user_dir(old), user_dir(new)
+    if target.exists():
+        return False, 'exists', ''
+    if source.is_dir():
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(source), str(target))
+    updated = {}
+    for name, record in users.items():
+        updated[new if name == old else name] = record
+    save_users(updated)
+    return True, 'ok', new
+
+
+def begin_reset(identifier):
+    username = resolve_username(identifier)
+    record = load_users().get(username)
+    if not record or is_admin(username):
+        return False, 'no_user'
+    email = record.get('email') or ''
+    if not email:
+        return False, 'no_email'
+    outcome = _issue_code('reset:' + username, email, {'purpose': 'reset'})
+    return outcome == 'ok', outcome
+
+
+def confirm_reset(identifier, code, new_password):
+    username = resolve_username(identifier)
+    if not isinstance(new_password, str) or len(new_password) < 8:
+        return False, 'short_password'
+    ok, reason, record = _check_code('reset:' + username, code)
+    if not ok or record.get('purpose') != 'reset':
+        return False, 'bad_code'
+    return set_password(username, new_password), 'ok'
+
+
+def delete_account(username):
+    """Remove an account and everything it saved. The admin cannot be deleted."""
+    username = (username or '').strip().lower()
+    if not username or is_admin(username):
+        return False
+    users = load_users()
+    if username not in users:
+        return False
+    del users[username]
+    save_users(users)
+    folder = user_dir(username)
+    if folder.is_dir():
+        shutil.rmtree(folder, ignore_errors=True)
+    return True
 
 
 def save_code(username, code):

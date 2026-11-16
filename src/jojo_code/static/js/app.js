@@ -1662,22 +1662,52 @@
   }
 
   var acctUsername = document.getElementById('acct-username');
+  var acctUsernameLabel = document.getElementById('acct-username-label');
+  var acctEmail = document.getElementById('acct-email');
+  var acctEmailRow = document.getElementById('acct-email-row');
   var acctPassword = document.getElementById('acct-password');
   var acctStatus = document.getElementById('acct-status');
   var acctHeading = document.getElementById('account-heading');
   var acctLoginBtn = document.getElementById('acct-login');
   var acctCreate = document.getElementById('acct-create');
+  var acctOtpRow = document.getElementById('acct-otp-row');
+  var acctCode = document.getElementById('acct-code');
+  var acctOtpConfirm = document.getElementById('acct-otp-confirm');
+  var acctResetRow = document.getElementById('acct-reset-password-row');
+  var acctResetPassword = document.getElementById('acct-reset-password');
   var signUp = false;
+  var otpPurpose = '';
 
   // One box, two jobs. The link below the fields switches between signing
   // in and creating an account: the heading and the button both say which
-  // one is about to happen.
+  // one is about to happen. Signup needs an email, not a username; the
+  // server picks the username after the code is confirmed.
   function setAccountMode(toSignUp) {
     signUp = !!toSignUp;
     if (acctHeading) acctHeading.textContent = signUp ? t('account.sign_up') : t('account.login');
     if (acctLoginBtn) acctLoginBtn.textContent = signUp ? t('account.sign_up') : t('account.login');
     if (acctCreate) acctCreate.textContent = signUp ? t('account.have_account') : t('account.create_account');
+    if (acctEmailRow) acctEmailRow.hidden = !signUp;
+    if (acctUsername) acctUsername.hidden = signUp;
+    if (acctUsernameLabel) {
+      acctUsernameLabel.hidden = signUp;
+      acctUsernameLabel.textContent = t('account.username_or_email');
+    }
+    otpPurpose = '';
+    if (acctOtpRow) acctOtpRow.hidden = true;
+    if (acctResetRow) acctResetRow.hidden = true;
     if (acctStatus) acctStatus.textContent = '';
+  }
+
+  function acctError(data) {
+    if (data.error === 'bad_code' || data.error === 'no_code') return t('account.code_wrong');
+    return data.error || t('account.failed');
+  }
+
+  function showOtp(isReset) {
+    otpPurpose = isReset ? 'reset' : 'register';
+    if (acctOtpRow) acctOtpRow.hidden = false;
+    if (acctResetRow) acctResetRow.hidden = !isReset;
   }
 
   if (acctCreate) {
@@ -1694,20 +1724,59 @@
   // the reader is in, not by a second button that duplicates the fields.
   var acctLogin = document.getElementById('acct-login');
   if (acctLogin) acctLogin.addEventListener('click', function () {
-    var url = signUp ? '/api/auth/register' : '/api/auth/login';
-    var success = signUp ? 'account.status_registered' : 'account.status_logged_in';
-    acctPost(url, { username: acctUsername.value, password: acctPassword.value })
+    if (signUp) {
+      acctPost('/api/auth/register', { email: acctEmail.value, password: acctPassword.value })
+        .then(function (r) {
+          if (acctStatus) acctStatus.textContent = r.ok ? t('account.code_sent') : acctError(r.data);
+          if (r.ok) showOtp(false);
+        });
+      return;
+    }
+    acctPost('/api/auth/login', { username: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? t(success) : (r.data.error || t('account.failed'));
+        if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_logged_in') : acctError(r.data);
         if (r.ok) window.location.reload();
       });
   });
   var acctForgot = document.getElementById('acct-forgot');
   if (acctForgot) acctForgot.addEventListener('click', function (e) {
     e.preventDefault();
-    acctPost('/api/auth/reset-password', { username: acctUsername.value })
+    acctPost('/api/auth/reset/request', { username: acctUsername.value })
       .then(function (r) {
-        if (acctStatus) acctStatus.textContent = r.ok ? t('account.password_reset', r.data.password || 'default') : (r.data.error || t('account.failed'));
+        if (acctStatus) acctStatus.textContent = r.ok ? t('account.code_sent') : acctError(r.data);
+        if (r.ok) showOtp(true);
+      });
+  });
+  if (acctOtpConfirm) acctOtpConfirm.addEventListener('click', function () {
+    var url = otpPurpose === 'register' ? '/api/auth/register/confirm' : '/api/auth/reset/confirm';
+    var body = otpPurpose === 'register'
+      ? { email: acctEmail.value, code: acctCode.value }
+      : { username: acctUsername.value, code: acctCode.value, new_password: acctResetPassword.value };
+    var done = otpPurpose === 'register' ? 'account.status_registered' : 'account.password_changed';
+    acctPost(url, body).then(function (r) {
+      if (acctStatus) acctStatus.textContent = r.ok ? t(done) : acctError(r.data);
+      if (r.ok && otpPurpose === 'register') window.location.reload();
+    });
+  });
+  var acctUsernameSave = document.getElementById('acct-username-save');
+  if (acctUsernameSave) acctUsernameSave.addEventListener('click', function () {
+    var field = document.getElementById('acct-new-username');
+    var status = document.getElementById('acct-username-status');
+    acctPost('/api/auth/username', { username: field.value }).then(function (r) {
+      if (status) status.textContent = r.ok ? t('settings.saved') : acctError(r.data);
+      if (r.ok) field.value = r.data.username;
+    });
+  });
+  var acctPasswordChange = document.getElementById('acct-password-change');
+  if (acctPasswordChange) acctPasswordChange.addEventListener('click', function () {
+    var current = document.getElementById('acct-current-password');
+    var next = document.getElementById('acct-new-password');
+    var status = document.getElementById('acct-password-status');
+    acctPost('/api/auth/change-password', { current: current.value, new: next.value })
+      .then(function (r) {
+        if (status) status.textContent = r.ok ? t('account.password_changed') :
+          (r.data.error === 'wrong password' ? t('account.password_wrong') : t('account.password_short'));
+        if (r.ok) { current.value = ''; next.value = ''; }
       });
   });
   // ---------- What the account keeps on the server ----------
@@ -2024,6 +2093,8 @@
     menuProfile.addEventListener('click', function () {
       closeAccountMenu();
       profileModal.style.display = 'flex';
+      var nameField = document.getElementById('acct-new-username');
+      if (nameField && window.CURRENT_USER) nameField.value = window.CURRENT_USER;
       if (acctAutosaveName) acctAutosaveName.value = autosaveName;
     });
   }

@@ -504,5 +504,17 @@
   "feedback.email": "Email",
   "feedback.rating": "Rating",
   "feedback.positive": "Positive",
-  "feedback.negative": "Negative"
+  "feedback.negative": "Negative",
+  "account.change_password": "Cambiar contraseña",
+  "account.change_password_help": "Úsalo después de crear la cuenta o restablecer la contraseña. Elige una nueva contraseña que recuerdes.",
+  "account.current_password": "Contraseña actual",
+  "account.new_password": "Nueva contraseña",
+  "account.password_changed": "Contraseña cambiada.",
+  "account.password_short": "Usa al menos 8 caracteres.",
+  "account.password_wrong": "Esa no es tu contraseña actual.",
+  "account.code": "Código del correo",
+  "account.code_sent": "Código enviado. Revisa tu correo.",
+  "account.code_wrong": "Ese código es incorrecto o ha caducado.",
+  "account.confirm_code": "Confirmar código",
+  "account.username_or_email": "Nombre de usuario o correo"
 }

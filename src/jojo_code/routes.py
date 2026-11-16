@@ -2718,32 +2718,35 @@ def profile_apply_api():
 
 
 def admin_authorized():
-    """Access-code gate for the maintainer's dashboard."""
-    if not ACCESS_CODE:
-        return True
+    """Only the maintainer's signed-in session may open the dashboard."""
     from flask import session
-    if session.get('admin_access'):
-        return True
-    given = request.args.get('code', '')
-    if isinstance(given, str) and given and hmac.compare_digest(
-            given.encode('utf-8'), ACCESS_CODE.encode('utf-8')):
-        session['admin_access'] = True
-        return True
-    return False
+    return bool(session.get('admin_access'))
 
 
 @main_bp.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     from flask import session, redirect
     if request.method == 'POST':
-        code = (request.form.get('code') or '').strip()
-        if ACCESS_CODE and hmac.compare_digest(code.encode('utf-8'), ACCESS_CODE.encode('utf-8')):
+        username = (request.form.get('username') or '').strip().lower()
+        password = request.form.get('password') or ''
+        users.ensure_admin()
+        if users.is_admin(username) and users.verify(username, password):
             session['admin_access'] = True
+            session['admin_user'] = username
             return redirect('/admin')
-        return render_template('admin_login.html', error='Wrong code.')
+        return render_template('admin_login.html', error='Wrong username or password.')
 
     if not admin_authorized():
         return render_template('admin_login.html', error=None)
+
+    messages = {
+        'password_changed': 'Password changed.',
+        'password_failed': 'Could not change password. Check the current password and try again.',
+        'account_deleted': 'Account deleted.',
+        'account_reset': 'Password reset to jojocode27. Ask the reader to change it.',
+        'account_failed': 'Could not change that account.',
+    }
+    message = messages.get(request.args.get('msg', ''), '')
 
     # Feedback
     path = CONFIG_DIR / 'feedback.jsonl'
@@ -2761,6 +2764,7 @@ def admin_panel():
                         continue
         except OSError:
             pass
+    feedback_total = len(items)
     items = list(reversed(items))[:200]
 
     # Analytics
@@ -2772,20 +2776,85 @@ def admin_panel():
         except Exception:
             analytics = {}
 
-    return render_template('admin.html', items=items, analytics=analytics)
+    accounts = users.account_summary()
+    readers = [a for a in accounts if not a['admin']]
+    week_ago = time.time() - 7 * 24 * 60 * 60
+    stats = {
+        'accounts': len(readers),
+        'new_week': sum(1 for a in readers if a['created'] >= week_ago),
+        'files': sum(a['files'] for a in readers),
+        'feedback': feedback_total,
+    }
+    return render_template('admin.html', items=items, analytics=analytics,
+                           accounts=accounts, stats=stats, message=message)
 
 
 @main_bp.route('/admin/logout', methods=['POST'])
 def admin_logout():
     from flask import session
     session.pop('admin_access', None)
+    session.pop('admin_user', None)
     return redirect('/admin')
+
+
+@main_bp.route('/admin/password', methods=['POST'])
+def admin_password():
+    from flask import session, redirect
+    if not admin_authorized() or _cross_site_request():
+        return redirect('/admin')
+    username = session.get('admin_user') or users.ADMIN_USERNAME
+    new = request.form.get('new') or ''
+    if (len(new) < 8 or not users.verify(username, request.form.get('current') or '')
+            or not users.set_password(username, new)):
+        return redirect('/admin?msg=password_failed')
+    return redirect('/admin?msg=password_changed')
+
+
+@main_bp.route('/admin/accounts/reset-password', methods=['POST'])
+def admin_account_reset():
+    from flask import redirect
+    if not admin_authorized() or _cross_site_request():
+        return redirect('/admin')
+    username = (request.form.get('username') or '').strip().lower()
+    if not users.set_password(username, users.DEFAULT_RESET_PASSWORD):
+        return redirect('/admin?msg=account_failed')
+    return redirect('/admin?msg=account_reset')
+
+
+@main_bp.route('/admin/accounts/delete', methods=['POST'])
+def admin_account_delete():
+    from flask import redirect
+    if not admin_authorized() or _cross_site_request():
+        return redirect('/admin')
+    username = (request.form.get('username') or '').strip().lower()
+    if not users.delete_account(username):
+        return redirect('/admin?msg=account_failed')
+    return redirect('/admin?msg=account_deleted')
 
 @main_bp.route('/api/auth/disconnect', methods=['POST'])
 def auth_disconnect_api():
     from flask import session
     session.pop('user_username', None)
     session.pop('admin_access', None)
+    session.pop('admin_user', None)
+    return jsonify({'success': True})
+
+
+@main_bp.route('/api/auth/change-password', methods=['POST'])
+def auth_change_password_api():
+    """Let a signed-in reader replace a reset or initial password."""
+    from flask import session
+    data = request.get_json(silent=True) or {}
+    username = (session.get('user_username') or '').strip().lower()
+    new = data.get('new')
+    if not username:
+        return jsonify({'success': False, 'error': 'access required'}), 403
+    if not isinstance(new, str) or len(new) < 8:
+        return jsonify({'success': False, 'error': 'password too short'}), 400
+    if not users.verify(username, data.get('current') or ''):
+        return jsonify({'success': False, 'error': 'wrong password'}), 403
+    if not users.set_password(username, new):
+        return jsonify({'success': False, 'error': 'could not change password'}), 500
     return jsonify({'success': True})
 
 
@@ -2793,38 +2862,70 @@ def auth_disconnect_api():
 def auth_register_api():
     from . import users
     data = request.get_json(silent=True) or {}
-    username = data.get('username', '')
-    password = data.get('password', '')
-    ok, reason = users.register(username, password)
+    ok, reason = users.begin_register(data.get('email'), data.get('password'))
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True, 'step': 'code'})
+
+
+@main_bp.route('/api/auth/register/confirm', methods=['POST'])
+def auth_register_confirm_api():
     from flask import session
-    session['user_username'] = (username or '').strip().lower()
-    return jsonify({'success': True, 'username': session['user_username']})
+    from . import users
+    data = request.get_json(silent=True) or {}
+    ok, reason, username = users.confirm_register(data.get('email'),
+                                                  data.get('code'))
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    session['user_username'] = username
+    return jsonify({'success': True, 'username': username})
 
 
 @main_bp.route('/api/auth/login', methods=['POST'])
 def auth_login_api():
     from . import users
     data = request.get_json(silent=True) or {}
-    username = data.get('username', '')
-    password = data.get('password', '')
-    if not users.verify(username, password):
+    identifier = (data.get('username') or '').strip().lower()
+    if not users.verify(identifier, data.get('password', '')):
         return jsonify({'success': False, 'error': 'invalid credentials'}), 403
     from flask import session
-    session['user_username'] = (username or '').strip().lower()
+    session['user_username'] = users.resolve_username(identifier)
     return jsonify({'success': True, 'username': session['user_username']})
 
 
-@main_bp.route('/api/auth/reset-password', methods=['POST'])
-def auth_reset_password_api():
+@main_bp.route('/api/auth/reset/request', methods=['POST'])
+def auth_reset_request_api():
     from . import users
     data = request.get_json(silent=True) or {}
-    username = data.get('username', '')
-    ok, reason = users.reset_password(username)
+    ok, reason = users.begin_reset(data.get('username'))
     if not ok:
         return jsonify({'success': False, 'error': reason}), 400
-    return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
+    return jsonify({'success': True, 'step': 'code'})
+
+
+@main_bp.route('/api/auth/reset/confirm', methods=['POST'])
+def auth_reset_confirm_api():
+    from . import users
+    data = request.get_json(silent=True) or {}
+    ok, reason = users.confirm_reset(data.get('username'), data.get('code'),
+                                     data.get('new_password'))
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True})
+
+
+@main_bp.route('/api/auth/username', methods=['POST'])
+def auth_username_api():
+    """Change the name the reader signs in with. Email stays the anchor."""
+    from flask import session
+    from . import users
+    data = request.get_json(silent=True) or {}
+    old = (session.get('user_username') or '').strip().lower()
+    ok, reason, new = users.change_username(old, data.get('username'))
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    session['user_username'] = new
+    return jsonify({'success': True, 'username': new})
 
 
 @main_bp.route('/api/packages/list', methods=['GET'])
