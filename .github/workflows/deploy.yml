@@ -10,10 +10,15 @@ jobs:
     steps:
       - name: Execute remote SSH deployment commands
         uses: appleboy/ssh-action@master
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
         with:
           host: 132.145.69.213
           username: opc
           key: ${{ secrets.ORACLE_SSH_KEY }}
+          envs: SMTP_USER,SMTP_PASS,MAIL_FROM
           script: |
             set -euo pipefail
             cd /home/opc/jojo-code-ide
@@ -25,6 +30,14 @@ jobs:
             git fetch --prune origin main
             git reset --hard origin/main
             git --no-pager log --oneline -1
+            # SMTP settings live in GitHub Secrets so a new server gets them
+            # without anyone hand-editing .env. Missing secrets leave the
+            # existing .env alone instead of deploying an empty one.
+            if [ -n "$SMTP_USER" ] && [ -n "$SMTP_PASS" ] && [ -n "$MAIL_FROM" ]; then
+              printf 'SMTP_USER=%s\nSMTP_PASS=%s\nMAIL_FROM=%s\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\n' \
+                "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM" > .env
+              chmod 600 .env
+            fi
             source venv/bin/activate
             pip install -r requirements.txt
             # The PM2 process is named accessible-coding and is started from
