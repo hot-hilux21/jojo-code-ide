@@ -41,6 +41,18 @@ def create_app():
             return jsonify({'error': 'Invalid host.'}), 403
         return None
 
+    # The page and its scripts must never be served from a cache: a stale
+    # app.js is the one failure that looks like a broken app rather than an
+    # old one, because the wiring never runs and the buttons do nothing.
+    @app.after_request
+    def no_cache(response):
+        path = request.path or ''
+        if path.endswith(('.html', '.js', '.css')) or path in ('', '/'):
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+
     app.register_blueprint(main_bp)
 
     return app

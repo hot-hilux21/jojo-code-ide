@@ -189,6 +189,10 @@ BLOCKED_IMPORTS = [
     'tempfile', 'pickle', 'marshal', 'shelve', 'sqlite3', 'webbrowser',
     'platform', 'getpass', 'pwd', 'grp', 'resource', 'signal', 'asyncio',
     'concurrent', 'ssl', 'ftplib', 'nntplib', 'cgi', 'cgitb', 'wsgiref',
+    # GUI toolkits: no display on the browser sandbox, and they are only
+    # available in the desktop build.
+    'tkinter', 'Tkinter', 'givy', 'guizero', 'PyQt5', 'pyqt5', 'PyQt6', 'pyqt6',
+    'PySide2', 'pyside2', 'PySide6', 'pyside6', 'wx', 'wxPython', 'wxpython',
     # OS-level and code-execution escape hatches that the text sandbox must
     # not let a hosted program reach. These are not part of the beginner
     # surface and each one can bypass the import/builtin checks above.
@@ -2988,6 +2992,54 @@ def privacy_page():
 @main_bp.route('/terms')
 def terms_page():
     return render_template('terms.html')
+
+
+@main_bp.route('/api/packages/list', methods=['GET'])
+def packages_list_api():
+    """The packages the reader has installed, by name."""
+    from flask import jsonify
+    from . import packages
+    folder = packages.packages_dir()
+    names = []
+    if folder.exists():
+        for entry in sorted(folder.iterdir()):
+            if entry.is_dir():
+                names.append(entry.name)
+    return jsonify({'success': True, 'packages': names})
+
+
+@main_bp.route('/api/packages/install', methods=['POST'])
+def packages_install_api():
+    """Install a package into the reader's own packages directory.
+
+    Desktop only: the hosted copy has no pip to call and no place to put
+    the result, so it refuses rather than pretending.
+    """
+    import subprocess
+    import sys
+    from flask import jsonify, request
+    from . import packages
+    if on_public_web():
+        return jsonify({'success': False, 'error': 'Not available on the web.'}), 403
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    if not name:
+        return jsonify({'success': False, 'error': 'Package name required.'}), 400
+    try:
+        packages.packages_dir().mkdir(parents=True, exist_ok=True)
+        result = subprocess.run(
+            [sys.executable, '-m', 'pip', 'install',
+             '--target', str(packages.packages_dir()), name],
+            capture_output=True, text=True, timeout=300,
+        )
+        if result.returncode == 0:
+            return jsonify({'success': True, 'output': (result.stdout or '')[-500:]})
+        return jsonify({'success': False,
+                        'error': (result.stderr or result.stdout or '')[-500:]})
+    except FileNotFoundError:
+        return jsonify({'success': False, 'error': 'pip is not available in this build.'})
+    except Exception as exc:
+        return jsonify({'success': False, 'error': str(exc)})
 
 
 @main_bp.route('/faq')

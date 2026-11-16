@@ -1713,6 +1713,71 @@
   if (cloudPush) cloudPush.addEventListener('click', function () { cloudCall('/api/cloud/push'); });
   if (cloudPull) cloudPull.addEventListener('click', function () { cloudCall('/api/cloud/pull'); });
 
+  // ---------- Package manager (desktop build only) ----------
+  // The button is not drawn on the hosted copy, so these lookups come back
+  // empty there and every use below is guarded.
+  var packagesBtn = document.getElementById('packages-btn');
+  var packagesModal = document.getElementById('packages-modal');
+  var packagesClose = document.getElementById('packages-close');
+  var pkgName = document.getElementById('pkg-name');
+  var pkgInstall = document.getElementById('pkg-install');
+  var pkgStatus = document.getElementById('pkg-status');
+  var pkgList = document.getElementById('pkg-list');
+  var pkgEmpty = document.getElementById('pkg-empty');
+  function loadPackages() {
+    fetch('/api/packages/list').then(function (r) { return r.json(); }).then(function (d) {
+      if (!pkgList) return;
+      pkgList.innerHTML = '';
+      var pkgs = (d && d.packages) || [];
+      if (pkgEmpty) pkgEmpty.hidden = pkgs.length > 0;
+      pkgs.forEach(function (p) {
+        var li = document.createElement('li');
+        li.textContent = p;
+        pkgList.appendChild(li);
+      });
+    }).catch(function () {});
+  }
+  if (packagesBtn && packagesModal) {
+    packagesBtn.addEventListener('click', function () {
+      packagesModal.style.display = 'flex';
+      loadPackages();
+    });
+  }
+  if (packagesClose && packagesModal) {
+    packagesClose.addEventListener('click', function () {
+      packagesModal.style.display = 'none';
+    });
+  }
+  if (packagesModal) {
+    packagesModal.addEventListener('click', function (e) {
+      if (e.target === packagesModal) packagesModal.style.display = 'none';
+    });
+  }
+  if (pkgInstall) {
+    pkgInstall.addEventListener('click', function () {
+      if (pkgStatus) pkgStatus.textContent = t('packages.installing');
+      fetch('/api/packages/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: pkgName ? pkgName.value : '' }),
+      }).then(function (r) {
+        return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+      }).then(function (r) {
+        if (pkgStatus) {
+          pkgStatus.textContent = r.ok
+            ? t('packages.installed')
+            : (r.data.error || t('packages.failed'));
+        }
+        if (r.ok) {
+          loadPackages();
+          if (pkgName) pkgName.value = '';
+        }
+      }).catch(function () {
+        if (pkgStatus) pkgStatus.textContent = t('packages.failed');
+      });
+    });
+  }
+
   var accountBtn = document.getElementById('account-btn');
   var accountModal = document.getElementById('account-modal');
   var accountClose = document.getElementById('account-close');

@@ -7,7 +7,7 @@
   <meta name="description" content="{{ t('app.description') }}">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ version }}-{{ build_commit }}">
   <!-- The two default fonts are preloaded so the first screen is drawn in
        the right font rather than swapping to a fallback. -->
   <link rel="preload" as="font" type="font/ttf" crossorigin
@@ -1786,6 +1786,22 @@
   <button id="account-btn" type="button"
           style="position:fixed;top:8px;right:8px;z-index:9998;" class="btn btn-small">{{ 'login' }}</button>
   <a href="/faq" class="btn btn-small" style="position:fixed;top:8px;right:90px;z-index:9998;text-decoration:none;">{{ 'FAQ' }}</a>
+  {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="position:fixed;top:8px;right:160px;z-index:9998;">{{ 'Packages' }}</button>{% endif %}
+  <div id="packages-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
+      <h2>{{ t('packages.title') }}</h2>
+      <div class="field">
+        <label for="pkg-name">{{ t('packages.name') }}</label>
+        <input id="pkg-name" type="text" style="width:100%">
+      </div>
+      <button class="btn btn-small" type="button" id="pkg-install">{{ t('packages.install') }}</button>
+      <p id="pkg-status" aria-live="polite"></p>
+      <h3>{{ t('packages.installed_list') }}</h3>
+      <ul id="pkg-list"></ul>
+      <p id="pkg-empty" class="settings-hint">{{ t('packages.none') }}</p>
+      <button class="btn btn-small" type="button" id="packages-close">{{ t('settings.close') }}</button>
+    </div>
+  </div>
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.title') }}</h2>
@@ -1822,6 +1838,6 @@
   </div>
   <button id="admin-trigger" type="button" aria-hidden="true" tabindex="-1"
           style="position:fixed;top:0;right:0;width:48px;height:48px;opacity:0;border:0;background:transparent;cursor:default;z-index:9999;"></button>
-  <script src="{{ url_for('static', filename='js/app.js') }}?v={{ version }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}?v={{ version }}-{{ build_commit }}"></script>
 </body>
 </html>
