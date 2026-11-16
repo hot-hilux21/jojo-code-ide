@@ -243,12 +243,12 @@
              {% if config.focus_mode != 'gutter' %}checked{% endif %}>
       <label class="pane-gutter-label" for="line-numbers-toggle">{{ t('pane.line_numbers') }}</label>
     </span>
-     <button type="button" class="btn btn-small pane-indent" id="pane-indent-add"
-             title="{{ t('pane.indent') }}">{{ t('pane.indent') }}</button>
-     <button type="button" class="btn btn-small pane-indent" id="pane-indent-fix"
-             title="{{ t('pane.fix_indent') }}">{{ t('pane.fix_indent') }}</button>
+      <button type="button" class="btn btn-small pane-indent" id="pane-indent-add"
+              title="{{ t('pane.indent') }}" aria-label="{{ t('pane.indent') }}"><span class="btn-icon" aria-hidden="true">{{ icon('move-horizontal') }}</span><span class="btn-label">{{ t('pane.indent') }}</span></button>
+      <button type="button" class="btn btn-small pane-indent" id="pane-indent-fix"
+              title="{{ t('pane.fix_indent') }}" aria-label="{{ t('pane.fix_indent') }}"><span class="btn-icon" aria-hidden="true">{{ icon('check') }}</span><span class="btn-label">{{ t('pane.fix_indent') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="pane-cleanup"
-              title="{{ t('pane.cleanup') }}">{{ t('pane.cleanup') }}</button>
+              title="{{ t('pane.cleanup') }}" aria-label="{{ t('pane.cleanup') }}"><span class="btn-icon" aria-hidden="true">{{ icon('type') }}</span><span class="btn-label">{{ t('pane.cleanup') }}</span></button>
     {% endif %}
     <div class="pane-mini-panel" id="mini-{{ pane }}-panel" role="group"
          aria-label="{{ label }}" hidden>
@@ -324,13 +324,11 @@
     </span>
     <span class="pane-fade-sliders" id="pane-fade-actions">
       <button type="button" class="btn btn-small pane-indent" id="btn-undo"
-              title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}">{{ icon('rotate-ccw') }} {{ t('nav.undo') }}</button>
+              title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('rotate-ccw') }}</span><span class="btn-label">{{ t('nav.undo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-redo"
-              title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}">{{ icon('rotate-cw') }} {{ t('nav.redo') }}</button>
-      <button type="button" class="btn btn-small pane-indent" id="pane-save"
-              title="{{ t('nav.save_title') }}" aria-label="{{ t('nav.save') }}">{{ icon('save') }} {{ t('nav.save') }}</button>
+              title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('rotate-cw') }}</span><span class="btn-label">{{ t('nav.redo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
-              title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}">{{ icon('save') }} {{ t('nav.autosave') }}</button>
+              title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span></button>
       <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
     </span>
   </div>

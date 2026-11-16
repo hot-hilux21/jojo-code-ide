@@ -3590,9 +3590,6 @@
     });
   }
 
-  var paneSave = document.getElementById('pane-save');
-  if (paneSave) paneSave.addEventListener('click', saveFile);
-
   var btnUndo = document.getElementById('btn-undo');
   var btnRedo = document.getElementById('btn-redo');
   var btnAutoSave = document.getElementById('btn-autosave');
