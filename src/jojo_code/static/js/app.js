@@ -4563,21 +4563,21 @@
 
   function paintIconOnly(hiding) {
     var shown = !hiding;
-    function set(button, stateKey, labelKey) {
+    function set(button, onKey, offKey) {
       if (!button) return;
       button.setAttribute('aria-checked', shown ? 'true' : 'false');
       button.classList.toggle('active', shown);
       var state = document.getElementById(button.id + '-state');
-      if (state) state.textContent = shown ? t(stateKey) : t('switch.off');
-      if (labelKey) button.setAttribute('aria-label', shown ? t(labelKey) : t('switch.off'));
+      if (state) state.textContent = shown ? t(onKey) : t(offKey);
+      if (onKey) button.setAttribute('aria-label', shown ? t(onKey) : t(offKey));
     }
-    set(iconOnlyButton, 'switch.on');
-    set(setupIconOnlyButton, 'switch.on');
+    set(iconOnlyButton, 'controls.labels_on', 'controls.labels_off');
+    set(setupIconOnlyButton, 'controls.labels_on', 'controls.labels_off');
     if (hideIconsButton) {
       hideIconsButton.setAttribute('aria-checked', shown ? 'true' : 'false');
       hideIconsButton.classList.toggle('active', shown);
       if (hideIconsState) hideIconsState.textContent = shown ? t('controls.labels_on') : t('controls.labels_off');
-      hideIconsButton.setAttribute('aria-label', 'labels on and off');
+      hideIconsButton.setAttribute('aria-label', shown ? t('controls.labels_on') : t('controls.labels_off'));
     }
   }
 
