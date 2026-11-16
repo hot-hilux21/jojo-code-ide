@@ -287,6 +287,17 @@
     autosaveEnabled = value;
     try { localStorage.setItem('jojo_code_autosave_enabled', value ? 'on' : 'off'); } catch (e) {}
   }
+  // The name the autosave writes to. Read before the autosave starts,
+  // because the first thing it does is look for a file to load.
+  var autosaveName = (function () {
+    try { return localStorage.getItem('jojo_code_autosave_name') || ''; } catch (e) { return ''; }
+  })();
+  function setAutosaveName(value) {
+    autosaveName = (value || '').trim();
+    try {
+      localStorage.setItem('jojo_code_autosave_name', autosaveName);
+    } catch (e) { /* a blocked store is not worth a dialog */ }
+  }
   (function () {
     var AUTOSAVE_KEY = 'jojo_code_autosave';
     try {
@@ -300,22 +311,30 @@
     } catch (e) {}
   })();
 
-   // Cloud autosave for logged-in users (experimental).
+   // Autosave to the server, for a reader who is logged in. The file it
+   // writes to is named by the reader, so the name has to be known before
+   // anything is written: a file with no name has nowhere to go.
    (function () {
      if (!window.CURRENT_USER || !autosaveEnabled) return;
      var timer = null;
      function pushCode() {
-       fetch('/api/user/code', {
+       var name = autosaveName;
+       if (!name) return;
+       fetch('/api/user/files', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ code: editor.getValue() }),
+         body: JSON.stringify({ name: name, code: editor.getValue() }),
        }).catch(function () {});
      }
      editor.on('change', function () {
        if (timer) clearTimeout(timer);
        timer = setTimeout(pushCode, 2000);
      });
-     fetch('/api/user/code').then(function (r) { return r.json(); }).then(function (d) {
+     // The saved file comes back on load, so the reader finds their work
+     // where they left it.
+     var saved = autosaveName;
+     if (!saved) return;
+     fetch('/api/user/files/' + encodeURIComponent(saved)).then(function (r) { return r.json(); }).then(function (d) {
        if (d && d.success && typeof d.code === 'string' && d.code.trim()) {
          editor.setValue(d.code);
        }
@@ -1691,7 +1710,13 @@
   var acctFilesEmpty = document.getElementById('acct-files-empty');
   var acctSettingsSave = document.getElementById('acct-settings-save');
   var acctSettingsLoad = document.getElementById('acct-settings-load');
+  var acctAutosaveName = document.getElementById('acct-autosave-name');
+  var acctAutosaveNameSave = document.getElementById('acct-autosave-name-save');
   var acctServerStatus = document.getElementById('acct-server-status');
+
+  // The name the autosave uses is read at the top of this file, before the
+  // autosave itself starts, because the first thing it does is look for a
+  // file to load.
 
   function sayServerStatus(text) {
     if (acctServerStatus) acctServerStatus.textContent = text || '';
@@ -1716,7 +1741,7 @@
         var open = document.createElement('button');
         open.type = 'button';
         open.className = 'btn btn-small';
-        open.textContent = t('account.file_open');
+        open.textContent = t('account.file_import');
         open.addEventListener('click', function () {
           fetch('/api/user/files/' + encodeURIComponent(file.name))
             .then(function (r) { return r.json(); })
@@ -1725,8 +1750,10 @@
                 sayServerStatus((answer && answer.error) || t('account.failed'));
                 return;
               }
+              // Importing puts the file's contents in the editor, so the
+              // reader can carry on from where the file left off.
               if (editor) editor.setValue(answer.code || '');
-              sayServerStatus(t('account.file_opened'));
+              sayServerStatus(t('account.file_imported'));
             }).catch(function () { sayServerStatus(t('account.failed')); });
         });
         item.appendChild(open);
@@ -1752,6 +1779,26 @@
         acctFileList.appendChild(item);
       });
     }).catch(function () { sayServerStatus(t('account.failed')); });
+  }
+
+  if (acctAutosaveNameSave) {
+    acctAutosaveNameSave.addEventListener('click', function () {
+      var name = acctAutosaveName ? acctAutosaveName.value.trim() : '';
+      if (!name) {
+        sayServerStatus(t('account.autosave_name_missing'));
+        return;
+      }
+      setAutosaveName(name);
+      // Kept on the server as well, so the name travels with the account
+      // rather than only living in this browser.
+      fetch('/api/user/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: { autosave_file: name } }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        sayServerStatus(d && d.success ? t('account.autosave_name_saved') : t('account.failed'));
+      }).catch(function () { sayServerStatus(t('account.failed')); });
+    });
   }
 
   if (acctFileSave) {
@@ -1891,7 +1938,10 @@
       accountModal.style.display = 'flex';
       // The saved files are only there for a signed-in reader, so they are
       // asked for when the account box opens rather than at page load.
-      if (window.CURRENT_USER) loadAccountFiles();
+      if (window.CURRENT_USER) {
+        loadAccountFiles();
+        if (acctAutosaveName) acctAutosaveName.value = autosaveName;
+      }
     });
   }
   if (accountClose && accountModal) {
@@ -3774,6 +3824,10 @@
     setAutosaveEnabled(!autosaveEnabled);
   });
 
+  // Save and open. The save button had no listener at all in this branch,
+  // so pressing it did nothing at all.
+  if (btnSave) btnSave.addEventListener('click', saveFile);
+
   btnOpen.addEventListener('click', openFile);
 
   fileInput.addEventListener('change', function () {
@@ -5634,9 +5688,9 @@
   var shellSession = null;
   var shellBusy = false;
 
-  // Hidden admin entry: three taps in the top-right corner.
+  // Hidden admin entry: three taps on the dot between the footer links.
   (function () {
-    var trigger = document.getElementById('admin-trigger');
+    var trigger = document.getElementById('admin-dot');
     if (!trigger) return;
     var taps = 0, timer = null;
     trigger.addEventListener('click', function () {

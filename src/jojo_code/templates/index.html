@@ -328,6 +328,7 @@
       <button type="button" class="btn btn-small pane-indent" id="btn-redo"
               title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('redo') }}</span><span class="btn-label">{{ t('nav.redo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
+              {% if not current_user %}hidden{% endif %}
               title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span></button>
       <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
     </span>
@@ -428,7 +429,7 @@
   </main>
 
   <footer class="footer" role="contentinfo">
-    <p>{{ t('footer.text') }} <a href="https://github.com/hot-hilux21/jojo-code-ide" target="_blank" rel="noopener">{{ t('footer.github') }}</a></p>
+    <p>{{ t('footer.text') }} <span id="admin-dot" role="separator" aria-hidden="true">{{ '·' }}</span> <a href="https://github.com/hot-hilux21/jojo-code-ide" target="_blank" rel="noopener">{{ t('footer.github') }}</a></p>
     <!-- A newer version, when a check has found one. A plain line in the
          main window rather than a badge or a flash: pressing it opens
          Settings at the updates group, where the check and the download
@@ -1780,14 +1781,11 @@
   <script src="{{ url_for('static', filename='js/matchbrackets.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/active-line.js') }}"></script>
   <script src="{{ url_for('static', filename='js/tint.js') }}"></script>
-  <p style="text-align:center;font-size:0.85rem;margin:1rem 0;">
-    <a href="/privacy" style="color:var(--accent);text-decoration:underline;">{{ 'Privacy' }}</a>{{ ' · ' }}<a href="/terms" style="color:var(--accent);text-decoration:underline;">{{ 'Terms' }}</a>
-  </p>
   <script>window.CURRENT_USER = {{ (current_user or '')|tojson }};</script>
   <div style="position:fixed;top:8px;right:8px;z-index:9998;display:flex;gap:0.4rem;align-items:center;">
     <a href="/faq" class="btn btn-small" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('help-circle') }} {{ 'FAQ' }}</a>
     {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('package') }} {{ 'Packages' }}</button>{% endif %}
-    <button id="account-btn" type="button" class="btn btn-small">{{ 'login' }}</button>
+    <button id="account-btn" type="button" class="btn btn-small" title="{{ t('account.title') }}" aria-label="{{ t('account.title') }}" style="display:inline-flex;align-items:center;gap:0.3rem;padding:var(--space-1) var(--space-3);">{{ icon('user') }}</button>
   </div>
   <div id="packages-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
@@ -1807,6 +1805,8 @@
   <div id="account-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:360px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.title') }}</h2>
+
+      <h3>{{ t('account.my_account') }}</h3>
       {% if current_user %}<p>{{ t('account.signed_in_as_user', current_user) }}</p>{% endif %}
       <div class="field">
         <label for="acct-username">{{ t('account.username') }}</label>
@@ -1818,23 +1818,29 @@
         <p id="acct-status" aria-live="polite"></p>
       </div>
       <div class="field" id="acct-server" {% if not current_user %}hidden{% endif %}>
-        <p class="settings-hint">{{ t('account.files_title') }}</p>
-        <label for="acct-file-name">{{ t('account.file_name') }}</label>
-        <input id="acct-file-name" type="text" style="width:100%">
-        <button class="btn btn-small" type="button" id="acct-file-save">{{ t('account.file_save') }}</button>
-        <ul id="acct-file-list"></ul>
-        <p id="acct-files-empty" class="settings-hint" hidden>{{ t('account.files_empty') }}</p>
+        <label for="acct-autosave-name">{{ t('account.autosave_name') }}</label>
+        <input id="acct-autosave-name" type="text" style="width:100%" placeholder="my_code.py">
+        <p class="field-help">{{ t('account.autosave_name_help') }}</p>
+        <button class="btn btn-small" type="button" id="acct-autosave-name-save">{{ t('account.autosave_name_save') }}</button>
         <button class="btn btn-small" type="button" id="acct-settings-save">{{ t('account.settings_save') }}</button>
         <button class="btn btn-small" type="button" id="acct-settings-load">{{ t('account.settings_load') }}</button>
         <p id="acct-server-status" aria-live="polite"></p>
       </div>
       <button class="btn btn-small" type="button" id="sign-out-btn">{{ t('account.sign_out') }}</button>
+
+      <h3>{{ t('account.my_files') }}</h3>
+      <div class="field" id="acct-files" {% if not current_user %}hidden{% endif %}>
+        <label for="acct-file-name">{{ t('account.file_name') }}</label>
+        <input id="acct-file-name" type="text" style="width:100%">
+        <button class="btn btn-small" type="button" id="acct-file-save">{{ t('account.file_save') }}</button>
+        <ul id="acct-file-list"></ul>
+        <p id="acct-files-empty" class="settings-hint" hidden>{{ t('account.files_empty') }}</p>
+      </div>
+
       <button class="btn btn-small" type="button" id="account-close">{{ t('account.close') }}</button>
       <p class="settings-hint"><a href="#" id="acct-forgot">{{ t('account.forgot') }}</a></p>
     </div>
   </div>
-  <button id="admin-trigger" type="button" aria-hidden="true" tabindex="-1"
-          style="position:fixed;top:0;right:0;width:48px;height:48px;opacity:0;border:0;background:transparent;cursor:default;z-index:9999;"></button>
   <script src="{{ url_for('static', filename='js/app.js') }}?v={{ version }}-{{ build_commit }}"></script>
 </body>
 </html>

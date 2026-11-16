@@ -2827,16 +2827,6 @@ def auth_reset_password_api():
     return jsonify({'success': True, 'password': users.DEFAULT_RESET_PASSWORD})
 
 
-@main_bp.route('/privacy')
-def privacy_page():
-    return render_template('privacy.html')
-
-
-@main_bp.route('/terms')
-def terms_page():
-    return render_template('terms.html')
-
-
 @main_bp.route('/api/packages/list', methods=['GET'])
 def packages_list_api():
     """The packages the reader has installed, by name."""
@@ -3014,7 +3004,11 @@ def user_settings_api():
     settings = data.get('settings')
     if not isinstance(settings, dict):
         return jsonify({'success': False, 'error': 'bad settings'}), 400
-    users.save_settings(username, settings)
+    # Merged rather than replaced, so saving one thing does not throw away
+    # another. The autosave file name and the settings copy both live here.
+    merged = users.load_settings(username)
+    merged.update(settings)
+    users.save_settings(username, merged)
     return jsonify({'success': True})
 
 
