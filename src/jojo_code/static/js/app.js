@@ -275,6 +275,52 @@
     }).catch(function () {});
   }
 
+  var achievementNames = {
+    first_account: t('achievement.first_account'),
+    first_run: t('achievement.first_run'),
+    first_shell: t('achievement.first_shell'),
+    first_cloud: t('achievement.first_cloud'),
+    first_feedback: t('achievement.first_feedback'),
+    doom: t('achievement.doom')
+  };
+
+  function awardAchievement(key) {
+    if (!window.CURRENT_USER) return;
+    fetch('/api/achievements/award', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.new) return;
+      var status = document.getElementById('achievement-status');
+      if (status) status.textContent = achievementNames[d.key] || d.key;
+      loadAchievements();
+    }).catch(function () {});
+  }
+
+  function loadAchievements() {
+    var list = document.getElementById('achievement-list');
+    if (!list || !window.CURRENT_USER) return;
+    fetch('/api/achievements').then(function (r) { return r.json(); }).then(function (d) {
+      var earned = (d && d.earned) || [];
+      var all = (d && d.all) || [];
+      list.textContent = '';
+      all.forEach(function (key) {
+        var has = earned.indexOf(key) >= 0;
+        var item = document.createElement('li');
+        item.className = 'badge' + (has ? ' earned' : '');
+        var name = document.createElement('span');
+        name.textContent = achievementNames[key] || key;
+        var state = document.createElement('span');
+        state.textContent = has ? '\u2713' : t('achievement.locked');
+        state.setAttribute('aria-label', has ? t('achievement.title') : t('achievement.locked'));
+        item.appendChild(name);
+        item.appendChild(state);
+        list.appendChild(item);
+      });
+    }).catch(function () {});
+  }
+
   // ---------- CodeMirror setup ----------
   var editor = CodeMirror(editorEl, {
     mode: 'python',
@@ -1675,6 +1721,7 @@
         }
         if (response.ok) {
           recordEvent('feedback_sent');
+          awardAchievement('first_feedback');
           if (feedbackPositive) feedbackPositive.value = '';
           if (feedbackNegative) feedbackNegative.value = '';
         }
@@ -1778,7 +1825,11 @@
     var done = otpPurpose === 'register' ? 'account.status_registered' : 'account.password_changed';
     acctPost(url, body).then(function (r) {
       if (acctStatus) acctStatus.textContent = r.ok ? t(done) : acctError(r.data);
-      if (r.ok && otpPurpose === 'register') { recordEvent('signup'); window.location.reload(); }
+      if (r.ok && otpPurpose === 'register') {
+        recordEvent('signup');
+        awardAchievement('first_account');
+        window.location.reload();
+      }
     });
   });
   var acctUsernameSave = document.getElementById('acct-username-save');
@@ -2122,6 +2173,7 @@
       profileModal.style.display = 'flex';
       var nameField = document.getElementById('acct-new-username');
       if (nameField && window.CURRENT_USER) nameField.value = window.CURRENT_USER;
+      loadAchievements();
       if (acctAutosaveName) acctAutosaveName.value = autosaveName;
     });
   }
@@ -3377,6 +3429,7 @@
     pendingAnswers = [];
     answersForCode = null;
     recordEvent('code_run');
+    awardAchievement('first_run');
     startRun();
   }
 
@@ -4149,6 +4202,7 @@
       syncAutosaveButton();
       updateLastSaved();
       recordEvent('cloud_saved');
+      awardAchievement('first_cloud');
     }).catch(function () {});
   }
   if (btnSaveCloud) btnSaveCloud.addEventListener('click', saveToCloud);
@@ -6159,6 +6213,8 @@
       .then(function (data) {
         if (shellFail(data)) return;
         shellSay(data.output);
+        awardAchievement('first_shell');
+        if (data.doom) awardAchievement('doom');
         if (data.doom) {
           var overlay = document.createElement('div');
           overlay.style.position = 'fixed';

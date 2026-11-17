@@ -518,5 +518,13 @@
   "account.confirm_code": "코드 확인",
   "account.username_or_email": "사용자 이름 또는 이메일",
   "account.picture_drop": "여기에 이미지를 놓거나 Enter를 눌러 선택하세요",
-  "nav.save_cloud": "클라우드에 저장"
+  "nav.save_cloud": "클라우드에 저장",
+  "achievement.title": "업적",
+  "achievement.first_account": "계정 만들기",
+  "achievement.first_run": "첫 프로그램 실행",
+  "achievement.first_shell": "첫 셸 명령",
+  "achievement.first_cloud": "클라우드에 저장",
+  "achievement.first_feedback": "의견 보내기",
+  "achievement.doom": "DOOM 실행",
+  "achievement.locked": "아직 없음"
 }

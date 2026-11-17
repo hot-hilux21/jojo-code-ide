@@ -518,5 +518,13 @@
   "account.confirm_code": "コードを確認",
   "account.username_or_email": "ユーザー名またはメールアドレス",
   "account.picture_drop": "ここに画像をドロップするか、Enter キーで選択してください",
-  "nav.save_cloud": "クラウドに保存"
+  "nav.save_cloud": "クラウドに保存",
+  "achievement.title": "実績",
+  "achievement.first_account": "アカウントを作成",
+  "achievement.first_run": "最初のプログラムを実行",
+  "achievement.first_shell": "最初のシェルコマンド",
+  "achievement.first_cloud": "クラウドに保存",
+  "achievement.first_feedback": "フィードバックを送信",
+  "achievement.doom": "DOOMを起動",
+  "achievement.locked": "まだなし"
 }

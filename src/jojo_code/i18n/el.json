@@ -518,5 +518,13 @@
   "account.confirm_code": "Επιβεβαίωση κωδικού",
   "account.username_or_email": "Όνομα χρήστη ή email",
   "account.picture_drop": "Αφήστε μια εικόνα εδώ ή πατήστε Enter για επιλογή",
-  "nav.save_cloud": "Αποθήκευση στο cloud"
+  "nav.save_cloud": "Αποθήκευση στο cloud",
+  "achievement.title": "Επιτεύγματα",
+  "achievement.first_account": "Δημιουργήθηκε λογαριασμός",
+  "achievement.first_run": "Πρώτη εκτέλεση προγράμματος",
+  "achievement.first_shell": "Πρώτη εντολή κελύφους",
+  "achievement.first_cloud": "Αποθήκευση στο cloud",
+  "achievement.first_feedback": "Στάλθηκε σχόλιο",
+  "achievement.doom": "Εκτελέστηκε το DOOM",
+  "achievement.locked": "Ακόμη όχι"
 }

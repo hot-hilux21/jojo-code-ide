@@ -518,5 +518,13 @@
   "account.confirm_code": "कोड की पुष्टि करें",
   "account.username_or_email": "उपयोगकर्ता नाम या ईमेल",
   "account.picture_drop": "यहाँ चित्र छोड़ें, या चुनने के लिए Enter दबाएँ",
-  "nav.save_cloud": "क्लाउड में सहेजें"
+  "nav.save_cloud": "क्लाउड में सहेजें",
+  "achievement.title": "उपलब्धियाँ",
+  "achievement.first_account": "खाता बन गया",
+  "achievement.first_run": "पहला प्रोग्राम चलाया",
+  "achievement.first_shell": "पहला शेल कमांड",
+  "achievement.first_cloud": "क्लाउड में सहेजा",
+  "achievement.first_feedback": "प्रतिक्रिया दी",
+  "achievement.doom": "DOOM चलाया",
+  "achievement.locked": "अभी नहीं"
 }

@@ -518,5 +518,13 @@
   "account.confirm_code": "Confirmar código",
   "account.username_or_email": "Nome de usuário ou e-mail",
   "account.picture_drop": "Solte uma imagem aqui ou pressione Enter para escolher uma",
-  "nav.save_cloud": "Salvar na nuvem"
+  "nav.save_cloud": "Salvar na nuvem",
+  "achievement.title": "Conquistas",
+  "achievement.first_account": "Conta criada",
+  "achievement.first_run": "Primeiro programa executado",
+  "achievement.first_shell": "Primeiro comando de terminal",
+  "achievement.first_cloud": "Salvo na nuvem",
+  "achievement.first_feedback": "Feedback enviado",
+  "achievement.doom": "DOOM executado",
+  "achievement.locked": "Ainda não"
 }

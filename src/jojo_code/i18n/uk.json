@@ -518,5 +518,13 @@
   "account.confirm_code": "Підтвердити код",
   "account.username_or_email": "Ім'я користувача або електронна пошта",
   "account.picture_drop": "Перетягніть зображення сюди або натисніть Enter, щоб вибрати",
-  "nav.save_cloud": "Зберегти в хмару"
+  "nav.save_cloud": "Зберегти в хмару",
+  "achievement.title": "Досягнення",
+  "achievement.first_account": "Акаунт створено",
+  "achievement.first_run": "Першу програму запущено",
+  "achievement.first_shell": "Першу команду оболонки виконано",
+  "achievement.first_cloud": "Збережено в хмару",
+  "achievement.first_feedback": "Відгук надіслано",
+  "achievement.doom": "Запущено DOOM",
+  "achievement.locked": "Ще ні"
 }

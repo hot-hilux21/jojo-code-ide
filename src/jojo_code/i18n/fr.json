@@ -518,5 +518,13 @@
   "account.confirm_code": "Confirmer le code",
   "account.username_or_email": "Nom d'utilisateur ou e-mail",
   "account.picture_drop": "Déposez une image ici, ou appuyez sur Entrée pour en choisir une",
-  "nav.save_cloud": "Enregistrer dans le cloud"
+  "nav.save_cloud": "Enregistrer dans le cloud",
+  "achievement.title": "Réussites",
+  "achievement.first_account": "Compte créé",
+  "achievement.first_run": "Premier programme exécuté",
+  "achievement.first_shell": "Première commande shell",
+  "achievement.first_cloud": "Enregistré dans le cloud",
+  "achievement.first_feedback": "Avis partagé",
+  "achievement.doom": "DOOM lancé",
+  "achievement.locked": "Pas encore"
 }

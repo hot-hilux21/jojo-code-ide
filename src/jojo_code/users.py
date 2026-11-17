@@ -115,6 +115,33 @@ def verify(identifier, password):
     return check_password_hash(record.get('password_hash', ''), password or '')
 
 
+ACHIEVEMENTS = (
+    'first_account', 'first_run', 'first_shell', 'first_cloud', 'first_feedback', 'doom',
+)
+
+
+def award(username, key):
+    """Give an account one badge. Returns (is_new, key)."""
+    username = (username or '').strip().lower()
+    if key not in ACHIEVEMENTS:
+        return False, ''
+    users = load_users()
+    record = users.get(username)
+    if not record:
+        return False, ''
+    earned = record.get('achievements') or []
+    if key in earned:
+        return False, ''
+    record['achievements'] = earned + [key]
+    save_users(users)
+    return True, key
+
+
+def achievements(username):
+    record = load_users().get((username or '').strip().lower(), {})
+    return list(record.get('achievements') or [])
+
+
 def account_summary():
     """Accounts for the maintainer's dashboard, without any credential data."""
     result = []

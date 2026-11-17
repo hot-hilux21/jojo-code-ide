@@ -518,5 +518,13 @@
   "account.confirm_code": "تأكيد الرمز",
   "account.username_or_email": "اسم المستخدم أو البريد الإلكتروني",
   "account.picture_drop": "أفلت صورة هنا أو اضغط Enter لاختيار صورة",
-  "nav.save_cloud": "حفظ في السحابة"
+  "nav.save_cloud": "حفظ في السحابة",
+  "achievement.title": "الإنجازات",
+  "achievement.first_account": "تم إنشاء الحساب",
+  "achievement.first_run": "أول تشغيل لبرنامج",
+  "achievement.first_shell": "أول أمر في الصدفة",
+  "achievement.first_cloud": "حفظ في السحابة",
+  "achievement.first_feedback": "مشاركة رأيك",
+  "achievement.doom": "تشغيل DOOM",
+  "achievement.locked": "بعدُ"
 }

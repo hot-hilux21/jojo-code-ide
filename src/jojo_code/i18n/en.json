@@ -518,5 +518,13 @@
   "account.confirm_code": "Confirm code",
   "account.username_or_email": "Username or email",
   "account.picture_drop": "Drop a picture here, or press Enter to choose one",
-  "nav.save_cloud": "Save to cloud"
+  "nav.save_cloud": "Save to cloud",
+  "achievement.title": "Achievements",
+  "achievement.first_account": "Account made",
+  "achievement.first_run": "First program run",
+  "achievement.first_shell": "First shell command",
+  "achievement.first_cloud": "Saved to cloud",
+  "achievement.first_feedback": "Shared feedback",
+  "achievement.doom": "DOOM ran",
+  "achievement.locked": "Not yet"
 }

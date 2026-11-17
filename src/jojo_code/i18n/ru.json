@@ -518,5 +518,13 @@
   "account.confirm_code": "Подтвердить код",
   "account.username_or_email": "Имя пользователя или электронная почта",
   "account.picture_drop": "Перетащите изображение сюда или нажмите Enter, чтобы выбрать",
-  "nav.save_cloud": "Сохранить в облако"
+  "nav.save_cloud": "Сохранить в облако",
+  "achievement.title": "Достижения",
+  "achievement.first_account": "Аккаунт создан",
+  "achievement.first_run": "Первая программа запущена",
+  "achievement.first_shell": "Первая команда оболонки",
+  "achievement.first_cloud": "Сохранено в облако",
+  "achievement.first_feedback": "Отзыв отправлен",
+  "achievement.doom": "Запущен DOOM",
+  "achievement.locked": "Пока нет"
 }

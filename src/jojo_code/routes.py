@@ -2914,6 +2914,27 @@ def auth_reset_confirm_api():
     return jsonify({'success': True})
 
 
+@main_bp.route('/api/achievements', methods=['GET'])
+def achievements_get_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    return jsonify({'earned': users.achievements(username),
+                    'all': list(users.ACHIEVEMENTS)})
+
+
+@main_bp.route('/api/achievements/award', methods=['POST'])
+def achievements_award_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return jsonify({'success': False}), 403
+    data = request.get_json(silent=True) or {}
+    is_new, key = users.award(username, data.get('key'))
+    return jsonify({'success': True, 'new': is_new, 'key': key})
+
+
 @main_bp.route('/api/auth/username', methods=['POST'])
 def auth_username_api():
     """Change the name the reader signs in with. Email stays the anchor."""

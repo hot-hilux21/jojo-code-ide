@@ -518,5 +518,13 @@
   "account.confirm_code": "确认验证码",
   "account.username_or_email": "用户名或邮箱",
   "account.picture_drop": "将图片拖到这里，或按 Enter 选择",
-  "nav.save_cloud": "保存到云端"
+  "nav.save_cloud": "保存到云端",
+  "achievement.title": "成就",
+  "achievement.first_account": "已创建账号",
+  "achievement.first_run": "首次运行程序",
+  "achievement.first_shell": "首次运行 shell 命令",
+  "achievement.first_cloud": "已保存到云端",
+  "achievement.first_feedback": "已提交反馈",
+  "achievement.doom": "已运行 DOOM",
+  "achievement.locked": "尚未获得"
 }

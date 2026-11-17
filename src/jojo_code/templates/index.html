@@ -1877,6 +1877,11 @@
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.account_settings') }}</h2>
       <div class="field">
+        <h3>{{ t('achievement.title') }}</h3>
+        <ul id="achievement-list" class="badge-list"></ul>
+        <p id="achievement-status" class="acct-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
         <label for="acct-new-username">{{ t('account.username') }}</label>
         <input id="acct-new-username" type="text" style="width:100%" autocomplete="username">
         <button class="btn btn-small" type="button" id="acct-username-save">{{ t('account.autosave_name_save') }}</button>
