@@ -526,5 +526,16 @@
   "achievement.first_cloud": "已保存到云端",
   "achievement.first_feedback": "已提交反馈",
   "achievement.doom": "已运行 DOOM",
-  "achievement.locked": "尚未获得"
+  "achievement.locked": "尚未获得",
+  "progress.rank": "段位",
+  "progress.level": "等级",
+  "progress.xp": "经验",
+  "progress.next": "下一段位",
+  "rank.bronze": "青铜",
+  "rank.silver": "白银",
+  "rank.gold": "黄金",
+  "rank.platinum": "铂金",
+  "rank.diamond": "钻石",
+  "rank.elite": "精英",
+  "rank.unreal": "无双"
 }

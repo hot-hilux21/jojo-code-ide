@@ -119,9 +119,65 @@ ACHIEVEMENTS = (
     'first_account', 'first_run', 'first_shell', 'first_cloud', 'first_feedback', 'doom',
 )
 
+# Badge XP is given once, with the badge. The other rewards can be earned
+# repeatedly through normal use, which is what moves a reader up the ranks.
+BADGE_XP = {
+    'first_account': 100, 'first_run': 50, 'first_shell': 50,
+    'first_cloud': 75, 'first_feedback': 75, 'doom': 200,
+}
+XP_REWARDS = {
+    'code_run': 10, 'shell': 5, 'file_saved': 20, 'cloud_saved': 30,
+    'avatar_uploaded': 30, 'feedback_sent': 40,
+}
+RANKS = (
+    ('bronze', 0), ('silver', 500), ('gold', 1000), ('platinum', 1800),
+    ('diamond', 3000), ('elite', 5000), ('unreal', 8000),
+)
+XP_PER_LEVEL = 250
+
+
+def _add_xp(record, amount):
+    record['xp'] = int(record.get('xp') or 0) + amount
+
+
+def award_xp(username, reason):
+    """Give repeatable XP for an action. Returns (ok, new_total)."""
+    username = (username or '').strip().lower()
+    amount = XP_REWARDS.get(reason)
+    if amount is None:
+        return False, 0
+    users = load_users()
+    record = users.get(username)
+    if not record:
+        return False, 0
+    _add_xp(record, amount)
+    save_users(users)
+    return True, int(record['xp'])
+
+
+def progress(username):
+    """Level, rank and progress for the account's profile card."""
+    xp = int(load_users().get((username or '').strip().lower(), {}).get('xp') or 0)
+    index = 0
+    for i, (_, threshold) in enumerate(RANKS):
+        if xp >= threshold:
+            index = i
+    rank, floor = RANKS[index]
+    next_rank, next_floor = (RANKS[index + 1] if index + 1 < len(RANKS) else (None, None))
+    span = (next_floor - floor) if next_floor else 1
+    return {
+        'xp': xp,
+        'level': 1 + xp // XP_PER_LEVEL,
+        'rank': rank,
+        'next_rank': next_rank,
+        'into_rank': xp - floor,
+        'rank_span': span,
+        'percent': min(100, round((xp - floor) * 100 / span)) if next_floor else 100,
+    }
+
 
 def award(username, key):
-    """Give an account one badge. Returns (is_new, key)."""
+    """Give an account one badge and its XP. Returns (is_new, key)."""
     username = (username or '').strip().lower()
     if key not in ACHIEVEMENTS:
         return False, ''
@@ -133,6 +189,7 @@ def award(username, key):
     if key in earned:
         return False, ''
     record['achievements'] = earned + [key]
+    _add_xp(record, BADGE_XP[key])
     save_users(users)
     return True, key
 

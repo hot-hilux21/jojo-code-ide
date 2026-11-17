@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Saved to cloud",
   "achievement.first_feedback": "Shared feedback",
   "achievement.doom": "DOOM ran",
-  "achievement.locked": "Not yet"
+  "achievement.locked": "Not yet",
+  "progress.rank": "Rank",
+  "progress.level": "Level",
+  "progress.xp": "Experience",
+  "progress.next": "Next rank",
+  "rank.bronze": "Bronze",
+  "rank.silver": "Silver",
+  "rank.gold": "Gold",
+  "rank.platinum": "Platinum",
+  "rank.diamond": "Diamond",
+  "rank.elite": "Elite",
+  "rank.unreal": "Unreal"
 }

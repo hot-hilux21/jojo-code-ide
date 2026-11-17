@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Enregistré dans le cloud",
   "achievement.first_feedback": "Avis partagé",
   "achievement.doom": "DOOM lancé",
-  "achievement.locked": "Pas encore"
+  "achievement.locked": "Pas encore",
+  "progress.rank": "Rang",
+  "progress.level": "Niveau",
+  "progress.xp": "Expérience",
+  "progress.next": "Rang suivant",
+  "rank.bronze": "Bronze",
+  "rank.silver": "Argent",
+  "rank.gold": "Or",
+  "rank.platinum": "Platine",
+  "rank.diamond": "Diamant",
+  "rank.elite": "Élite",
+  "rank.unreal": "Unreal"
 }

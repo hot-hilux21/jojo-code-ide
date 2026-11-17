@@ -1877,6 +1877,13 @@
     <div style="background:var(--panel,#1a1a1a);padding:1rem;border-radius:8px;max-width:380px;width:90%;max-height:90vh;overflow:auto;margin:auto;">
       <h2>{{ t('account.account_settings') }}</h2>
       <div class="field">
+        <h3>{{ t('progress.rank') }}</h3>
+        <p id="progress-summary" class="acct-status" aria-live="polite"></p>
+        <div id="progress-track" class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+      <div class="field">
         <h3>{{ t('achievement.title') }}</h3>
         <ul id="achievement-list" class="badge-list"></ul>
         <p id="achievement-status" class="acct-status" aria-live="polite"></p>

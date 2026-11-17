@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Сохранено в облако",
   "achievement.first_feedback": "Отзыв отправлен",
   "achievement.doom": "Запущен DOOM",
-  "achievement.locked": "Пока нет"
+  "achievement.locked": "Пока нет",
+  "progress.rank": "Ранг",
+  "progress.level": "Уровень",
+  "progress.xp": "Опыт",
+  "progress.next": "Следующий ранг",
+  "rank.bronze": "Бронза",
+  "rank.silver": "Серебро",
+  "rank.gold": "Золото",
+  "rank.platinum": "Платина",
+  "rank.diamond": "Алмаз",
+  "rank.elite": "Элита",
+  "rank.unreal": "Нереальный"
 }

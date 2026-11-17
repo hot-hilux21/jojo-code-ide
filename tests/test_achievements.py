@@ -39,6 +39,34 @@ class AchievementTests(unittest.TestCase):
         response = self.client.post('/api/achievements/award', json={'key': 'doom'})
         self.assertEqual(response.status_code, 403)
 
+    def test_badges_give_xp_once(self):
+        users.register("ada", "a long passphrase")
+        users.award("ada", "doom")
+        self.assertEqual(users.progress("ada")["xp"], 200)
+        users.award("ada", "doom")
+        self.assertEqual(users.progress("ada")["xp"], 200)
+
+    def test_repeatable_xp_moves_the_rank(self):
+        users.register("ada", "a long passphrase")
+        self.assertTrue(users.award_xp("ada", "code_run")[0])
+        self.assertFalse(users.award_xp("ada", "unknown")[0])
+        record = users.load_users()["ada"]
+        record["xp"] = 1200
+        users.save_users({"ada": record})
+        state = users.progress("ada")
+        self.assertEqual(state["rank"], "gold")
+        self.assertEqual(state["level"], 5)
+        self.assertEqual(state["next_rank"], "platinum")
+
+    def test_api_awards_xp_and_reports_progress(self):
+        users.register("ada", "a long passphrase")
+        with self.client.session_transaction() as session:
+            session['user_username'] = 'ada'
+        self.assertEqual(self.client.post('/api/xp/award', json={'reason': 'shell'}).status_code, 200)
+        state = self.client.get('/api/progress').get_json()
+        self.assertEqual(state['xp'], 5)
+        self.assertEqual(state['rank'], 'bronze')
+
     def test_api_returns_the_full_list_with_earned_flags(self):
         users.register("ada", "a long passphrase")
         users.award("ada", "doom")

@@ -526,5 +526,16 @@
   "achievement.first_cloud": "حفظ في السحابة",
   "achievement.first_feedback": "مشاركة رأيك",
   "achievement.doom": "تشغيل DOOM",
-  "achievement.locked": "بعدُ"
+  "achievement.locked": "بعدُ",
+  "progress.rank": "الرتبة",
+  "progress.level": "المستوى",
+  "progress.xp": "الخبرة",
+  "progress.next": "الرتبة التالية",
+  "rank.bronze": "برونز",
+  "rank.silver": "فضة",
+  "rank.gold": "ذهب",
+  "rank.platinum": "بلاتين",
+  "rank.diamond": "ألماس",
+  "rank.elite": "نخبة",
+  "rank.unreal": "أنريل"
 }

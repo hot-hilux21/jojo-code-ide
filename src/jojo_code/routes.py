@@ -2923,6 +2923,26 @@ def achievements_get_api():
                     'all': list(users.ACHIEVEMENTS)})
 
 
+@main_bp.route('/api/progress', methods=['GET'])
+def progress_get_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    return jsonify(users.progress(username))
+
+
+@main_bp.route('/api/xp/award', methods=['POST'])
+def xp_award_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return jsonify({'success': False}), 403
+    data = request.get_json(silent=True) or {}
+    ok, total = users.award_xp(username, data.get('reason'))
+    return jsonify({'success': ok, 'xp': total})
+
+
 @main_bp.route('/api/achievements/award', methods=['POST'])
 def achievements_award_api():
     from flask import session

@@ -526,5 +526,16 @@
   "achievement.first_cloud": "クラウドに保存",
   "achievement.first_feedback": "フィードバックを送信",
   "achievement.doom": "DOOMを起動",
-  "achievement.locked": "まだなし"
+  "achievement.locked": "まだなし",
+  "progress.rank": "ランク",
+  "progress.level": "レベル",
+  "progress.xp": "経験値",
+  "progress.next": "次のランク",
+  "rank.bronze": "ブロンズ",
+  "rank.silver": "シルバー",
+  "rank.gold": "ゴールド",
+  "rank.platinum": "プラチナ",
+  "rank.diamond": "ダイヤモンド",
+  "rank.elite": "エリート",
+  "rank.unreal": "アンリアル"
 }

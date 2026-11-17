@@ -283,6 +283,45 @@
     first_feedback: t('achievement.first_feedback'),
     doom: t('achievement.doom')
   };
+  var rankNames = {
+    bronze: t('rank.bronze'), silver: t('rank.silver'), gold: t('rank.gold'),
+    platinum: t('rank.platinum'), diamond: t('rank.diamond'),
+    elite: t('rank.elite'), unreal: t('rank.unreal')
+  };
+
+  function awardXp(reason) {
+    if (!window.CURRENT_USER) return;
+    fetch('/api/xp/award', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: reason }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.success) loadProgress();
+    }).catch(function () {});
+  }
+
+  function loadProgress() {
+    var summary = document.getElementById('progress-summary');
+    var track = document.getElementById('progress-track');
+    var fill = document.getElementById('progress-fill');
+    if (!summary || !window.CURRENT_USER) return;
+    fetch('/api/progress').then(function (r) { return r.json(); }).then(function (p) {
+      if (!p) return;
+      var rank = rankNames[p.rank] || p.rank;
+      var text = t('progress.rank') + ': ' + rank + ' | ' +
+        t('progress.level') + ' ' + p.level + ' | ' +
+        t('progress.xp') + ' ' + p.xp;
+      if (p.next_rank) {
+        text += ' | ' + t('progress.next') + ': ' + (rankNames[p.next_rank] || p.next_rank) +
+          ' (' + p.into_rank + '/' + p.rank_span + ')';
+      }
+      summary.textContent = text;
+      if (track && fill) {
+        fill.style.width = p.percent + '%';
+        track.setAttribute('aria-valuenow', String(p.percent));
+      }
+    }).catch(function () {});
+  }
 
   function awardAchievement(key) {
     if (!window.CURRENT_USER) return;
@@ -295,6 +334,7 @@
       var status = document.getElementById('achievement-status');
       if (status) status.textContent = achievementNames[d.key] || d.key;
       loadAchievements();
+      loadProgress();
     }).catch(function () {});
   }
 
@@ -1722,6 +1762,7 @@
         if (response.ok) {
           recordEvent('feedback_sent');
           awardAchievement('first_feedback');
+          awardXp('feedback_sent');
           if (feedbackPositive) feedbackPositive.value = '';
           if (feedbackNegative) feedbackNegative.value = '';
         }
@@ -1972,6 +2013,7 @@
         if (acctFileName) acctFileName.value = '';
         loadAccountFiles();
         recordEvent('file_saved');
+        awardXp('file_saved');
         sayServerStatus(t('account.file_saved'));
       }).catch(function () { sayServerStatus(t('account.failed')); });
     });
@@ -2174,6 +2216,7 @@
       var nameField = document.getElementById('acct-new-username');
       if (nameField && window.CURRENT_USER) nameField.value = window.CURRENT_USER;
       loadAchievements();
+      loadProgress();
       if (acctAutosaveName) acctAutosaveName.value = autosaveName;
     });
   }
@@ -2241,6 +2284,7 @@
         }
         showAccountAvatar(dataUrl);
         recordEvent('avatar_uploaded');
+        awardXp('avatar_uploaded');
         if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_saved');
       }).catch(function () {
         if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
@@ -3430,6 +3474,7 @@
     answersForCode = null;
     recordEvent('code_run');
     awardAchievement('first_run');
+    awardXp('code_run');
     startRun();
   }
 
@@ -4202,6 +4247,7 @@
       syncAutosaveButton();
       updateLastSaved();
       recordEvent('cloud_saved');
+      awardXp('cloud_saved');
       awardAchievement('first_cloud');
     }).catch(function () {});
   }
@@ -6214,6 +6260,7 @@
         if (shellFail(data)) return;
         shellSay(data.output);
         awardAchievement('first_shell');
+        awardXp('shell');
         if (data.doom) awardAchievement('doom');
         if (data.doom) {
           var overlay = document.createElement('div');

@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Збережено в хмару",
   "achievement.first_feedback": "Відгук надіслано",
   "achievement.doom": "Запущено DOOM",
-  "achievement.locked": "Ще ні"
+  "achievement.locked": "Ще ні",
+  "progress.rank": "Ранг",
+  "progress.level": "Рівень",
+  "progress.xp": "Досвід",
+  "progress.next": "Наступний ранг",
+  "rank.bronze": "Бронза",
+  "rank.silver": "Срібло",
+  "rank.gold": "Золото",
+  "rank.platinum": "Платина",
+  "rank.diamond": "Діамант",
+  "rank.elite": "Еліта",
+  "rank.unreal": "Нереальний"
 }

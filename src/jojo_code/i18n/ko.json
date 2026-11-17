@@ -526,5 +526,16 @@
   "achievement.first_cloud": "클라우드에 저장",
   "achievement.first_feedback": "의견 보내기",
   "achievement.doom": "DOOM 실행",
-  "achievement.locked": "아직 없음"
+  "achievement.locked": "아직 없음",
+  "progress.rank": "랭크",
+  "progress.level": "레벨",
+  "progress.xp": "경험치",
+  "progress.next": "다음 랭크",
+  "rank.bronze": "브론즈",
+  "rank.silver": "실버",
+  "rank.gold": "골드",
+  "rank.platinum": "플래티넘",
+  "rank.diamond": "다이아몬드",
+  "rank.elite": "엘리트",
+  "rank.unreal": "언리얼"
 }

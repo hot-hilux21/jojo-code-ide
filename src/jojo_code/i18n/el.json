@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Αποθήκευση στο cloud",
   "achievement.first_feedback": "Στάλθηκε σχόλιο",
   "achievement.doom": "Εκτελέστηκε το DOOM",
-  "achievement.locked": "Ακόμη όχι"
+  "achievement.locked": "Ακόμη όχι",
+  "progress.rank": "Βαθμός",
+  "progress.level": "Επίπεδο",
+  "progress.xp": "Εμπειρία",
+  "progress.next": "Επόμενος βαθμός",
+  "rank.bronze": "Μπρονζ",
+  "rank.silver": "Ασήμι",
+  "rank.gold": "Χρυσό",
+  "rank.platinum": "Πλατίνα",
+  "rank.diamond": "Διαμάντι",
+  "rank.elite": "Ελίτ",
+  "rank.unreal": "Απίστευτο"
 }

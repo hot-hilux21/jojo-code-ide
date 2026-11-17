@@ -526,5 +526,16 @@
   "achievement.first_cloud": "Guardado en la nube",
   "achievement.first_feedback": "Comentario enviado",
   "achievement.doom": "DOOM ejecutado",
-  "achievement.locked": "Aún no"
+  "achievement.locked": "Aún no",
+  "progress.rank": "Rango",
+  "progress.level": "Nivel",
+  "progress.xp": "Experiencia",
+  "progress.next": "Siguiente rango",
+  "rank.bronze": "Bronce",
+  "rank.silver": "Plata",
+  "rank.gold": "Oro",
+  "rank.platinum": "Platino",
+  "rank.diamond": "Diamante",
+  "rank.elite": "Élite",
+  "rank.unreal": "Irreal"
 }

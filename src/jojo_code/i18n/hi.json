@@ -526,5 +526,16 @@
   "achievement.first_cloud": "क्लाउड में सहेजा",
   "achievement.first_feedback": "प्रतिक्रिया दी",
   "achievement.doom": "DOOM चलाया",
-  "achievement.locked": "अभी नहीं"
+  "achievement.locked": "अभी नहीं",
+  "progress.rank": "रैंक",
+  "progress.level": "स्तर",
+  "progress.xp": "अनुभव",
+  "progress.next": "अगली रैंक",
+  "rank.bronze": "कांस्य",
+  "rank.silver": "चाँदी",
+  "rank.gold": "सोना",
+  "rank.platinum": "प्लैटिनम",
+  "rank.diamond": "हीरा",
+  "rank.elite": "एलीट",
+  "rank.unreal": "अनरियल"
 }
