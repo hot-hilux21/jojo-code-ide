@@ -1,6 +1,6 @@
 # Progress towards v2
 
-Last updated: 2026-10-30
+Last updated: 2026-11-17
 Current release: **2.0.0-beta** (tagged 2026-10-30, published to the beta channel). Last stable: **1.1.0** (tagged 2026-10-22). The `-beta` suffix moves the beta channel only, so the stable channel and the installed-build update path stay on 1.1.0 until v2 is tagged without a suffix. The beta channel also carries every push to `main`, so the two move together.
 Live site: https://jojocode.duckdns.org (Oracle Cloud, deployed from `main` by `.github/workflows/deploy.yml`)
 
@@ -25,7 +25,7 @@ This file is the working checklist between v1 and v2. It records what is shipped
 | Errors | Plain-English translations of Python errors, with the original kept |
 | Shell and trace | Python shell sessions, line-by-line variable trace table |
 | Packaging | Windows `.exe` (PyInstaller, Inno Setup), browser build, gunicorn entry point |
-| Storage | Local JSON config, offline first, no account |
+| Storage | Desktop local JSON config; web app optional email accounts with server-stored files, settings, code snapshot and avatar; settings JSON export/import |
 
 ---
 
@@ -78,7 +78,7 @@ This file is the working checklist between v1 and v2. It records what is shipped
 
 ### P0: finish the accessibility promise
 
-- [ ] Screen-reader pass on Windows (NVDA) and macOS (VoiceOver): setup wizard, settings dialog, dictionary search, trace table, shell, error output. Still needs a human with a screen reader; the markup is ready for it.
+- [ ] Human screen-reader pass on Windows (NVDA) and macOS (VoiceOver): setup wizard, settings dialog, dictionary search, trace table, shell, error output. Not scheduled. Automated markup checks are in place; they cannot replace a human pass, so the full accessibility claim stays open.
 - [x] Keyboard-only pass that covers every new control, including the hex grid and the Advanced disclosure. The hex grid is native radio inputs inside their labels, so Tab reaches the group and the arrow keys move within it with no script. Advanced is a `<details>`, so Enter and Space open it. Both pane dividers and the trace grip answer the arrow keys. A hands-on pass with a keyboard is still worth doing, but nothing here depends on a pointer.
 - [x] WCAG 2.2 additions beyond 2.1 AA:
   - 2.4.11 focus not obscured: the floating trace window now closes when the control that takes focus is completely underneath it.
@@ -92,6 +92,7 @@ This file is the working checklist between v1 and v2. It records what is shipped
 ### P1: reading comfort
 
 - [x] Let readers adjust the blur radius and choose which panes blur in focus mode. Shipped via `blur_intensity` plus `fade_output`, `fade_shell` and `fade_settings` sliders in the per-pane toolbar; validated by `tests/test_config_api.py`.
+- [x] Add a blur scope setting: off by default, with "code only" and "all" choices. It lives in Settings → Focus and in the editor's focus drawer, writes `blur_scope`, and limits where any focus fade is allowed to show.
 - [x] Add a reading ruler option (a horizontal highlight that follows the pointer) for line tracking. It lives in **Settings → Reading**, is off by default, and shades the line under the pointer with `background` only, so it costs no contrast and never draws over the text. The caret and the keyboard are untouched: this is a pointer aid, not a second cursor.
 - [x] Tune the custom theme contrast nudge. A failing pick now names the colour the editor uses instead, taken from the same derivation that paints the theme, so the message cannot drift from what is shown. The background, page and selection fields stopped being flagged: they were measured against the background they are not drawn on, so "Editor background" read "Too low" the moment any other field was touched.
 - [x] Allow exporting and importing settings as a small JSON file, so a reader can carry them between machines. The existing Settings backup (`/api/config/export`, `/api/config/import`) already carries every setting including the custom theme and is validated exactly as the panel is, so no separate theme file was needed.
@@ -108,7 +109,7 @@ This file is the working checklist between v1 and v2. It records what is shipped
 
 - [ ] Large file handling: measure typing latency at 5,000 and 20,000 lines, then decide whether to add a lazy mode.
 - [ ] Multi-file projects (open a folder, not a single file). This is the largest single change in v2 and needs its own design pass.
-- [ ] Optional opt-in cloud sync (Google Drive or OneDrive). Offline remains the default and the only mode that works without an account.
+- [x] Removed the Drive/OneDrive sync promise. The web app's email accounts store files and a settings copy on the server, and settings export to JSON. No new sync integration.
 - [ ] Linux build and packaging.
 - [ ] Python-only remains the contract; any second language is a v3 question.
 
@@ -121,12 +122,14 @@ This file is the working checklist between v1 and v2. It records what is shipped
 
 ---
 
-## 4. Open decisions for v2
+## 4. Decisions for v2
 
-1. Multi-file projects: tabbed editor in the existing page, or a file tree in a second pane? Decide before writing code.
-2. Cloud sync: build it, or document a manual export and drop the promise? It is currently listed as optional and nothing depends on it.
-3. Reading ruler and blur radius: do they belong in Settings, or in the per-pane mini toolbar? Avoid growing Settings into a wall of controls. **Reading ruler is settled**: it is a single switch under Settings → Reading, next to the text size and spacing controls it belongs with. Blur radius is still open.
-4. Whether to publish a public roadmap, given the project is solo-maintained and dates slip.
+1. Multi-file projects: **skip for now**. Stay single-file; revisit only on user demand.
+2. Cloud sync: **Drive/OneDrive dropped**. Web accounts store files and a settings copy on the server; settings export/import as JSON. No new sync integration.
+3. Reading aids: **reading ruler** lives under Settings → Reading. **Blur scope** (off / code only / all) appears in Settings → Focus and in the editor's focus drawer, off by default. Blur intensity keeps its existing places.
+4. Public roadmap: **no**. Keep plans private; solo maintenance and slipping dates make dated promises misleading.
+5. Code signing: **deferred**. No free issuer with enough reputation yet; do not pay for an open-source project. Keep SmartScreen guidance in the README.
+6. Screen-reader verification: **automated checks only for now**. A human NVDA/VoiceOver pass remains open and is recorded as such.
 
 ---
 

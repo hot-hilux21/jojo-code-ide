@@ -57,6 +57,8 @@ const KNOWN_IDS = new Set([
   'ui-backend', 'ui-backend-help',
   'blur-intensity', 'blur-intensity-label',
   'blur-field', 'theme-select', 'contrast-select', 'focus-mode',
+  'blur-scope', 'pane-blur-scope',
+  'blur-type', 'pane-blur-type',
   'pane-fade-mode', 'pane-editor-blur', 'pane-editor-blur-label',
   'fade-output', 'fade-output-label', 'fade-shell', 'fade-shell-label',
   'fade-settings', 'fade-settings-label',
@@ -413,6 +415,8 @@ function makeElement(id, extraAttributes = {}, extraProps = {}) {
     'data-line-height': '1.6',
     'data-letter-spacing': '0.5',
     'data-blur-intensity': '0.5',
+    'data-blur-scope': 'off',
+    'data-blur-type': 'fade',
     'data-focus-mode': 'off',
     'data-contrast': 'normal',
     'data-tts-voice': '',
@@ -1727,6 +1731,46 @@ if (missingAttrs.length) {
   console.log('FAIL body never received: ' + missingAttrs.join(', '));
 } else {
   console.log('     body received ' + savedSettings.join(', '));
+}
+
+// Blur scope has a copy in Settings and in the editor strip. Changing one
+// has to move the other and save the one value the server validates.
+const scopeSelect = elements.get('pane-blur-scope');
+if (!scopeSelect) {
+  failed = true;
+  console.log('FAIL the editor strip has no blur scope control');
+} else {
+  scopeSelect.value = 'all';
+  for (const handler of scopeSelect.__listeners['change'] || []) handler(fakeEvent);
+  const settingsSelect = elements.get('blur-scope');
+  if (documentStub.body.__attributes['data-blur-scope'] !== 'all' ||
+      !settingsSelect || settingsSelect.value !== 'all' ||
+      !configPosts.some((post) => post.blur_scope === 'all')) {
+    failed = true;
+    console.log('FAIL blur scope did not move both controls and save');
+  } else {
+    console.log('     blur scope keeps both controls in step and saves');
+  }
+}
+
+// Fade style has a copy in Settings and in the strip as well. Changing
+// either must move the other and save the one value the server validates.
+const typeSelect = elements.get('pane-blur-type');
+if (!typeSelect) {
+  failed = true;
+  console.log('FAIL the editor strip has no fade style control');
+} else {
+  typeSelect.value = 'blur';
+  for (const handler of typeSelect.__listeners['change'] || []) handler(fakeEvent);
+  const settingsType = elements.get('blur-type');
+  if (documentStub.body.__attributes['data-blur-type'] !== 'blur' ||
+      !settingsType || settingsType.value !== 'blur' ||
+      !configPosts.some((post) => post.blur_type === 'blur')) {
+    failed = true;
+    console.log('FAIL fade style did not move both controls and save');
+  } else {
+    console.log('     fade style keeps both controls in step and saves');
+  }
 }
 
 const missing = [...KNOWN_IDS].filter((id) => !lookups.includes(id));
@@ -4038,6 +4082,22 @@ function runPaneToolbarChecks() {
     console.log('     the bottom of the fade slider is off, and the view says so');
   }
   settingsSlider.value = keptValue;
+  fire('blur-intensity', 'input');
+
+  // The editor strip's slider is a second view of the same value. Its own
+  // number must follow the pointer even though the slider must not be
+  // written back while it is being dragged.
+  const stripSlider = elements.get('pane-editor-blur');
+  const stripReadout = elements.get('pane-editor-blur-label');
+  stripSlider.value = '0.7';
+  fire('pane-editor-blur', 'input');
+  if (stripReadout.textContent !== '70%' || stripSlider.value !== '0.7') {
+    failed = true;
+    console.log('FAIL the strip fade number lagged its slider: ' +
+                stripReadout.textContent + ' for ' + stripSlider.value);
+  } else {
+    console.log('     the strip fade number follows the slider it belongs to');
+  }
   fire('blur-intensity', 'input');
 
   // ---- Nothing has been touched, so nothing is owned ----

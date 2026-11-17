@@ -55,6 +55,7 @@ REQUIRED_SETTINGS_IDS = (
     "blur-intensity",
     "blur-intensity-label",
     "blur-field",
+    "blur-scope",
     "theme-select",
     "contrast-select",
     "theme-gradient",
@@ -181,6 +182,24 @@ class TemplateContractTests(RenderedPageFixture):
             "app.js looks these up but index.html has no matching element: "
             + ", ".join(missing),
         )
+
+    def test_icon_only_hides_faq_words_but_not_the_account_name(self):
+        faq = re.search(r'<a href="/faq".*?</a>', self.html, re.S)
+        self.assertIsNotNone(faq)
+        assert faq is not None
+        self.assertIn('<span class="btn-label">FAQ</span>', faq.group(0))
+        account = re.search(r'<button id="account-btn".*?</button>', self.html, re.S)
+        self.assertIsNotNone(account)
+        assert account is not None
+        # The signed-in name is who the reader is, not button chrome. The
+        # icon-only rule targets .btn-label, so it must not live in one.
+        self.assertNotIn('class="btn-label"', account.group(0))
+
+    def test_toolbar_does_not_slide_to_the_right_edge(self):
+        toolbar = re.search(r'\.toolbar\s*\{[^}]*\}', self.css)
+        self.assertIsNotNone(toolbar)
+        assert toolbar is not None
+        self.assertNotIn("margin-left: auto", toolbar.group(0))
 
     def test_settings_panel_is_complete(self):
         missing = [
@@ -525,6 +544,46 @@ class TemplateContractTests(RenderedPageFixture):
         self.assertIn("aria-live", self.html)
         self.assertIn("reportSaveError", self.js)
         self.assertIn("res.ok", self.js)
+
+
+class AccessibilityMarkupTests(RenderedPageFixture):
+    """Automated checks that stand in for a human screen-reader pass.
+
+    These cannot hear a screen reader. They do catch the markup mistakes that
+    make its job impossible: an unnamed dialog or a control nobody can name.
+    """
+
+    def test_every_dialog_names_its_heading(self):
+        dialogs = re.findall(r"<dialog\b[^>]*>", self.html)
+        self.assertTrue(dialogs, "no dialogs found in the rendered page")
+        for tag in dialogs:
+            with self.subTest(tag=tag[:80]):
+                name = re.search(r'aria-labelledby="([^"]+)"', tag)
+                self.assertIsNotNone(name, f"dialog has no name: {tag}")
+                assert name is not None
+                for target in name.group(1).split():
+                    self.assertIn(
+                        target,
+                        self.html_ids,
+                        f"dialog names a missing heading: {target}",
+                    )
+
+    def test_output_and_errors_have_live_regions(self):
+        self.assertIn('aria-live="polite"', self.html)
+        self.assertIn('role="alert"', self.html)
+
+    def test_blur_scope_controls_are_labelled_and_offered_twice(self):
+        for control in ("blur-scope", "pane-blur-scope"):
+            with self.subTest(control=control):
+                self.assertIn(control, self.html_ids)
+                self.assertIn(f'<label for="{control}"', self.html)
+        select = re.search(
+            r'<select id="blur-scope"[^>]*>.*?</select>', self.html, re.S
+        )
+        self.assertIsNotNone(select)
+        assert select is not None
+        for value in ("off", "code", "all"):
+            self.assertIn(f'value="{value}"', select.group(0))
 
 
 class UpdatePanelTests(RenderedPageFixture):

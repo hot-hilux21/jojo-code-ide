@@ -359,6 +359,14 @@ DEFAULT_CONFIG = {
     'reading_ruler': False,
     'focus_mode': 'gutter',
     'blur_intensity': 0.5,
+    # A master switch for where focus fading is allowed to show. Off keeps
+    # the screen sharp even if a focus mode is remembered; code only fades
+    # the editor lines; all also fades the other panes.
+    'blur_scope': 'off',
+    # How focus fading looks: 'fade' dims, 'blur' softens the edges. The
+    # dimming is the old behaviour, so a stored config without this key
+    # keeps looking exactly as it did before.
+    'blur_type': 'fade',
     # How a runtime error is worded in the output pane: 'custom' is the
     # plain-English translation, 'system' is Python's own message. Chosen
     # in Settings, so it survives a reload and the output pane stays a
@@ -1205,6 +1213,15 @@ def load_config():
             for key in ('fade_output', 'fade_shell', 'fade_settings'):
                 if config.get(key) == 0.5:
                     config[key] = 0.0
+            # Older configs had a focus mode but no blur scope. Carry the
+            # old behaviour forward instead of silently switching the fades
+            # off for a reader who had already chosen them.
+            if 'blur_scope' not in config:
+                old_mode = config.get('focus_mode')
+                if old_mode == 'fade':
+                    config['blur_scope'] = 'all'
+                elif old_mode == 'lines':
+                    config['blur_scope'] = 'code'
             # Merge with defaults for any missing keys
             for key, value in DEFAULT_CONFIG.items():
                 if key not in config:
@@ -2303,6 +2320,8 @@ CONFIG_TYPES = {
     'reading_ruler': bool,
     'focus_mode': str,
     'blur_intensity': (int, float),
+    'blur_scope': str,
+    'blur_type': str,
     'error_type': str,
     'fade_output': (int, float),
     'fade_shell': (int, float),
@@ -2365,6 +2384,8 @@ CONFIG_VALUES = {
     # never listed as a preset.
     'theme': set(THEMES.keys()) | {'custom'},
     'focus_mode': {'off', 'gutter', 'lines', 'fade'},
+    'blur_scope': {'off', 'code', 'all'},
+    'blur_type': {'fade', 'blur'},
     'error_type': {'custom', 'system'},
     'contrast': {'normal', 'high'},
     'glass_material': {'off', 'frosted', 'acrylic', 'mica', 'glossy'},
@@ -2624,7 +2645,13 @@ def config_export_api():
     # is the default, so leaving it out says the same thing. It also keeps
     # the file importable: the validator refuses null for a switch, and a
     # file the app wrote has to be a file the app can read back.
-    config = {key: value for key, value in config.items() if value is not None}
+    #
+    # Keys from an older build are left out for the same reason. load_config
+    # keeps them in the live file so nothing is lost by an upgrade, but the
+    # importer refuses a key this version does not know. Writing one into
+    # a backup would make a file this app wrote impossible to load again.
+    config = {key: value for key, value in config.items()
+              if value is not None and key in CONFIG_TYPES}
     payload = json.dumps(
         {'app': 'Jojo Code', 'version': __version__, 'config': config},
         indent=2, ensure_ascii=False,
@@ -2677,15 +2704,16 @@ def config_import_api():
 SETTINGS_PROFILES = {
     'comfortable': {
         'font_size': 18, 'line_height': 1.6, 'letter_spacing': 1.0,
-        'focus_mode': 'lines', 'blur_intensity': 0.3,
+        'focus_mode': 'lines', 'blur_intensity': 0.3, 'blur_scope': 'code',
     },
     'low_distraction': {
-        'focus_mode': 'fade', 'blur_intensity': 0.6,
+        'focus_mode': 'fade', 'blur_intensity': 0.6, 'blur_scope': 'all',
         'fade_output': 0.4, 'fade_shell': 0.4, 'fade_settings': 0.4,
     },
     'high_contrast': {'theme': 'high-contrast', 'contrast': 'high'},
     'screen_reader': {
         'sound_enabled': True, 'tts_enabled': True, 'focus_mode': 'off',
+        'blur_scope': 'off',
     },
 }
 

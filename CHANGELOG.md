@@ -7,6 +7,19 @@ the one being released.
 
 ---
 
+## Unreleased
+
+- Blur scope: off by default, with code-only and all-panes choices. The same
+  control sits in Settings → Focus and in the editor's focus drawer, so blur
+  can be limited without changing the remembered focus mode.
+- Automated accessibility checks for dialog names, live regions and control
+  labels. A human screen-reader pass is still open.
+- Documentation now matches the app: the web app has email accounts and
+  server-stored files/settings, Drive/OneDrive sync is dropped, signing is
+  deferred, and the live URL is jojocode.duckdns.org.
+
+---
+
 ## 2.0.0-beta — 2026-10-30
 
 The v2 work, released on the beta channel. Everything below landed on `main`

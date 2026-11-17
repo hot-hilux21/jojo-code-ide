@@ -42,7 +42,7 @@ Jump to any section:
 - **Execution** — built-in Python runner (10-second safety timeout)
 - **Fonts** — OpenDyslexic by default, plus Atkinson Hyperlegible, Lexend, Nunito and Andika for dyslexia-friendly reading. Calibri, Arial, Comic Sans and Courier New come from your own computer.
 - **Languages** — English, Hindi, French, Spanish, Portuguese, Russian, Korean, Japanese, Chinese, Greek, Arabic, Hijazi Arabic and Ukrainian, with right-to-left layout for Arabic.
-- **Focus mode** — hide the gutter, or blur every line except the one you are on
+- **Focus mode** — hide the gutter, or blur every line except the one you are on; blur scope sets off, code only or all panes, and fade style chooses dim or blur, from Settings or the editor strip
 - **Themes** — 15 presets (high contrast, dark, pastel, light, ocean, forest, white, AMOLED, red, orange, yellow, green, blue, indigo, violet), a custom theme builder with a hex colour grid, and a per-colour reset
 - **Text size and spacing** — separate size, line height and letter spacing for the editor, output and shell
 - **Reading ruler** — a shaded band follows your pointer over the code, so one line stays easy to follow without moving the caret
@@ -53,8 +53,8 @@ Jump to any section:
 - **First run** — a short wizard asks for language, font and theme with the same dropdowns as Settings, shows a line of text in the font you are choosing, and keeps Next, Back and Skip in a footer you can always see. A **Reset all settings** button sits in the corner of every screen for the case where the font or colour you picked cannot be read.
 - **Screen readers** — native landmarks, live regions, focus management and spoken step changes; no ARIA invented where the browser already does the job
 - **Errors** — plain-English messages, no jargon
-- **Storage** — offline-first, settings saved to your computer
-- **Privacy** — see [PRIVACY.md](PRIVACY.md): no accounts, no analytics; code runs on your machine unless you use the browser copy
+- **Storage** — offline-first on desktop; browser accounts store files and settings on the server, and settings export as JSON
+- **Privacy** — see [PRIVACY.md](PRIVACY.md): optional email accounts, no third-party analytics; code runs on your machine unless you use the browser copy
 - **Platforms** — browser web app and Windows `.exe`
 
 [↑ Back to contents](#contents)
@@ -110,7 +110,7 @@ Jojo Code is built for dyslexic and neurodivergent readers, not adapted for them
 
 > Needs the Microsoft Edge **WebView2 runtime** (built into Windows 10/11 or installed by the setup above). Click **Quit** in the sidebar footer to close the app.
 
-> Windows builds are code-signed through the [SignPath Foundation](https://signpath.org/) open-source programme. Until a signed build is published, Windows may still show a SmartScreen prompt: click **More info** then **Run anyway**.
+> Windows builds are not signed at the moment. Signing is deferred until a free issuer is available; see [docs/code-signing.md](docs/code-signing.md). Windows may show a SmartScreen prompt: click **More info** then **Run anyway**.
 
 ### Browser (web)
 
@@ -120,7 +120,7 @@ Open [https://jojocode.duckdns.org](https://jojocode.duckdns.org). No install ne
 
 ```bash
 git clone https://github.com/hot-hilux21/jojo-code-ide.git
-cd accessible-coding
+cd jojo-code-ide
 pip install -r requirements.txt
 python app.py
 ```
@@ -153,6 +153,8 @@ node tests/dom_harness.js
 **Windows app.** Your code runs on your own computer. Press Run and the app starts a process of its own to run your file, then prints what came out. Nothing you write is uploaded, no account is needed, and the app makes no network requests to run your code. The only thing it goes online for is checking for a new version; that check is on by default and can be turned off in Settings.
 
 **Browser copy.** Your code is sent to the server hosting the site, run there, and the output is sent back. This is the only version where your code leaves your machine. That server is shared by everyone using the site, so this copy runs with a sandbox the Windows app does not: imports such as `os` and `subprocess` are refused before your program starts.
+
+The browser copy has optional email accounts. Sign in to save named code files and a personal copy of your settings on the server, or keep using the editor without an account. Settings can also be exported and imported as a JSON file. See [PRIVACY.md](PRIVACY.md) for what is stored where.
 
 [↑ Back to contents](#contents) · [↓ Next: Python dictionary](#python-dictionary)
 
@@ -477,8 +479,8 @@ What is done so far:
 
 Coming next:
 
-- [ ] More text-to-speech options
-- [ ] Configurable blur zones (blocks, functions)
+- [ ] More text-to-speech options (read from here, pause and resume)
+- [ ] Human screen-reader pass with NVDA and VoiceOver
 
 [↑ Back to contents](#contents) · [↓ Next: Roadmap](#roadmap)
 
@@ -486,9 +488,9 @@ Coming next:
 
 ## Roadmap
 
-- **Now** — editor, runner, save/open, fonts, focus mode, themes, plain errors, error line highlighting
-- **Next** — more text-to-speech options, configurable blur zones
-- **v1.0+** — linter, Jupyter, collaboration, plugins
+- **Now** — editor, runner, save/open, fonts, focus mode, blur scope, themes, plain errors, error line highlighting
+- **Next** — more text-to-speech options, automated and human accessibility checks
+- **Later** — multi-file projects and Linux packaging, if users ask for them; linter, Jupyter and plugins are open ideas, not promises
 
 See the [full specification](#full-specification) for details.
 

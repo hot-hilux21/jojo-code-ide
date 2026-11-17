@@ -119,6 +119,31 @@ class NewSettingsTests(ConfigApiTestCase):
         self.assertEqual(stored["letter_spacing"], 1.5)
         self.assertEqual(stored["blur_intensity"], 0.75)
 
+    def test_blur_scope_defaults_off_and_round_trips(self):
+        self.assertEqual(self.get_settings()["blur_scope"], "off")
+        for value in ("off", "code", "all"):
+            with self.subTest(blur_scope=value):
+                response = self.post_settings(blur_scope=value)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(self.get_settings()["blur_scope"], value)
+
+    def test_blur_scope_rejects_an_unknown_value(self):
+        response = self.post_settings(blur_scope="everywhere")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(self.get_settings()["blur_scope"], "off")
+
+
+class BlurScopeMigrationTests(ConfigApiTestCase):
+    def test_an_old_focus_mode_keeps_its_old_reach(self):
+        # A reader who had already chosen fading must not wake up to a sharp
+        # screen because a new setting appeared with an off default.
+        for mode, scope in (("lines", "code"), ("fade", "all"), ("gutter", "off")):
+            with self.subTest(focus_mode=mode):
+                routes.CONFIG_FILE.write_text(
+                    json.dumps({"focus_mode": mode}), encoding="utf-8"
+                )
+                self.assertEqual(routes.load_config()["blur_scope"], scope)
+
 
 class SetupWizardSettingsTests(ConfigApiTestCase):
     """The two values the setup screen stores.
@@ -997,6 +1022,21 @@ class ConfigBackupTests(ConfigApiTestCase):
         # left out rather than written as null.
         body = json.loads(self.export().get_data(as_text=True))
         self.assertNotIn("reduce_motion", body["config"])
+
+    def test_export_leaves_out_keys_this_version_cannot_import(self):
+        # A setup saved by an older build can still carry a setting the
+        # current one no longer knows. Keeping it in the live config is
+        # harmless; writing it into a backup would make the backup fail to
+        # load, because the importer refuses unknown keys.
+        stored = routes.load_config()
+        stored["code_color"] = "#ff0000"
+        routes.save_config(stored)
+        exported = json.loads(self.export().get_data(as_text=True))
+        self.assertNotIn("code_color", exported["config"])
+        response = self.client.post(
+            "/api/config/import", json={"config": exported["config"]}
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_import_applies_the_settings(self):
         response = self.client.post("/api/config/import", json={

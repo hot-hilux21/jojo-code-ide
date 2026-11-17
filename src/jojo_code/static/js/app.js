@@ -95,6 +95,14 @@
   var themeSelect = document.getElementById('theme-select');
   var contrastSelect = document.getElementById('contrast-select');
   var focusMode = document.getElementById('focus-mode');
+  // The blur scope is a master switch: off, code only or all panes. It has a
+  // copy in Settings and in the editor strip; both write one saved value.
+  var blurScope = document.getElementById('blur-scope');
+  var paneBlurScope = document.getElementById('pane-blur-scope');
+  // Fade style: dim everything back, or soften it with a blur. One saved
+  // value, with a copy in the editor strip.
+  var blurType = document.getElementById('blur-type');
+  var paneBlurType = document.getElementById('pane-blur-type');
   // The fade dropdown in the editor strip's top right, plus the sliders that
   // dropdown shows. The dropdown writes the same focus_mode as the Settings
   // dropdown; the code slider writes the same blur_intensity, and the three
@@ -1342,6 +1350,10 @@
   function applyBlurIntensity(value, source) {
     var amount = 1 - (value * 0.85);
     body.style.setProperty('--blur-amount', amount.toFixed(2));
+    // The blur style uses the same slider. Nested elements stack their
+    // filters, so two and a half pixels at the top is plenty; zero at the
+    // bottom leaves everything sharp.
+    body.style.setProperty('--blur-px', (value * 2.5).toFixed(2) + 'px');
     var percent = Math.round(value * 100) + '%';
     if (blurIntensityLabel) blurIntensityLabel.textContent = percent;
     if (blurIntensity && blurIntensity.value !== String(value)) {
@@ -1352,9 +1364,10 @@
     if (paneEditorBlur && source !== paneEditorBlur) {
       paneEditorBlur.value = String(value);
     }
-    if (paneEditorBlurLabel && source !== paneEditorBlur) {
-      paneEditorBlurLabel.textContent = percent;
-    }
+    // The slider itself must not be rewritten while the reader drags it,
+    // but its number must always follow the value. Guarding both was what
+    // left the strip stuck at the old percentage.
+    if (paneEditorBlurLabel) paneEditorBlurLabel.textContent = percent;
   }
 
   // The other surfaces of fade-all. Each keeps its own value: dimming the
@@ -1379,6 +1392,21 @@
   // otherwise a reader who hid the numbers while using "fade other lines"
   // would get plain "off" back and lose a setting they never touched.
   var lastVisibleFocusMode = 'off';
+
+  function applyBlurScope(scope) {
+    body.setAttribute('data-blur-scope', scope);
+    if (blurScope && blurScope.value !== scope) blurScope.value = scope;
+    if (paneBlurScope && paneBlurScope.value !== scope) paneBlurScope.value = scope;
+  }
+
+  // The two style dropdowns are views of one setting. Whichever the reader
+  // uses, both land on the same saved value and the body tells the
+  // stylesheet which effect to draw.
+  function applyBlurType(type, source) {
+    body.setAttribute('data-blur-type', type);
+    if (blurType && source !== blurType) blurType.value = type;
+    if (paneBlurType && source !== paneBlurType) paneBlurType.value = type;
+  }
 
   function applyFocusMode(mode) {
     body.setAttribute('data-focus-mode', mode);
@@ -3276,10 +3304,10 @@
     if (!ttsEnabled) return null;
     var pane = hoverPaneKey(el, event);
     if (pane) return pane;
-    if (ttsHoverScope === 'off') return null;
+    if (ttsHoverScopeValue === 'off') return null;
     var control = closestOf(el, HOVER_CONTROLS);
     if (control) return control;
-    if (ttsHoverScope !== 'all') return null;
+    if (ttsHoverScopeValue !== 'all') return null;
     return closestOf(el, HOVER_TEXT);
   }
 
@@ -3354,7 +3382,7 @@
         ? hoverPaneWords(hoverTarget)
         : whatToSay(hoverTarget);
       if (words) speak(words);
-    }, Math.max(0, ttsHoverDelay || 0));
+    }, Math.max(0, ttsHoverDelayMs || 0));
   }
 
   function onMouseOut(event) {
@@ -5391,6 +5419,24 @@
     });
   }
 
+  // Both copies of the scope write the one value, so the Settings panel and
+  // the editor strip cannot describe two different screens.
+  [blurScope, paneBlurScope].forEach(function (select) {
+    if (!select) return;
+    select.addEventListener('change', function () {
+      applyBlurScope(select.value);
+      saveConfig({ blur_scope: select.value });
+    });
+  });
+
+  [blurType, paneBlurType].forEach(function (select) {
+    if (!select) return;
+    select.addEventListener('change', function () {
+      applyBlurType(select.value, select);
+      saveConfig({ blur_type: select.value });
+    });
+  });
+
   // The fade controls sit in a left drawer when fade-all is on. It opens by
   // default; the X closes it and the edge tab brings it back, so the editor
   // never has controls sitting on top of its centre.
@@ -6739,6 +6785,8 @@
   applyWordSpacing(body.getAttribute('data-word-spacing') || '0.5');
   paintStepperLimits();
   applyBlurIntensity(parseFloat(body.getAttribute('data-blur-intensity') || '0.5'));
+  applyBlurScope(body.getAttribute('data-blur-scope') || 'off');
+  applyBlurType(body.getAttribute('data-blur-type') || 'fade');
   applyFocusMode(body.getAttribute('data-focus-mode') || 'off');
   syncBlurField();
   // Each surface of fade-all starts from its own saved value.

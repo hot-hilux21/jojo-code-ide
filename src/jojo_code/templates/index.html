@@ -121,7 +121,7 @@
     {% endfor %}
   </style>
 </head>
-<body data-theme="{{ config.theme }}" data-font="{{ config.font }}" data-font-size="{{ config.font_size }}" data-font-weight="{{ config.font_weight }}" data-highlight-color="{{ config.highlight_color }}" data-line-height="{{ config.line_height }}" data-letter-spacing="{{ config.letter_spacing }}" data-word-spacing="{{ config.word_spacing }}" data-editor-font-size="{{ config.editor_font_size }}" data-editor-line-height="{{ config.editor_line_height }}" data-editor-letter-spacing="{{ config.editor_letter_spacing }}" data-output-font-size="{{ config.output_font_size }}" data-output-line-height="{{ config.output_line_height }}" data-output-letter-spacing="{{ config.output_letter_spacing }}" data-shell-font-size="{{ config.shell_font_size }}" data-shell-line-height="{{ config.shell_line_height }}" data-shell-letter-spacing="{{ config.shell_letter_spacing }}" data-focus-mode="{{ config.focus_mode }}" data-blur-intensity="{{ config.blur_intensity }}" data-fade-output="{{ config.fade_output }}" data-fade-shell="{{ config.fade_shell }}" data-fade-settings="{{ config.fade_settings }}" data-contrast="{{ config.contrast }}" data-tts-voice="{{ config.tts_voice }}" data-tts-rate="{{ config.tts_rate }}" data-tts-hover-scope="{{ config.tts_hover_scope }}" data-tts-hover-delay="{{ config.tts_hover_delay }}" data-tts-hover-code="{{ 'true' if config.tts_hover_code else 'false' }}" data-tts-hover-output="{{ 'true' if config.tts_hover_output else 'false' }}" data-tts-hover-shell="{{ 'true' if config.tts_hover_shell else 'false' }}" data-tts-voice-gender="{{ config.tts_voice_gender }}" data-locale="{{ locale }}" data-direction="{{ direction }}" data-reduce-motion="{% if config.reduce_motion is sameas true %}true{% elif config.reduce_motion is sameas false %}false{% else %}unset{% endif %}" data-sound="{{ 'true' if config.sound_enabled else 'false' }}" data-glass-material="{{ config.glass_material }}" data-glass-tint="{{ glass_tint }}" data-glass-choice="{{ glass_choice }}" data-gradient="{% if config.theme_gradient %}on{% else %}off{% endif %}" data-icon-only="{{ 'true' if config.icon_only else 'false' }}" data-show-shortcut-label="{{ 'true' if config.show_shortcut_label else 'false' }}" data-reading-ruler="{{ 'true' if config.reading_ruler else 'false' }}"{% if body_style %} style="{{ body_style }}"{% endif %}>
+<body data-theme="{{ config.theme }}" data-font="{{ config.font }}" data-font-size="{{ config.font_size }}" data-font-weight="{{ config.font_weight }}" data-highlight-color="{{ config.highlight_color }}" data-line-height="{{ config.line_height }}" data-letter-spacing="{{ config.letter_spacing }}" data-word-spacing="{{ config.word_spacing }}" data-editor-font-size="{{ config.editor_font_size }}" data-editor-line-height="{{ config.editor_line_height }}" data-editor-letter-spacing="{{ config.editor_letter_spacing }}" data-output-font-size="{{ config.output_font_size }}" data-output-line-height="{{ config.output_line_height }}" data-output-letter-spacing="{{ config.output_letter_spacing }}" data-shell-font-size="{{ config.shell_font_size }}" data-shell-line-height="{{ config.shell_line_height }}" data-shell-letter-spacing="{{ config.shell_letter_spacing }}" data-focus-mode="{{ config.focus_mode }}" data-blur-intensity="{{ config.blur_intensity }}" data-blur-scope="{{ config.blur_scope }}" data-blur-type="{{ config.get('blur_type', 'fade') }}" data-fade-output="{{ config.fade_output }}" data-fade-shell="{{ config.fade_shell }}" data-fade-settings="{{ config.fade_settings }}" data-contrast="{{ config.contrast }}" data-tts-voice="{{ config.tts_voice }}" data-tts-rate="{{ config.tts_rate }}" data-tts-hover-scope="{{ config.tts_hover_scope }}" data-tts-hover-delay="{{ config.tts_hover_delay }}" data-tts-hover-code="{{ 'true' if config.tts_hover_code else 'false' }}" data-tts-hover-output="{{ 'true' if config.tts_hover_output else 'false' }}" data-tts-hover-shell="{{ 'true' if config.tts_hover_shell else 'false' }}" data-tts-voice-gender="{{ config.tts_voice_gender }}" data-locale="{{ locale }}" data-direction="{{ direction }}" data-reduce-motion="{% if config.reduce_motion is sameas true %}true{% elif config.reduce_motion is sameas false %}false{% else %}unset{% endif %}" data-sound="{{ 'true' if config.sound_enabled else 'false' }}" data-glass-material="{{ config.glass_material }}" data-glass-tint="{{ glass_tint }}" data-glass-choice="{{ glass_choice }}" data-gradient="{% if config.theme_gradient %}on{% else %}off{% endif %}" data-icon-only="{{ 'true' if config.icon_only else 'false' }}" data-show-shortcut-label="{{ 'true' if config.show_shortcut_label else 'false' }}" data-reading-ruler="{{ 'true' if config.reading_ruler else 'false' }}"{% if body_style %} style="{{ body_style }}"{% endif %}>
 
   <a class="skip-link" href="#editor">{{ t('app.skip_to_editor') }}</a>
 
@@ -302,6 +302,18 @@
       <option value="off" {% if config.focus_mode not in ('lines', 'fade') %}selected{% endif %}>{{ t('focus.off') }}</option>
       <option value="lines" {% if config.focus_mode == 'lines' %}selected{% endif %}>{{ t('focus.lines') }}</option>
       <option value="fade" {% if config.focus_mode == 'fade' %}selected{% endif %}>{{ t('focus.fade_all') }}</option>
+    </select>
+    <label for="pane-blur-scope" class="pane-fade-label">{{ t('focus.scope') }}</label>
+    <select id="pane-blur-scope" class="tool-select pane-fade-mode" aria-describedby="pane-blur-scope-help">
+      <option value="off" {% if config.blur_scope == 'off' %}selected{% endif %}>{{ t('focus.off') }}</option>
+      <option value="code" {% if config.blur_scope == 'code' %}selected{% endif %}>{{ t('focus.lines') }}</option>
+      <option value="all" {% if config.blur_scope == 'all' %}selected{% endif %}>{{ t('focus.fade_all') }}</option>
+    </select>
+    <span class="visually-hidden" id="pane-blur-scope-help">{{ t('focus.scope_help') }}</span>
+    <label for="pane-blur-type" class="pane-fade-label">{{ t('focus.type') }}</label>
+    <select id="pane-blur-type" class="tool-select pane-fade-mode">
+      <option value="fade" {% if config.get('blur_type', 'fade') == 'fade' %}selected{% endif %}>{{ t('focus.type_fade') }}</option>
+      <option value="blur" {% if config.get('blur_type') == 'blur' %}selected{% endif %}>{{ t('focus.type_blur') }}</option>
     </select>
     <span class="pane-fade-sliders" id="pane-fade-sliders">
       {# Code only: the fade amount the code itself gets, the same value
@@ -903,6 +915,24 @@
               <option value="gutter" {% if config.focus_mode == 'gutter' %}selected{% endif %}>{{ t('focus.gutter') }}</option>
               <option value="lines" {% if config.focus_mode == 'lines' %}selected{% endif %}>{{ t('focus.lines') }}</option>
               <option value="fade" {% if config.focus_mode == 'fade' %}selected{% endif %}>{{ t('focus.fade_all') }}</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="blur-scope">{{ t('focus.scope') }}</label>
+            <select id="blur-scope" aria-describedby="blur-scope-help">
+              <option value="off" {% if config.blur_scope == 'off' %}selected{% endif %}>{{ t('focus.off') }}</option>
+              <option value="code" {% if config.blur_scope == 'code' %}selected{% endif %}>{{ t('focus.lines') }}</option>
+              <option value="all" {% if config.blur_scope == 'all' %}selected{% endif %}>{{ t('focus.fade_all') }}</option>
+            </select>
+            <p class="field-help" id="blur-scope-help">{{ t('focus.scope_help') }}</p>
+          </div>
+
+          <div class="field">
+            <label for="blur-type">{{ t('focus.type') }}</label>
+            <select id="blur-type">
+              <option value="fade" {% if config.get('blur_type', 'fade') == 'fade' %}selected{% endif %}>{{ t('focus.type_fade') }}</option>
+              <option value="blur" {% if config.get('blur_type') == 'blur' %}selected{% endif %}>{{ t('focus.type_blur') }}</option>
             </select>
           </div>
 
@@ -1786,8 +1816,11 @@
   <script src="{{ url_for('static', filename='js/tint.js') }}"></script>
   <script>window.CURRENT_USER = {{ (current_user or '')|tojson }};</script>
   <div style="position:fixed;top:8px;right:8px;z-index:9998;display:flex;gap:0.4rem;align-items:center;">
-    <a href="/faq" class="btn btn-small" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('help-circle') }} {{ 'FAQ' }}</a>
-    {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('package') }} {{ 'Packages' }}</button>{% endif %}
+    <a href="/faq" class="btn btn-small" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('help-circle') }} <span class="btn-label">{{ 'FAQ' }}</span></a>
+    {% if not hosted %}<button id="packages-btn" type="button" class="btn btn-small" style="display:inline-flex;align-items:center;gap:0.3rem;">{{ icon('package') }} <span class="btn-label">{{ 'Packages' }}</span></button>{% endif %}
+    {# The reader's name is the label of the profile button. It is not a
+       .btn-label on purpose: hiding button words must never hide who is
+       signed in. #}
     <button id="account-btn" type="button" class="btn btn-small" title="{{ t('account.title') }}"
             aria-label="{{ t('account.title') }}" aria-haspopup="true" aria-expanded="false"
             style="display:inline-flex;align-items:center;gap:0.3rem;padding:var(--space-1) var(--space-3);">

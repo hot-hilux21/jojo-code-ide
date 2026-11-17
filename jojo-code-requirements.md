@@ -42,11 +42,11 @@ Jump to any section:
 
 | Aspect | Requirement |
 |--------|-------------|
-| **Local Storage** | JSON or TOML config files saved to disk |
-| **Cloud Sync** | Optional: Google Drive or OneDrive (user opt-in) |
-| **Sync Scope** | Projects + settings only; no auto-sync |
-| **Auth** | Google/OneDrive login to carry settings across devices |
-| **Export/Import** | Manual config file export/import supported |
+| **Local Storage** | JSON config file on the device; desktop is offline-first |
+| **Server Storage** | Optional email account on the web app; saved files, settings copy, code snapshot and avatar live against that account |
+| **Sync Scope** | Files and settings only; no Drive/OneDrive integration, no continuous sync |
+| **Auth** | Email-based account on the web app; sign-in is optional |
+| **Export/Import** | Manual settings JSON export/import supported |
 
 ---
 
@@ -188,7 +188,7 @@ Jump to any section:
 - Struggles with standard IDE cognitive load
 - Needs font customization, focus mode, text-to-speech
 - Learning Python for school/CS degree
-- Values offline capability; wants cloud backup option
+- Values offline capability; wants an optional server copy of files and settings
 
 ### 9.2 Secondary: Neurodivergent Learner (General)
 - ADHD, dyspraxia, processing differences
@@ -220,7 +220,6 @@ Jump to any section:
 ### Should-Have (v0.2–0.3)
 - [ ] Custom theme builder
 - [ ] Multiple TTS options (ReciteMe + 2 open-source)
-- [ ] Google Drive/OneDrive sync (optional login)
 - [ ] Step-by-step debugger UI
 - [ ] Visual error highlighting
 - [ ] Configurable blur zones (blocks, functions)
