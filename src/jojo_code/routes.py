@@ -1205,9 +1205,6 @@ def load_config():
             for key in ('fade_output', 'fade_shell', 'fade_settings'):
                 if config.get(key) == 0.5:
                     config[key] = 0.0
-            # A retired setting from the removed React shell. Drop it so an
-            # old checkout cannot keep offering a screen that no longer exists.
-            config.pop('ui_backend', None)
             # Merge with defaults for any missing keys
             for key, value in DEFAULT_CONFIG.items():
                 if key not in config:
