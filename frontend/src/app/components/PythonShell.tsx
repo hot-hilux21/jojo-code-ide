@@ -63,9 +63,9 @@ export function PythonShell({ workspace }: { workspace: Workspace }) {
           spellCheck={false}
           disabled={workspace.shellBusy}
         />
-        <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground" disabled={workspace.shellBusy}>Run</button>
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground" onClick={() => void workspace.resetShell()}>Reset</button>
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground" onClick={() => { stopChant(); void workspace.closeShell(); }}>Close</button>
+        <button type="submit" className="btn btn-small" disabled={workspace.shellBusy}>Run</button>
+        <button type="button" className="btn btn-small" onClick={() => void workspace.resetShell()}>Reset</button>
+        <button type="button" className="btn btn-small" onClick={() => { stopChant(); void workspace.closeShell(); }}>Close</button>
       </form>
     </section>
   );

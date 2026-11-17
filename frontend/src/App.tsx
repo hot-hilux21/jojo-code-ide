@@ -105,7 +105,7 @@ export default function App() {
       fetch("/api/config").then((r) => r.json()),
       fetch("/api/themes").then((r) => r.json()),
       fetch("/api/fonts").then((r) => r.json()),
-      fetch("/api/credits").then((r) => r.json()),
+      fetch("/api/credits").then((r) => r.json()).catch(() => []),
       fetch("/api/glossary").then((r) => r.json()).catch(() => []),
       fetch("/api/version").then((r) => r.json()).catch(() => ({ version: "2.0.0-beta" })),
     ])
@@ -128,6 +128,9 @@ export default function App() {
         setSetupLocale(cfg.locale || "en");
         setSetupFont(cfg.font || "OpenDyslexic");
         setSetupTheme(cfg.theme || "light");
+        // Switching back from the new shell must land in the editor, not in
+        // the first-run wizard. Only a reader who has not finished setup sees it.
+        setScreen(cfg.setup_complete ? "editor" : "setup");
       })
     return () => {
       active = false;
@@ -519,7 +522,7 @@ export default function App() {
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => void saveConfig({ ui_backend: "react" })}
+                  onClick={() => void saveConfig({ ui_backend: "react", setup_complete: true })}
                 >
                   Try the new UI
                 </Button>

@@ -34,7 +34,7 @@ export function OutputPane({ workspace }: { workspace: Workspace }) {
             />
             <button
               type="submit"
-              className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground"
+              className="btn btn-small"
             >
               Send
             </button>

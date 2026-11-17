@@ -3392,6 +3392,23 @@ def feedback_list_api():
     items = list(reversed(items))[:100]
     return jsonify({'success': True, 'items': items})
 
+@main_bp.route('/api/credits')
+def credits_api():
+    """The maintainer's credits, for the React About dialog."""
+    return jsonify(list(credits_list()))
+
+
+@main_bp.route('/api/glossary')
+def glossary_api():
+    """Glossary rows for the React dictionary, in the reader's language."""
+    locale = request.args.get('locale') or i18n.DEFAULT_LOCALE
+    rows = []
+    for section in glossary.sections_for(locale):
+        for term, meaning in section.get('rows', []):
+            rows.append({'term': term, 'meaning': meaning})
+    return jsonify(rows)
+
+
 @main_bp.route('/api/version')
 def version_api():
     """What version is running, and whether it can update itself at all."""

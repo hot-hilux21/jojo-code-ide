@@ -43,7 +43,7 @@ export function PackagesModal({ onClose }: { onClose: () => void }) {
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
-        <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground">
+        <button type="submit" className="btn btn-small">
           Install
         </button>
       </form>

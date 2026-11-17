@@ -27,9 +27,9 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
   return (
     <ModalFrame title="Account" onClose={onClose}>
       <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Account actions">
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3" onClick={() => setMode("login")}>Log in</button>
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3" onClick={() => setMode("signup")}>Create account</button>
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3" onClick={() => setMode("reset")}>Reset password</button>
+        <button type="button" className="btn btn-small" onClick={() => setMode("login")}>Log in</button>
+        <button type="button" className="btn btn-small" onClick={() => setMode("signup")}>Create account</button>
+        <button type="button" className="btn btn-small" onClick={() => setMode("reset")}>Reset password</button>
       </div>
       <form
         className="space-y-3"
@@ -63,7 +63,7 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
           <label className="block"><span className="block text-sm">Code from email</span>
             <input className={field} inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} /></label>
         ) : null}
-        <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-4 text-foreground">Continue</button>
+        <button type="submit" className="btn">Continue</button>
         <p role="status">{status}</p>
       </form>
     </ModalFrame>

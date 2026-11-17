@@ -62,7 +62,7 @@ export function AccountModal({
       {!signedIn ? (
         <div className="space-y-3">
           <p>Sign in to keep your code, themes and progress with you.</p>
-          <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-4" onClick={() => openModal("login")}>Log in or create account</button>
+          <button type="button" className="btn" onClick={() => openModal("login")}>Log in or create account</button>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -101,7 +101,7 @@ export function AccountModal({
             }}>
               <label className="block"><span className="block text-sm">Username</span>
                 <input className={field} value={username} onChange={(e) => setUsername(e.target.value)} /></label>
-              <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3">Save username</button>
+              <button type="submit" className="btn btn-small">Save username</button>
             </form>
             <form className="space-y-2" onSubmit={(event) => {
               event.preventDefault();
@@ -113,7 +113,7 @@ export function AccountModal({
                 <input className={field} type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} /></label>
               <label className="block"><span className="block text-sm">New password</span>
                 <input className={field} type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></label>
-              <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3">Change password</button>
+              <button type="submit" className="btn btn-small">Change password</button>
             </form>
             <form className="space-y-2" onSubmit={(event) => {
               event.preventDefault();
@@ -123,7 +123,7 @@ export function AccountModal({
             }}>
               <label className="block"><span className="block text-sm">Add or change email</span>
                 <input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-              <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3">Send code</button>
+              <button type="submit" className="btn btn-small">Send code</button>
             </form>
             <form className="space-y-2" onSubmit={(event) => {
               event.preventDefault();
@@ -133,14 +133,14 @@ export function AccountModal({
             }}>
               <label className="block"><span className="block text-sm">Email code</span>
                 <input className={field} inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} /></label>
-              <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3">Verify email</button>
+              <button type="submit" className="btn btn-small">Verify email</button>
             </form>
             <label
               htmlFor="avatar-upload"
               className="flex cursor-pointer flex-col items-center rounded-lg border border-dashed border-panel-border bg-background p-4 text-foreground"
             >
               <span className="mt-2 font-medium">Choose profile picture</span>
-              <span className="mt-2 inline-block min-h-11 rounded-md border border-panel-border bg-panel px-3 py-2 text-sm">
+              <span className="mt-2 inline-block btn btn-small py-2 text-sm">
                 Browse files
               </span>
               <input
@@ -161,7 +161,7 @@ export function AccountModal({
             </label>
             <button
               type="button"
-              className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+              className="btn btn-small"
               onClick={() => void post("/api/auth/disconnect").then(() => { onClose(); load(); })}
             >
               Sign out

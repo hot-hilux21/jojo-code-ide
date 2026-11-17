@@ -151,7 +151,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               <input type="color" value={settings[key]} onChange={(e) => set(key, e.target.value)} />
             </Row>
           ))}
-          <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+          <button type="button" className="btn btn-small"
             onClick={() => set("theme", "custom")}>
             Use these colours
           </button>
@@ -203,7 +203,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               onKeyDown={(event) => captureKey("run_key", event)}
               aria-label="Run key"
             />
-            <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+            <button type="button" className="btn btn-small"
               onClick={() => { setRecord("run_key"); runKeyInput.current?.focus(); }}>
               Record
             </button>
@@ -217,7 +217,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               onKeyDown={(event) => captureKey("stop_key", event)}
               aria-label="Stop key"
             />
-            <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+            <button type="button" className="btn btn-small"
               onClick={() => { setRecord("stop_key"); stopKeyInput.current?.focus(); }}>
               Record
             </button>
@@ -266,7 +266,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
               <option value="beta">Beta</option><option value="stable">Stable</option>
             </select>
           </Row>
-          <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+          <button type="button" className="btn btn-small"
             onClick={() => void post<{ version?: string }>("/api/update/check").then((data) => setUpdateStatus(data.version || "Checked.")).catch(() => setUpdateStatus("Check failed."))}>
             Check now
           </button>
@@ -298,7 +298,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
       case "Reset":
         return <>
           <p>Put every setting back to its default.</p>
-          <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-4" onClick={() => void reset()}>Reset settings</button>
+          <button type="button" className="btn" onClick={() => void reset()}>Reset settings</button>
         </>;
       case "About":
         return <>

@@ -57,7 +57,7 @@ export function FeedbackModal({ onClose }: { onClose: () => void }) {
           <textarea className={field} rows={4} value={positive} onChange={(e) => setPositive(e.target.value)} /></label>
         <label className="block"><span className="block text-sm">What would you improve?</span>
           <textarea className={field} rows={4} value={negative} onChange={(e) => setNegative(e.target.value)} /></label>
-        <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-4 text-foreground">
+        <button type="submit" className="btn">
           Send feedback
         </button>
         <p role="status">{status}</p>

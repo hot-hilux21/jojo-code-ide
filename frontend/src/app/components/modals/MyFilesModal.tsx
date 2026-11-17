@@ -57,7 +57,7 @@ export function MyFilesModal({
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
-        <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground">
+        <button type="submit" className="btn btn-small">
           Save current code
         </button>
       </form>
@@ -68,7 +68,7 @@ export function MyFilesModal({
             <span className="flex-1">{file.name}</span>
             <button
               type="button"
-              className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground"
+              className="btn btn-small"
               onClick={() => {
                 void get<FileReply>(`/api/user/files/${encodeURIComponent(file.name)}`)
                   .then((data) => { if (data.code !== undefined) workspace.setCode(data.code); })
@@ -79,7 +79,7 @@ export function MyFilesModal({
             </button>
             <button
               type="button"
-              className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground"
+              className="btn btn-small"
               onClick={() => {
                 void fetch(`/api/user/files/${encodeURIComponent(file.name)}`, { method: "DELETE" })
                   .then(load)

@@ -31,7 +31,7 @@ export function FocusDrawer() {
             <h2 className="font-semibold">Focus controls</h2>
             <button
               type="button"
-              className="min-h-11 min-w-11 rounded-md border border-panel-border bg-background text-foreground"
+              className="btn btn-small"
               aria-label="Close focus controls"
               onClick={() => setOpen(false)}
             >

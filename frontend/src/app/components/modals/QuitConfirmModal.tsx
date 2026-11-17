@@ -11,7 +11,7 @@ export function QuitConfirmModal({ onClose }: { onClose: () => void }) {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          className="min-h-11 rounded-md border border-panel-border bg-panel px-4"
+          className="btn"
           onClick={() => {
             void post("/api/shutdown")
               .then(() => setStatus("Closing the app."))
@@ -20,7 +20,7 @@ export function QuitConfirmModal({ onClose }: { onClose: () => void }) {
         >
           Quit
         </button>
-        <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-4" onClick={onClose}>
+        <button type="button" className="btn" onClick={onClose}>
           Stay
         </button>
       </div>

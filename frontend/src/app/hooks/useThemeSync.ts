@@ -104,6 +104,8 @@ export function useThemeSync(
     root.dataset.focusMode = settings.focus_mode;
     root.dataset.glassMaterial = settings.glass_material;
     root.dataset.errorType = settings.error_type;
+    root.dataset.iconOnly = String(settings.icon_only);
+    root.dataset.showShortcutLabel = String(settings.show_shortcut_label);
     root.lang = settings.locale;
     root.dir = RTL_LOCALES.has(settings.locale) ? "rtl" : "ltr";
   }, [settings, themes, fonts]);
