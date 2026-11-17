@@ -94,7 +94,7 @@ Name: "installpython"; Description: "Install Python and add it to PATH"; GroupDe
 ; that is still in use to be replaced at the next restart, and asks for that
 ; restart when it finishes. It has no effect without administrator rights,
 ; which PrivilegesRequired=admin above already gives.
-Source: "dist\Jojo Code\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace
+Source: "dist\JojoCode\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace
 Source: "installer\prereqs\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "installer\prereqs\MicrosoftEdgeWebview2Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "installer\prereqs\python-3.13.16-amd64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: ShouldInstallPython
