@@ -20,6 +20,9 @@ import json
 import math
 import re
 import unittest
+from tests.legacy_ui import use_legacy_ui
+
+use_legacy_ui(globals())
 from pathlib import Path
 
 from jojo_code import create_app, routes

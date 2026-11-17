@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
+import { useSpeakable } from "../hooks/useSpeakable";
 import type { Workspace } from "../hooks/useWorkspace";
 import { useSpeech } from "../providers/SpeechProvider";
 
 /** The shell keeps its own transcript in state; no global DOM listeners. */
 export function PythonShell({ workspace }: { workspace: Workspace }) {
   const { playLoop, stopLoop } = useSpeech();
+  const shellSpeech = useSpeakable("Python shell", "shell");
+  const commandSpeech = useSpeakable("Shell command");
   const chantTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => {
@@ -43,14 +46,14 @@ export function PythonShell({ workspace }: { workspace: Workspace }) {
   };
 
   return (
-    <section className="workspace-pane" aria-labelledby="shell-heading">
+    <section className="workspace-pane" aria-labelledby="shell-heading" aria-label="Python shell" tabIndex={0} {...shellSpeech}>
       <header id="shell-heading" className="font-semibold">Python shell</header>
       <div className="pane-scroll" role="log" aria-live="polite">{workspace.shellOutput}</div>
       <form
         className="flex gap-2 border-t border-panel-border p-2"
         onSubmit={(event) => { event.preventDefault(); submit(); }}
       >
-        <label className="sr-only" htmlFor="shell-command">Shell command</label>
+        <label className="sr-only" htmlFor="shell-command" {...commandSpeech}>Shell command</label>
         <input
           id="shell-command"
           className="min-h-11 flex-1 rounded-md border border-panel-border bg-background px-2 font-mono text-foreground"

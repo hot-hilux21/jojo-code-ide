@@ -1,12 +1,14 @@
+import { useSpeakable } from "../hooks/useSpeakable";
 import type { TraceRow } from "../hooks/useWorkspace";
 
 export function TraceTable({ rows }: { rows: TraceRow[] }) {
+  const tableSpeech = useSpeakable("Variable trace table", "text");
   if (!rows.length) return null;
   const columns = Array.from(
     new Set(rows.flatMap((row) => Object.keys(row))),
   );
   return (
-    <section className="workspace-pane" aria-labelledby="trace-heading">
+    <section className="workspace-pane" aria-labelledby="trace-heading" tabIndex={0} {...tableSpeech}>
       <header id="trace-heading" className="font-semibold">
         Variable trace
       </header>

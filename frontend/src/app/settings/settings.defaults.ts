@@ -57,7 +57,7 @@ export const DEFAULT_SETTINGS: Settings = {
   tts_voice_gender: "male",
   auto_update: true,
   update_channel: "beta",
-  ui_backend: "flask",
+  ui_backend: "react",
 };
 
 export const SETTINGS_STORAGE_KEY = "jojo-code.settings.v1";

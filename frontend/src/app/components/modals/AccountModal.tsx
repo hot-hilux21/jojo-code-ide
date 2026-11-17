@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFlaskApi } from "../../hooks/useFlaskApi";
 import { ModalFrame } from "./ModalFrame";
 import type { ModalName } from "../TopBar";
@@ -39,7 +39,6 @@ export function AccountModal({
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [status, setStatus] = useState("");
-  const avatarInput = useRef<HTMLInputElement>(null);
 
   const load = () => {
     void get<{ email?: string }>("/api/auth/me")
@@ -136,19 +135,20 @@ export function AccountModal({
                 <input className={field} inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} /></label>
               <button type="submit" className="min-h-11 rounded-md border border-panel-border bg-panel px-3">Verify email</button>
             </form>
-            <button
-              type="button"
-              className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
-              onClick={() => avatarInput.current?.click()}
+            <label
+              htmlFor="avatar-upload"
+              className="flex cursor-pointer flex-col items-center rounded-lg border border-dashed border-panel-border bg-background p-4 text-foreground"
             >
-              Choose profile picture
-            </button>
-            <input
-              ref={avatarInput}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(event) => {
+              <span className="mt-2 font-medium">Choose profile picture</span>
+              <span className="mt-2 inline-block min-h-11 rounded-md border border-panel-border bg-panel px-3 py-2 text-sm">
+                Browse files
+              </span>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
                 const reader = new FileReader();
@@ -157,7 +157,8 @@ export function AccountModal({
                 };
                 reader.readAsDataURL(file);
               }}
-            />
+              />
+            </label>
             <button
               type="button"
               className="min-h-11 rounded-md border border-panel-border bg-panel px-3"

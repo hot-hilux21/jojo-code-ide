@@ -25,13 +25,13 @@ export function SpeakButton({
   return (
     <button
       type="button"
+      {...speakProps}
       className={className}
       onClick={onClick}
       disabled={disabled}
       hidden={hidden}
       aria-label={label}
       aria-pressed={pressed}
-      {...speakProps}
     >
       {children}
     </button>

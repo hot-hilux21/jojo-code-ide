@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 import { useSettings } from "./SettingsProvider";
 
 interface SpeechContextValue {
-  speak: (label: string, kind?: "control" | "text") => void;
+  speak: (label: string, kind?: "control" | "text" | "code" | "output" | "shell") => void;
   cancel: () => void;
   playSound: (name: string) => void;
   playLoop: (name: string) => void;
@@ -41,7 +41,7 @@ export function SpeechProvider({ children }: { children: ReactNode }) {
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   }, []);
 
-  const speak = useCallback((label: string, kind: "control" | "text" = "control") => {
+  const speak = useCallback((label: string, kind: "control" | "text" | "code" | "output" | "shell" = "control") => {
     if (!settings.tts_enabled) return;
     if (settings.tts_hover_scope === "off") return;
     if (settings.tts_hover_scope === "controls" && kind !== "control") return;

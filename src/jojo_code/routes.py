@@ -454,7 +454,7 @@ DEFAULT_CONFIG = {
     # Which screen the app draws. The classic Flask/Jinja one or the React
     # build the new UI is moving onto. The reader can switch back at any time;
     # the value is validated like every other setting.
-    'ui_backend': 'flask',
+    'ui_backend': 'react',
 }
 
 # Editor palettes. These are the single source of truth: the settings
@@ -1550,17 +1550,16 @@ def _build_commit() -> str:
 
 REACT_DIST = Path(__file__).resolve().parents[2] / 'frontend' / 'dist'
 
-# The React UI is not approved for default use yet (see AGENTS.md). Flip this
-# to True only when the user signs off, then the stored ui_backend setting
-# takes effect again. While False the classic Flask UI always loads.
-REACT_ENABLED = False
+# The React UI is the default now. The stored ui_backend setting still lets
+# a reader go back to the classic Flask page if they need it.
+REACT_ENABLED = True
 
 
 @main_bp.route('/')
 def index():
     config = load_config()
     locale = i18n.normalise(config.get('locale')) or i18n.DEFAULT_LOCALE
-    backend = (config.get('ui_backend') or 'flask') if REACT_ENABLED else 'flask'
+    backend = (config.get('ui_backend') or DEFAULT_CONFIG['ui_backend']) if REACT_ENABLED else 'flask'
     if backend == 'react' and (REACT_DIST / 'index.html').is_file():
         return send_from_directory(REACT_DIST, 'index.html')
     # The setup step is clamped here, not in the template. A config file

@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
 import { useSettings } from "../../providers/SettingsProvider";
+import { useSpeech } from "../../providers/SpeechProvider";
 import { useFlaskApi } from "../../hooks/useFlaskApi";
 import type { Settings } from "../../settings/settings.types";
 import { ModalFrame } from "./ModalFrame";
+
+const CUSTOM_COLOUR_KEYS = [
+  "theme_custom_page", "theme_custom_bg", "theme_custom_fg",
+  "theme_custom_selection", "theme_custom_keyword", "theme_custom_string",
+  "theme_custom_comment", "theme_custom_number", "theme_custom_function",
+  "theme_custom_error",
+] as const;
 
 const SECTIONS = [
   "Language", "Font", "Reading", "Colours & Contrast", "Try it out", "Focus",
@@ -28,11 +36,39 @@ function fieldClass(): string {
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
   const { settings, themes, fonts, update, reset, status } = useSettings();
+  const { voices } = useSpeech();
   const { post } = useFlaskApi();
   const [section, setSection] = useState<Section>("Language");
   const [version, setVersion] = useState("");
   const [updateStatus, setUpdateStatus] = useState("");
   const [importStatus, setImportStatus] = useState("");
+  const [record, setRecord] = useState<"run_key" | "stop_key" | null>(null);
+  const lastEscape = useRef(0);
+  const runKeyInput = useRef<HTMLInputElement>(null);
+  const stopKeyInput = useRef<HTMLInputElement>(null);
+
+  const captureKey = (target: "run_key" | "stop_key", event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (record !== target) return;
+    event.preventDefault();
+    const parts: string[] = [];
+    if (event.ctrlKey || event.metaKey) parts.push("Ctrl");
+    if (event.altKey) parts.push("Alt");
+    if (event.shiftKey) parts.push("Shift");
+    if (event.key === "Escape") {
+      const now = Date.now();
+      if (now - lastEscape.current < 700) {
+        parts.push("Escape", "Escape");
+        lastEscape.current = 0;
+      } else {
+        lastEscape.current = now;
+        parts.push("Escape");
+      }
+    } else {
+      parts.push(event.key.length === 1 ? event.key.toUpperCase() : event.key);
+    }
+    set(target, parts.join("+"));
+    setRecord(null);
+  };
 
   useEffect(() => {
     void post<{ version?: string }>("/api/version")
@@ -106,6 +142,19 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <Row label="Panel tint">
             <input type="color" value={settings.glass_tint || "#ffffff"} onChange={(e) => set("glass_tint", e.target.value)} />
           </Row>
+          <h4 className="mt-4 font-semibold">Custom colours</h4>
+          <p className="text-sm text-muted-foreground">
+            Pick your own palette, then switch the theme to Custom to use it.
+          </p>
+          {CUSTOM_COLOUR_KEYS.map((key) => (
+            <Row key={key} label={key.replace("theme_custom_", "")}>
+              <input type="color" value={settings[key]} onChange={(e) => set(key, e.target.value)} />
+            </Row>
+          ))}
+          <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+            onClick={() => set("theme", "custom")}>
+            Use these colours
+          </button>
         </>;
       case "Try it out":
         return <p className="reading-sample rounded-md border border-panel-border p-3">
@@ -145,12 +194,52 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </Row>;
       case "Keyboard":
         return <>
-          <Row label="Run key"><output>{settings.run_key}</output></Row>
-          <Row label="Stop key"><output>{settings.stop_key}</output></Row>
+          <Row label="Run key">
+            <input
+              ref={runKeyInput}
+              className={fieldClass()}
+              value={settings.run_key}
+              onChange={(event) => set("run_key", event.target.value)}
+              onKeyDown={(event) => captureKey("run_key", event)}
+              aria-label="Run key"
+            />
+            <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+              onClick={() => { setRecord("run_key"); runKeyInput.current?.focus(); }}>
+              Record
+            </button>
+          </Row>
+          <Row label="Stop key">
+            <input
+              ref={stopKeyInput}
+              className={fieldClass()}
+              value={settings.stop_key}
+              onChange={(event) => set("stop_key", event.target.value)}
+              onKeyDown={(event) => captureKey("stop_key", event)}
+              aria-label="Stop key"
+            />
+            <button type="button" className="min-h-11 rounded-md border border-panel-border bg-panel px-3"
+              onClick={() => { setRecord("stop_key"); stopKeyInput.current?.focus(); }}>
+              Record
+            </button>
+          </Row>
+          <p className="text-sm text-muted-foreground">
+            Press Record, then the keys you want. For a double Escape, press Escape twice quickly.
+          </p>
         </>;
       case "Reading Aloud":
         return <>
           <Row label="Reading aloud on"><input type="checkbox" checked={settings.tts_enabled} onChange={(e) => set("tts_enabled", e.target.checked)} /></Row>
+          <Row label="Voice">
+            <select className={fieldClass()} value={settings.tts_voice} onChange={(e) => set("tts_voice", e.target.value)}>
+              <option value="">System default</option>
+              {voices.map((voice) => <option key={voice.voiceURI} value={voice.voiceURI}>{voice.name}</option>)}
+            </select>
+          </Row>
+          <Row label="Voice preference">
+            <select className={fieldClass()} value={settings.tts_voice_gender} onChange={(e) => set("tts_voice_gender", e.target.value)}>
+              {["male", "female", "any"].map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+          </Row>
           <Row label="Hover scope">
             <select className={fieldClass()} value={settings.tts_hover_scope} onChange={(e) => set("tts_hover_scope", e.target.value)}>
               {["off", "controls", "all"].map((value) => <option key={value} value={value}>{value}</option>)}
@@ -228,7 +317,11 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         <nav aria-label="Settings sections" className="space-y-1">
           {SECTIONS.map((name) => (
             <button key={name} type="button" aria-current={section === name ? "page" : undefined}
-              className="min-h-11 w-full rounded-md border border-panel-border bg-background px-3 text-left text-foreground"
+              className={`block min-h-11 w-full rounded-lg px-4 py-2 text-left text-sm font-medium transition-colors ${
+                section === name
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+              }`}
               onClick={() => setSection(name)}>
               {name}
             </button>

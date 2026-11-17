@@ -100,3 +100,20 @@ each phase with `npm run build` and `npm run lint` in `frontend/`.
 Rule checks over `frontend/src/app`: no `document.querySelector`,
 `document.getElementById`, `getElementsBy`, or `style={{` overrides. Theme
 changes go through the single `useThemeSync` hook to `:root` custom properties.
+
+Tailwind work follows the component patterns in `https://hyperui.dev/llms.txt`:
+the Settings sidebar uses the accessible side-menu pattern and the profile
+picture picker uses the file-uploader pattern, both recoloured with the app's
+CSS tokens so dark mode and custom themes still apply.
+
+Browser QA against a local Flask server at `font-size: 24px`, `line-height: 2`,
+`letter-spacing: 0.5px`, `word-spacing: 0.5px`:
+
+- `.app-shell` height matched the 718px viewport; no page scroll.
+- 14 toolbar buttons, zero outside the viewport.
+- `:root` computed variables read back as 24px / 2 / 0.5px / 0.5px.
+- Settings dialog opened with one Radix dialog; Keyboard showed editable Run
+  and Stop keys with Record buttons; Reading Aloud showed Voice and Voice
+  preference; Colours showed all ten custom colour wells.
+- With speech enabled and a stubbed `speechSynthesis.speak`, hovering Run,
+  the editor, output and shell produced the matching spoken labels.
