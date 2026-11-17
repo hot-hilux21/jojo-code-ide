@@ -369,80 +369,58 @@
     autofocus: true,
     value: '# Welcome to Jojo Code!\n# Write Python code and press Run (or Ctrl+Enter).\n\nprint("Hello, world!")\n\nfor i in range(3):\n    print("Counting:", i)\n'
   });
-  // Autosave: keep the last edited code so a refresh or crash does not lose it.
+  // Autosave: one toggle in the coding toolbar. On, the code is kept in the
+  // browser on every change; when signed in, the same code is also written
+  // to the reader's account under the fixed name autosave.py. Off, nothing
+  // is written. The Save button still puts a copy on the computer.
+  var AUTOSAVE_KEY = 'jojo_code_autosave';
+  var AUTOSAVE_FILE = 'autosave.py';
   var autosaveEnabled = (function () {
     try { return localStorage.getItem('jojo_code_autosave_enabled') !== 'off'; } catch (e) { return true; }
   })();
   function setAutosaveEnabled(value) {
     autosaveEnabled = value;
     try { localStorage.setItem('jojo_code_autosave_enabled', value ? 'on' : 'off'); } catch (e) {}
+    if (!value) return;
+    try { localStorage.setItem(AUTOSAVE_KEY, editor.getValue()); } catch (e) {}
+    pushCloudCode();
   }
-  // The name the autosave writes to. Read before the autosave starts,
-  // because the first thing it does is look for a file to load.
-  var autosaveName = (function () {
-    try { return localStorage.getItem('jojo_code_autosave_name') || ''; } catch (e) { return ''; }
-  })();
-  function setAutosaveName(value) {
-    autosaveName = (value || '').trim();
-    try {
-      localStorage.setItem('jojo_code_autosave_name', autosaveName);
-    } catch (e) { /* a blocked store is not worth a dialog */ }
-  }
-  // Cloud autosave is offered only after the reader has made one explicit
-  // save. Until then there is no file to autosave into, and no reason to
-  // overwrite code that was never sent to the server.
-  var cloudSaveDone = (function () {
-    try { return localStorage.getItem('jojo_code_cloud_saved') === '1'; } catch (e) { return false; }
-  })();
-  function markCloudSaved() {
-    cloudSaveDone = true;
-    try { localStorage.setItem('jojo_code_cloud_saved', '1'); } catch (e) {}
-    var toggle = document.getElementById('btn-autosave');
-    if (toggle) toggle.hidden = false;
-  }
-  if (cloudSaveDone && window.CURRENT_USER) markCloudSaved();
-  (function () {
-    var AUTOSAVE_KEY = 'jojo_code_autosave';
-    try {
-      var saved = localStorage.getItem(AUTOSAVE_KEY);
-      if (saved && saved.trim()) {
-        editor.setValue(saved);
-      }
-      editor.on('change', function () {
-        try { localStorage.setItem(AUTOSAVE_KEY, editor.getValue()); } catch (e) {}
-      });
-    } catch (e) {}
-  })();
+  // Restore the browser copy on load. It is the reader's own last session,
+  // whether or not they are signed in.
+  try {
+    var saved = localStorage.getItem(AUTOSAVE_KEY);
+    if (saved && saved.trim()) editor.setValue(saved);
+  } catch (e) {}
 
-   // Autosave to the server, for a reader who is logged in. The file it
-   // writes to is named by the reader, so the name has to be known before
-   // anything is written: a file with no name has nowhere to go.
-   (function () {
-     if (!window.CURRENT_USER || !autosaveEnabled) return;
-     var timer = null;
-     function pushCode() {
-       var name = autosaveName;
-       if (!cloudSaveDone || !autosaveEnabled || !name) return;
-       fetch('/api/user/files', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ name: name, code: editor.getValue() }),
-       }).then(function () { updateLastSaved(); }).catch(function () {});
-     }
-     editor.on('change', function () {
-       if (timer) clearTimeout(timer);
-       timer = setTimeout(pushCode, 2000);
-     });
-     // Only restore a cloud copy after an explicit save. On a first visit
-     // the local code must win.
-     var saved = cloudSaveDone ? autosaveName : '';
-     if (!saved) return;
-     fetch('/api/user/files/' + encodeURIComponent(saved)).then(function (r) { return r.json(); }).then(function (d) {
-       if (d && d.success && typeof d.code === 'string' && d.code.trim()) {
-         editor.setValue(d.code);
-       }
-     }).catch(function () {});
-   })();
+  var cloudTimer = null;
+  function pushCloudCode() {
+    if (!window.CURRENT_USER || !autosaveEnabled) return;
+    fetch('/api/user/files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: AUTOSAVE_FILE, code: editor.getValue() }),
+    }).then(function () { updateLastSaved(); }).catch(function () {});
+  }
+  editor.on('change', function () {
+    if (!autosaveEnabled) return;
+    try { localStorage.setItem(AUTOSAVE_KEY, editor.getValue()); } catch (e) {}
+    if (cloudTimer) clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(pushCloudCode, 2000);
+  });
+  // A signed-in reader finds their cloud copy waiting, unless the browser
+  // copy is newer. Both hold the same file name now, so there is one source.
+  if (window.CURRENT_USER) {
+    fetch('/api/user/files/' + encodeURIComponent(AUTOSAVE_FILE)).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.success && typeof d.code === 'string' && d.code.trim()) {
+        var local = '';
+        try { local = localStorage.getItem(AUTOSAVE_KEY) || ''; } catch (e) {}
+        if (!local.trim() || local === d.code) {
+          editor.setValue(d.code);
+          try { localStorage.setItem(AUTOSAVE_KEY, d.code); } catch (e) {}
+        }
+      }
+    }).catch(function () {});
+  }
 
   // ---------- Indentation helpers ----------
   var indentAddBtn = document.getElementById('pane-indent-add');
@@ -1929,8 +1907,6 @@
   var acctFilesEmpty = document.getElementById('acct-files-empty');
   var acctSettingsSave = document.getElementById('acct-settings-save');
   var acctSettingsLoad = document.getElementById('acct-settings-load');
-  var acctAutosaveName = document.getElementById('acct-autosave-name');
-  var acctAutosaveNameSave = document.getElementById('acct-autosave-name-save');
 
   // The status line. There is one in each box that says something, and the
   // message goes to whichever of them is on screen.
@@ -1998,26 +1974,6 @@
         acctFileList.appendChild(item);
       });
     }).catch(function () { sayServerStatus(t('account.failed')); });
-  }
-
-  if (acctAutosaveNameSave) {
-    acctAutosaveNameSave.addEventListener('click', function () {
-      var name = acctAutosaveName ? acctAutosaveName.value.trim() : '';
-      if (!name) {
-        sayServerStatus(t('account.autosave_name_missing'));
-        return;
-      }
-      setAutosaveName(name);
-      // Kept on the server as well, so the name travels with the account
-      // rather than only living in this browser.
-      fetch('/api/user/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings: { autosave_file: name } }),
-      }).then(function (r) { return r.json(); }).then(function (d) {
-        sayServerStatus(d && d.success ? t('account.autosave_name_saved') : t('account.failed'));
-      }).catch(function () { sayServerStatus(t('account.failed')); });
-    });
   }
 
   if (acctFileSave) {
@@ -2242,7 +2198,6 @@
       if (nameField && window.CURRENT_USER) nameField.value = window.CURRENT_USER;
       loadAchievements();
       loadProgress();
-      if (acctAutosaveName) acctAutosaveName.value = autosaveName;
     });
   }
 
@@ -4275,33 +4230,20 @@
       if (accountModal) accountModal.style.display = 'flex';
       return;
     }
-    var name = autosaveName;
-    if (!name) {
-      if (accountModal) accountModal.style.display = 'flex';
-      if (acctAutosaveName) acctAutosaveName.focus();
-      return;
-    }
     fetch('/api/user/files', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, code: editor.getValue() }),
+      body: JSON.stringify({ name: AUTOSAVE_FILE, code: editor.getValue() }),
     }).then(function (r) { return r.json(); }).then(function (d) {
       if (!d || !d.success) return;
-      markCloudSaved();
       setAutosaveEnabled(true);
       syncAutosaveButton();
       updateLastSaved();
       recordEvent('cloud_saved');
-      awardAchievement('first_cloud');
     }).catch(function () {});
   }
   if (btnSaveCloud) btnSaveCloud.addEventListener('click', saveToCloud);
   if (btnAutoSave) btnAutoSave.addEventListener('click', function () {
-    if (!cloudSaveDone || !autosaveName) {
-      if (accountModal) accountModal.style.display = 'flex';
-      if (acctAutosaveName) acctAutosaveName.focus();
-      return;
-    }
     setAutosaveEnabled(!autosaveEnabled);
     syncAutosaveButton();
   });
@@ -5447,6 +5389,25 @@
       syncBlurField();
       saveConfig({ focus_mode: paneFadeMode.value });
     });
+  }
+
+  // The fade controls sit in a left drawer when fade-all is on. It opens by
+  // default; the X closes it and the edge tab brings it back, so the editor
+  // never has controls sitting on top of its centre.
+  var focusDrawerTab = document.getElementById('focus-drawer-tab');
+  var focusDrawerClose = document.getElementById('focus-drawer-close');
+  function setFocusDrawer(open) {
+    document.body.setAttribute('data-focus-drawer', open ? 'open' : 'closed');
+    if (focusDrawerClose) focusDrawerClose.focus();
+  }
+  if (focusDrawerClose) {
+    focusDrawerClose.addEventListener('click', function () {
+      setFocusDrawer(false);
+      if (focusDrawerTab) focusDrawerTab.focus();
+    });
+  }
+  if (focusDrawerTab) {
+    focusDrawerTab.addEventListener('click', function () { setFocusDrawer(true); });
   }
   if (paneEditorBlur) {
     paneEditorBlur.addEventListener('input', function () {

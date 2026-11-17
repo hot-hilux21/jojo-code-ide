@@ -555,5 +555,8 @@
   "leaderboard.optin": "向其他读者显示我的名字和经验值",
   "leaderboard.show": "查看排行榜",
   "leaderboard.empty": "还没有人加入排行榜。",
-  "progress.streak": "连续天数"
+  "progress.streak": "连续天数",
+  "focus.drawer_open": "打开专注设置",
+  "focus.drawer_close": "关闭专注设置",
+  "focus.drawer_tab": "专注设置"
 }

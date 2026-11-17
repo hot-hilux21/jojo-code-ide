@@ -555,5 +555,8 @@
   "leaderboard.optin": "내 이름과 XP를 다른 사용자에게 표시",
   "leaderboard.show": "리더보드 보기",
   "leaderboard.empty": "아직 참여한 사람이 없습니다.",
-  "progress.streak": "연속일"
+  "progress.streak": "연속일",
+  "focus.drawer_open": "집중 설정 열기",
+  "focus.drawer_close": "집중 설정 닫기",
+  "focus.drawer_tab": "집중 설정"
 }

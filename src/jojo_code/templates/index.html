@@ -285,7 +285,11 @@
   {# The fade control sits at the top right of the editor strip: a mode
      dropdown plus the sliders that mode shows, independent of Settings
      but writing the same values, so the two views cannot disagree. #}
+  <button type="button" id="focus-drawer-tab" class="focus-drawer-tab" hidden
+          aria-label="{{ t('focus.drawer_open') }}" title="{{ t('focus.drawer_open') }}">{{ t('focus.drawer_tab') }}</button>
   <div class="pane-fade" id="pane-fade" role="group" aria-labelledby="pane-fade-mode-label">
+    <button type="button" id="focus-drawer-close" class="focus-drawer-close"
+            aria-label="{{ t('focus.drawer_close') }}" title="{{ t('focus.drawer_close') }}">{{ t('focus.drawer_close') }}</button>
     <label for="pane-fade-mode" class="pane-fade-label" id="pane-fade-mode-label">{{ t('focus.mode') }}</label>
     <select id="pane-fade-mode" class="tool-select pane-fade-mode">
       <option value="off" {% if config.focus_mode not in ('lines', 'fade') %}selected{% endif %}>{{ t('focus.off') }}</option>
@@ -330,7 +334,7 @@
       <button type="button" class="btn btn-small pane-indent" id="btn-save-cloud"
               {% if not current_user %}hidden{% endif %}
               title="{{ t('nav.save_cloud') }}" aria-label="{{ t('nav.save_cloud') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.save_cloud') }}</span></button>
-      <button type="button" class="btn btn-small pane-indent" id="btn-autosave" hidden
+      <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
               title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span></button>
       <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
     </span>
@@ -1932,12 +1936,6 @@
         <input id="acct-new-password" type="password" style="width:100%" autocomplete="new-password">
         <button class="btn btn-small" type="button" id="acct-password-change">{{ t('account.change_password') }}</button>
         <p id="acct-password-status" class="acct-status" aria-live="polite"></p>
-      </div>
-      <div class="field">
-        <label for="acct-autosave-name">{{ t('account.autosave_name') }}</label>
-        <input id="acct-autosave-name" type="text" style="width:100%" placeholder="my_code.py">
-        <p class="field-help">{{ t('account.autosave_name_help') }}</p>
-        <button class="btn btn-small" type="button" id="acct-autosave-name-save">{{ t('account.autosave_name_save') }}</button>
       </div>
       <div class="field">
         <button class="btn btn-small" type="button" id="acct-settings-save">{{ t('account.settings_save') }}</button>

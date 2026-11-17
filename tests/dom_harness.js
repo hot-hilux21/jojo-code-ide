@@ -244,6 +244,7 @@ const KNOWN_IDS = new Set([
   'achievement-list', 'achievement-status', 'acct-new-username',
   'acct-new-email', 'acct-email-code', 'acct-username-status',
   'lb-optin', 'lb-show', 'lb-list', 'lb-status', 'progress-streak',
+  'focus-drawer-tab', 'focus-drawer-close',
 ]);
 
 const numericIds = new Set([

@@ -555,5 +555,8 @@
   "leaderboard.optin": "Afficher mon nom et mes points aux autres",
   "leaderboard.show": "Voir le classement",
   "leaderboard.empty": "Personne n’est encore au classement.",
-  "progress.streak": "Série de jours"
+  "progress.streak": "Série de jours",
+  "focus.drawer_open": "Ouvrir les réglages de concentration",
+  "focus.drawer_close": "Fermer les réglages de concentration",
+  "focus.drawer_tab": "Concentration"
 }

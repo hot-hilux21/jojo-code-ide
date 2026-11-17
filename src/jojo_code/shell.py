@@ -217,6 +217,14 @@ class ShellSession:
         """Run one command; return {'output', 'error', 'error_type'}."""
         with self._lock:
             self.last_used = time.time()
+            # Easter egg: a bare "ay" is not Python, so answer it here rather
+            # than letting the child raise NameError. The chant is the whole
+            # output, in the # # the reader asked for.
+            if isinstance(code, str) and code.strip().lower() == 'ay':
+                return {
+                    'output': '\n'.join(['# ay ay ay ay #'] * 8) + '\n',
+                    'error': '', 'error_type': '', 'ay': True,
+                }
             proc = self._send({'code': code})
             result = self._read_reply(proc, timeout or self._timeout)
             # Cheat codes: a bare word that is not Python is still allowed

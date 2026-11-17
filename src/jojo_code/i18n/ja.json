@@ -555,5 +555,8 @@
   "leaderboard.optin": "名前とXPを他の人に表示する",
   "leaderboard.show": "ランキングを見る",
   "leaderboard.empty": "まだ誰も参加していません。",
-  "progress.streak": "連続日数"
+  "progress.streak": "連続日数",
+  "focus.drawer_open": "フォーカス設定を開く",
+  "focus.drawer_close": "フォーカス設定を閉じる",
+  "focus.drawer_tab": "フォーカス設定"
 }

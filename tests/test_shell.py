@@ -587,5 +587,35 @@ class ShellRouteTests(unittest.TestCase):
         self.assertTrue(reply["success"])
 
 
+class ShellAyEggTests(unittest.TestCase):
+    """A bare "ay" chants instead of raising NameError."""
+
+    def _session(self):
+        import threading
+        from jojo_code.shell import ShellSession
+
+        session = ShellSession.__new__(ShellSession)
+        session._lock = threading.Lock()
+        session._timeout = 5
+        session.last_used = 0
+        return session
+
+    def test_ay_returns_the_chant(self):
+        session = self._session()
+        result = session.exec('ay')
+        self.assertTrue(result['ay'])
+        self.assertIn('# ay ay ay ay #', result['output'])
+        self.assertEqual(result['error'], '')
+
+    def test_ay_is_case_and_space_insensitive(self):
+        from unittest import mock
+
+        session = self._session()
+        self.assertTrue(session.exec('  AY  ')['ay'])
+        with mock.patch.object(session, '_send', return_value=None), \
+             mock.patch.object(session, '_read_reply', return_value={'output': 'ay'}):
+            self.assertFalse(session.exec('print("ay")').get('ay', False))
+
+
 if __name__ == "__main__":
     unittest.main()

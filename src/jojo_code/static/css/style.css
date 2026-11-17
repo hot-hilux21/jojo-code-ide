@@ -1149,6 +1149,79 @@ body[data-focus-mode="fade"] .pane-fade-slider.pane-fade-pane {
   display: inline-flex;
 }
 
+/* Fade-all controls live in a left drawer. It squishes the workspace rather
+   than sitting over the editor: the editor keeps its whole centre. The drawer
+   is open by default in fade mode; the X closes it and the tab reopens it. */
+.focus-drawer-tab { display: none; }
+.focus-drawer-close { display: none; }
+body[data-focus-mode="fade"] .workspace { padding-left: 300px; }
+body[data-focus-mode="fade"] .pane-fade {
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  width: 284px;
+  z-index: 40;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-right: 1px solid var(--panel-border);
+  border-bottom: 0;
+  overflow-y: auto;
+}
+body[data-focus-mode="fade"] .pane-fade .pane-fade-sliders {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+body[data-focus-mode="fade"] .pane-fade .pane-fade-slider,
+body[data-focus-mode="fade"] .pane-fade .mini-field {
+  display: flex;
+  width: 100%;
+}
+body[data-focus-mode="fade"] .pane-fade .mini-field {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+}
+body[data-focus-mode="fade"] .focus-drawer-close { display: inline-flex; }
+body[data-focus-mode="fade"][data-focus-drawer="closed"] .workspace { padding-left: var(--space-3); }
+body[data-focus-mode="fade"][data-focus-drawer="closed"] .pane-fade { display: none; }
+body[data-focus-mode="fade"][data-focus-drawer="closed"] .focus-drawer-tab {
+  display: flex;
+  position: fixed;
+  inset-block: 0;
+  left: 0;
+  width: 32px;
+  z-index: 40;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  padding: var(--space-2) 0;
+  background: var(--panel-bg);
+  color: var(--fg);
+  border: 1px solid var(--panel-border);
+  border-left: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  cursor: pointer;
+  min-height: 44px;
+}
+body[data-focus-mode="fade"][data-focus-drawer="closed"] .focus-drawer-tab:hover,
+body[data-focus-mode="fade"][data-focus-drawer="closed"] .focus-drawer-tab:focus-visible { color: var(--accent); }
+@media (max-width: 900px) {
+  body[data-focus-mode="fade"] .workspace,
+  body[data-focus-mode="fade"][data-focus-drawer="closed"] .workspace { padding-left: var(--space-3); }
+  body[data-focus-mode="fade"] .pane-fade {
+    position: static;
+    width: auto;
+    inset-block: auto;
+    flex-direction: row;
+    overflow: visible;
+  }
+}
+
 /* Focus mode: fade everything except the code editor so the reader can
    read one thing at a time. The editor, its gutter, the output and shell
    panes stay fully legible; the chrome around them drops back. Open

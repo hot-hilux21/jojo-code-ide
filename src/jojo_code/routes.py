@@ -2247,6 +2247,7 @@ def shell_exec():
         'error_line': error_line,
         'doom': bool(result.get('doom')),
         'admin': bool(result.get('admin')),
+        'ay': bool(result.get('ay')),
     })
 
 @main_bp.route('/api/shell/reset', methods=['POST'])
