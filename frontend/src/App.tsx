@@ -22,6 +22,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import CodeMirror from "@uiw/react-codemirror";
 import { useEffect, useState } from "react";
+import { useSettings } from "@/app/providers/SettingsProvider";
+import type { SettingsPatch } from "@/app/settings/settings.types";
 
 const FONT_GLYPH =
   "The quick brown fox jumps over the lazy dog 0123456789 !@#$%^&*()_+-=[]{};:<>,.?/~";
@@ -50,6 +52,7 @@ type FontMap = Record<string, { name: string; family: string }>;
 type Config = Record<string, any>;
 
 export default function App() {
+  const { update: updateSettings } = useSettings();
   const [screen, setScreen] = useState<"setup" | "app" | "editor" | "credits">("setup");
   const [setupStep, setSetupStep] = useState(1);
   const [setupLocale, setSetupLocale] = useState("en");
@@ -75,7 +78,6 @@ export default function App() {
   const [config, setConfig] = useState<Config | null>(null);
   const [themes, setThemes] = useState<ThemeMap>({});
   const [fonts, setFonts] = useState<FontMap>({});
-  const [loaded, setLoaded] = useState(false);
 
   const [runResult, setRunResult] = useState<{
     output: string;
@@ -126,9 +128,7 @@ export default function App() {
         setSetupLocale(cfg.locale || "en");
         setSetupFont(cfg.font || "OpenDyslexic");
         setSetupTheme(cfg.theme || "light");
-        setLoaded(true);
       })
-      .catch(() => setLoaded(true));
     return () => {
       active = false;
     };
@@ -139,24 +139,6 @@ export default function App() {
   const selectedFontLabel = selectedFont?.name || setupFont;
   const readingFont = fonts[font] || Object.values(fonts)[0];
   const readingFontFamily = readingFont?.family || "sans-serif";
-
-  useEffect(() => {
-    if (!loaded) return;
-    document.body.setAttribute("data-theme", theme);
-    document.documentElement.classList.toggle("dark", theme !== "light" && theme !== "pastel" && theme !== "white");
-    const family = fonts[font]?.family;
-    if (family) {
-      document.body.style.setProperty("--font-ui", family);
-      document.body.style.fontFamily = family;
-    }
-    if (config) {
-      document.body.style.setProperty("--font-size", `${config.font_size}px`);
-      document.body.style.setProperty("--font-weight", String(config.font_weight || 400));
-      document.body.style.setProperty("--line-height", String(config.line_height || 1.5));
-      document.body.style.setProperty("--letter-spacing", `${config.letter_spacing || 0.5}px`);
-      document.body.style.setProperty("--word-spacing", `${config.word_spacing ?? 0.5}px`);
-    }
-  }, [loaded, theme, font, fonts, config]);
 
   useEffect(() => {
     if (!recording) return;
@@ -251,17 +233,7 @@ export default function App() {
     if (patch.font !== undefined) setFont(patch.font);
     if (patch.sound_enabled !== undefined) setSound(!!patch.sound_enabled);
     if (patch.tts_enabled !== undefined) setSpeak(!!patch.tts_enabled);
-    try {
-      const res = await fetch("/api/config", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      const data = await res.json();
-      if (data?.config) setConfig(data.config);
-    } catch {
-      // Keep the optimistic update; the next load will reconcile.
-    }
+    await updateSettings(patch as SettingsPatch);
   };
 
   const deleteFont = async (key: string) => {
