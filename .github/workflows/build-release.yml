@@ -69,7 +69,7 @@ jobs:
           python tools/stamp_version.py stamp --version $version
           "version=$version" >> $env:GITHUB_OUTPUT
       - name: Build exe
-        run: pyinstaller Jojo Code.spec --noconfirm
+        run: pyinstaller JojoCode.spec --noconfirm
       # Code signing, off until it is asked for. Every step below is skipped
       # while SIGNPATH_ORGANIZATION_ID is blank, so this workflow goes on
       # building and releasing exactly as it did before and starts signing the
@@ -148,7 +148,7 @@ jobs:
           python tools/stamp_version.py stamp --version $version
           "version=$version" >> $env:GITHUB_OUTPUT
       - name: Build onedir app
-        run: pyinstaller Jojo Code-onedir.spec --noconfirm
+        run: pyinstaller JojoCode-onedir.spec --noconfirm
       - name: Download installer prerequisites
         shell: pwsh
         run: |

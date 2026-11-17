@@ -131,7 +131,7 @@ Then open http://localhost:5000
 
 ```bash
 pip install pyinstaller
-pyinstaller Jojo Code.spec --noconfirm
+pyinstaller JojoCode.spec --noconfirm
 ```
 
 Your exe is at `dist/JojoCode.exe`.
