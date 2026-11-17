@@ -550,5 +550,10 @@
   "error.plain.bad_username": "استخدم من 3 إلى 20 حرفًا أو رقمًا أو _ أو -.",
   "account.email_add": "أضف بريدًا",
   "account.email_add_help": "الحسابات القديمة ليس لها بريد. أضف واحدًا لإعادة التعيين بالرمز.",
-  "account.send_code": "أرسل الرمز"
+  "account.send_code": "أرسل الرمز",
+  "leaderboard.title": "لوحة المتصدرين",
+  "leaderboard.optin": "أظهر اسمي ونقاطي للقراء الآخرين",
+  "leaderboard.show": "عرض اللوحة",
+  "leaderboard.empty": "لم ينضم أحد بعد.",
+  "progress.streak": "سلسلة الأيام"
 }

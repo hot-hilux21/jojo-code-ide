@@ -550,5 +550,10 @@
   "error.plain.bad_username": "Χρησιμοποιήστε 3 έως 20 γράμματα, αριθμούς, _ ή -.",
   "account.email_add": "Προσθήκη email",
   "account.email_add_help": "Οι παλιοί λογαριασμοί δεν έχουν email. Προσθέστε ένα για επαναφορά με κωδικό.",
-  "account.send_code": "Αποστολή κωδικού"
+  "account.send_code": "Αποστολή κωδικού",
+  "leaderboard.title": "Πίνακας πρωταθλητών",
+  "leaderboard.optin": "Δείξτε το όνομα και τους πόντους μου στους άλλους",
+  "leaderboard.show": "Προβολή πίνακα",
+  "leaderboard.empty": "Δεν συμμετέχει κανείς ακόμη.",
+  "progress.streak": "Σειρά ημερών"
 }

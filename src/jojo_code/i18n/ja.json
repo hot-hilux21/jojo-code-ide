@@ -550,5 +550,10 @@
   "error.plain.bad_username": "3〜20文字の英字、数字、_、- を使ってください。",
   "account.email_add": "メールを追加",
   "account.email_add_help": "古いアカウントにはメールがありません。コードで再設定するために追加してください。",
-  "account.send_code": "コードを送る"
+  "account.send_code": "コードを送る",
+  "leaderboard.title": "ランキング",
+  "leaderboard.optin": "名前とXPを他の人に表示する",
+  "leaderboard.show": "ランキングを見る",
+  "leaderboard.empty": "まだ誰も参加していません。",
+  "progress.streak": "連続日数"
 }

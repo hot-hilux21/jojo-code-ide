@@ -2801,8 +2801,19 @@ def admin_panel():
         'files': sum(a['files'] for a in readers),
         'feedback': feedback_total,
     }
+    # Daily signups for the last week, newest last. Drawn as small bars on the
+    # dashboard, so a burst of new readers is visible rather than a single sum.
+    signups = []
+    for offset in range(6, -1, -1):
+        day = time.strftime('%Y-%m-%d', time.gmtime(time.time() - offset * 86400))
+        signups.append({
+            'day': day,
+            'count': sum(1 for a in readers if a['joined'] == day),
+        })
+    top = sorted(readers, key=lambda a: a['xp'], reverse=True)[:10]
     return render_template('admin.html', items=items, analytics=analytics,
-                           accounts=accounts, stats=stats, message=message)
+                           accounts=accounts, stats=stats, message=message,
+                           signups=signups, top=top)
 
 
 @main_bp.route('/admin/logout', methods=['POST'])
@@ -2972,7 +2983,28 @@ def progress_get_api():
     from flask import session
     from . import users
     username = (session.get('user_username') or '').strip().lower()
-    return jsonify(users.progress(username))
+    state = users.progress(username)
+    state['streak'] = users.streak(username)
+    record = users.load_users().get(username, {})
+    state['optin'] = bool(record.get('leaderboard_optin'))
+    return jsonify(state)
+
+
+@main_bp.route('/api/leaderboard', methods=['GET'])
+def leaderboard_api():
+    from . import users
+    return jsonify({'rows': users.leaderboard()})
+
+
+@main_bp.route('/api/leaderboard/optin', methods=['POST'])
+def leaderboard_optin_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return jsonify({'success': False}), 403
+    data = request.get_json(silent=True) or {}
+    return jsonify({'success': users.set_leaderboard_optin(username, data.get('on'))})
 
 
 @main_bp.route('/api/achievements/award', methods=['POST'])

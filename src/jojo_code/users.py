@@ -8,6 +8,7 @@ add SMTP if you want it.
 Each account also gets a folder of its own under the config dir, where
 the settings and the files the reader saves to the server live.
 """
+import datetime
 import hashlib
 import hmac
 import json
@@ -134,10 +135,34 @@ RANKS = (
     ('diamond', 3000), ('elite', 5000), ('unreal', 8000),
 )
 XP_PER_LEVEL = 250
+DIVISIONS = ('I', 'II', 'III')
+STREAK_DAILY_XP = 25
+
+
+def _today():
+    return time.strftime('%Y-%m-%d', time.gmtime())
 
 
 def _add_xp(record, amount):
     record['xp'] = int(record.get('xp') or 0) + amount
+
+
+def _touch_streak(record):
+    """One streak step per day. Returns the XP earned for today, if any."""
+    today = _today()
+    if record.get('streak_day') == today:
+        return 0
+    yesterday = (datetime.datetime.strptime(today, '%Y-%m-%d').date()
+                 - datetime.timedelta(days=1)).isoformat()
+    record['streak'] = (int(record.get('streak') or 0) + 1
+                        if record.get('streak_day') == yesterday else 1)
+    record['streak_day'] = today
+    best = int(record.get('best_streak') or 0)
+    if record['streak'] > best:
+        record['best_streak'] = record['streak']
+    bonus = STREAK_DAILY_XP + min(record['streak'], 7) * 5
+    _add_xp(record, bonus)
+    return bonus
 
 
 def award_xp(username, reason):
@@ -151,8 +176,47 @@ def award_xp(username, reason):
     if not record:
         return False, 0
     _add_xp(record, amount)
+    _touch_streak(record)
     save_users(users)
     return True, int(record['xp'])
+
+
+def streak(username):
+    record = load_users().get((username or '').strip().lower(), {})
+    active = record.get('streak_day') == _today()
+    return {
+        'current': int(record.get('streak') or 0) if active else 0,
+        'best': int(record.get('best_streak') or 0),
+        'active_today': active,
+    }
+
+
+def set_leaderboard_optin(username, value):
+    users = load_users()
+    record = users.get((username or '').strip().lower())
+    if not record:
+        return False
+    record['leaderboard_optin'] = bool(value)
+    save_users(users)
+    return True
+
+
+def leaderboard(limit=20):
+    """Only readers who opted in, highest XP first. No emails or hashes."""
+    rows = []
+    for username, record in load_users().items():
+        if not record.get('leaderboard_optin') or record.get('admin'):
+            continue
+        state = progress(username)
+        rows.append({
+            'username': username,
+            'xp': state['xp'],
+            'rank': state['rank'],
+            'division': state['division'],
+            'label': state['label'],
+        })
+    rows.sort(key=lambda r: r['xp'], reverse=True)
+    return rows[:limit]
 
 
 def progress(username):
@@ -165,14 +229,20 @@ def progress(username):
     rank, floor = RANKS[index]
     next_rank, next_floor = (RANKS[index + 1] if index + 1 < len(RANKS) else (None, None))
     span = (next_floor - floor) if next_floor else 1
+    percent = min(100, round((xp - floor) * 100 / span)) if next_floor else 100
+    # Three steps inside each rank, the way a battle-pass ladder reads:
+    # division I is the bottom, III the top before the next rank.
+    division = DIVISIONS[min(2, percent // 34)]
     return {
         'xp': xp,
         'level': 1 + xp // XP_PER_LEVEL,
         'rank': rank,
+        'division': division,
+        'label': rank.capitalize() + ' ' + division,
         'next_rank': next_rank,
         'into_rank': xp - floor,
         'rank_span': span,
-        'percent': min(100, round((xp - floor) * 100 / span)) if next_floor else 100,
+        'percent': percent,
     }
 
 
@@ -213,6 +283,9 @@ def account_summary():
             'files': len(list_files(username)),
             'settings': bool(load_settings(username)),
             'admin': bool(record.get('admin')),
+            'xp': int(record.get('xp') or 0),
+            'streak': int(record.get('streak') or 0),
+            'leaderboard_optin': bool(record.get('leaderboard_optin')),
         })
     return result
 

@@ -550,5 +550,10 @@
   "error.plain.bad_username": "3 से 20 अक्षर, अंक, _ या - इस्तेमाल करें।",
   "account.email_add": "ईमेल जोड़ें",
   "account.email_add_help": "पुराने खातों में ईमेल नहीं होता। कोड से पासवर्ड रीसेट करने के लिए एक जोड़ें।",
-  "account.send_code": "कोड भेजें"
+  "account.send_code": "कोड भेजें",
+  "leaderboard.title": "लीडरबोर्ड",
+  "leaderboard.optin": "मेरा नाम और XP दूसरों को दिखाएँ",
+  "leaderboard.show": "लीडरबोर्ड देखें",
+  "leaderboard.empty": "अभी कोई लीडरबोर्ड में नहीं है।",
+  "progress.streak": "दिनों की लय"
 }

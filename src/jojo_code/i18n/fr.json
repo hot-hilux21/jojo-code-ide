@@ -550,5 +550,10 @@
   "error.plain.bad_username": "Utilisez 3 à 20 lettres, chiffres, _ ou -.",
   "account.email_add": "Ajouter un e-mail",
   "account.email_add_help": "Les anciens comptes n’ont pas d’e-mail. Ajoutez-en un pour réinitialiser par code.",
-  "account.send_code": "Envoyer le code"
+  "account.send_code": "Envoyer le code",
+  "leaderboard.title": "Classement",
+  "leaderboard.optin": "Afficher mon nom et mes points aux autres",
+  "leaderboard.show": "Voir le classement",
+  "leaderboard.empty": "Personne n’est encore au classement.",
+  "progress.streak": "Série de jours"
 }

@@ -550,5 +550,10 @@
   "error.plain.bad_username": "От 3 до 20 букв, цифр, _ или -.",
   "account.email_add": "Добавить почту",
   "account.email_add_help": "У старых аккаунтов нет почты. Добавьте её для сброса пароля по коду.",
-  "account.send_code": "Отправить код"
+  "account.send_code": "Отправить код",
+  "leaderboard.title": "Таблица лидеров",
+  "leaderboard.optin": "Показывать моё имя и очки другим",
+  "leaderboard.show": "Показать таблицу",
+  "leaderboard.empty": "Пока никто не присоединился.",
+  "progress.streak": "Серия дней"
 }

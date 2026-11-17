@@ -550,5 +550,10 @@
   "error.plain.bad_username": "Використовуйте від 3 до 20 літер, цифр, _ або -.",
   "account.email_add": "Додати пошту",
   "account.email_add_help": "Старі акаунти не мають пошти. Додайте її для скидання пароля кодом.",
-  "account.send_code": "Надіслати код"
+  "account.send_code": "Надіслати код",
+  "leaderboard.title": "Таблиця лідерів",
+  "leaderboard.optin": "Показувати моє ім’я та бали іншим",
+  "leaderboard.show": "Показати таблицю",
+  "leaderboard.empty": "Ни нікого в таблиці.",
+  "progress.streak": "Серія днів"
 }

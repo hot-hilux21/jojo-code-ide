@@ -296,8 +296,7 @@
     if (!summary || !window.CURRENT_USER) return;
     fetch('/api/progress').then(function (r) { return r.json(); }).then(function (p) {
       if (!p) return;
-      var rank = rankNames[p.rank] || p.rank;
-      var text = t('progress.rank') + ': ' + rank + ' | ' +
+      var text = t('progress.rank') + ': ' + p.label + ' | ' +
         t('progress.level') + ' ' + p.level + ' | ' +
         t('progress.xp') + ' ' + p.xp;
       if (p.next_rank) {
@@ -309,6 +308,13 @@
         fill.style.width = p.percent + '%';
         track.setAttribute('aria-valuenow', String(p.percent));
       }
+      var streak = document.getElementById('progress-streak');
+      if (streak && p.streak) {
+        streak.textContent = t('progress.streak') + ': ' + p.streak.current +
+          ' (best ' + p.streak.best + ')';
+      }
+      var optin = document.getElementById('lb-optin');
+      if (optin) optin.checked = !!window.CURRENT_USER && p.optin;
     }).catch(function () {});
   }
 
@@ -2239,6 +2245,28 @@
       if (acctAutosaveName) acctAutosaveName.value = autosaveName;
     });
   }
+
+  var lbOptin = document.getElementById('lb-optin');
+  if (lbOptin) lbOptin.addEventListener('change', function () {
+    acctPost('/api/leaderboard/optin', { on: lbOptin.checked }).catch(function () {});
+  });
+  var lbShow = document.getElementById('lb-show');
+  if (lbShow) lbShow.addEventListener('click', function () {
+    var list = document.getElementById('lb-list');
+    var status = document.getElementById('lb-status');
+    if (list) list.hidden = false;
+    fetch('/api/leaderboard').then(function (r) { return r.json(); }).then(function (d) {
+      var rows = (d && d.rows) || [];
+      if (status && !rows.length) status.textContent = t('leaderboard.empty');
+      if (!list) return;
+      list.textContent = '';
+      rows.forEach(function (row) {
+        var item = document.createElement('li');
+        item.textContent = row.username + ' - ' + row.label + ' - ' + row.xp + ' XP';
+        list.appendChild(item);
+      });
+    }).catch(function () {});
+  });
 
   if (menuSignOut) {
     menuSignOut.addEventListener('click', function () {

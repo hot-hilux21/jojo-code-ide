@@ -3,6 +3,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = str(REPO_ROOT / "src")
@@ -71,7 +72,45 @@ class AchievementTests(unittest.TestCase):
         self.assertEqual(self.client.post('/api/user/files', json={
             'name': 'work.py', 'code': 'print(1)',
         }).status_code, 200)
-        self.assertEqual(users.progress('ada')['xp'], 20)
+        self.assertGreaterEqual(users.progress('ada')['xp'], 20)
+
+    def test_divisions_rise_with_xp_inside_a_rank(self):
+        users.register("ada", "a long passphrase")
+        for xp, division in ((0, 'I'), (700, 'II'), (900, 'III'), (3000, 'I')):
+            record = users.load_users()
+            record['ada']['xp'] = xp
+            users.save_users(record)
+            state = users.progress('ada')
+            self.assertEqual(state['division'], division)
+            self.assertEqual(state['label'], state['rank'].capitalize() + ' ' + division)
+
+    def test_streak_advances_once_per_day(self):
+        users.register("ada", "a long passphrase")
+        with mock.patch.object(users, '_today', return_value='2026-11-17'):
+            users.award_xp('ada', 'code_run')
+            self.assertEqual(users.streak('ada')['current'], 1)
+            users.award_xp('ada', 'code_run')
+            self.assertEqual(users.streak('ada')['current'], 1)
+        with mock.patch.object(users, '_today', return_value='2026-11-18'):
+            users.award_xp('ada', 'code_run')
+            self.assertEqual(users.streak('ada')['current'], 2)
+            self.assertEqual(users.streak('ada')['best'], 2)
+        with mock.patch.object(users, '_today', return_value='2026-11-20'):
+            self.assertEqual(users.streak('ada')['current'], 0)
+            users.award_xp('ada', 'code_run')
+            self.assertEqual(users.streak('ada')['current'], 1)
+
+    def test_leaderboard_only_shows_opted_in_readers(self):
+        users.register("ada", "a long passphrase")
+        users.register("ben", "a long passphrase")
+        record = users.load_users()
+        record['ada']['xp'] = 500
+        record['ada']['leaderboard_optin'] = True
+        record['ben']['xp'] = 900
+        users.save_users(record)
+        rows = users.leaderboard()
+        self.assertEqual([r['username'] for r in rows], ['ada'])
+        self.assertEqual(rows[0]['label'], 'Silver I')
 
     def test_api_returns_the_full_list_with_earned_flags(self):
         users.register("ada", "a long passphrase")

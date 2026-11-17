@@ -1882,6 +1882,14 @@
         <div id="progress-track" class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <div id="progress-fill" class="progress-fill"></div>
         </div>
+        <p id="progress-streak" class="acct-status"></p>
+      </div>
+      <div class="field">
+        <h3>{{ t('leaderboard.title') }}</h3>
+        <label for="lb-optin"><input id="lb-optin" type="checkbox"> {{ t('leaderboard.optin') }}</label>
+        <button class="btn btn-small" type="button" id="lb-show">{{ t('leaderboard.show') }}</button>
+        <ol id="lb-list" class="badge-list" hidden></ol>
+        <p id="lb-status" class="acct-status" aria-live="polite"></p>
       </div>
       <div class="field">
         <h3>{{ t('account.email_add') }}</h3>

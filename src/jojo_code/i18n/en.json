@@ -550,5 +550,10 @@
   "error.plain.bad_username": "Use 3 to 20 letters, numbers, _ or -.",
   "account.email_add": "Add an email",
   "account.email_add_help": "Older accounts have no email. Add one so you can reset your password by code.",
-  "account.send_code": "Send code"
+  "account.send_code": "Send code",
+  "leaderboard.title": "Leaderboard",
+  "leaderboard.optin": "Show my name and XP to other readers",
+  "leaderboard.show": "View leaderboard",
+  "leaderboard.empty": "Nobody has joined the leaderboard yet.",
+  "progress.streak": "Day streak"
 }

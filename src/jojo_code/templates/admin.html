@@ -50,6 +50,11 @@
     .admin-form input { display: block; min-height: 44px; margin-bottom: var(--space-2); max-width: 24rem; }
     .admin-form label { display: block; margin-top: var(--space-2); }
     [aria-pressed="true"] { border-color: var(--accent); }
+    .signup-chart { list-style: none; margin: 0; padding: 0; display: flex; align-items: flex-end; gap: var(--space-2); height: 110px; }
+    .signup-chart li { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; height: 100%; }
+    .signup-bar { display: block; width: 60%; max-width: 48px; background: var(--accent); border-radius: 3px 3px 0 0; }
+    .signup-day { font-size: 0.8rem; color: var(--muted); }
+    .signup-count { font-weight: 600; }
   </style>
 </head>
 <body data-theme="light">
@@ -106,6 +111,8 @@
             <th scope="col">Account</th>
             <th scope="col">Email</th>
             <th scope="col">Signed up</th>
+            <th scope="col">XP</th>
+            <th scope="col">Streak</th>
             <th scope="col">Files</th>
             <th scope="col">Settings saved</th>
             <th scope="col">Actions</th>
@@ -117,6 +124,8 @@
               <td>{{ account.username }}{% if account.admin %} (admin){% endif %}</td>
               <td>{% if account.email %}{{ account.email }}{% if account.verified %} (verified){% endif %}{% else %}None{% endif %}</td>
               <td>{{ account.joined or 'Unknown' }}</td>
+              <td>{{ account.xp }}</td>
+              <td>{{ account.streak }}</td>
               <td>{{ account.files }}</td>
               <td>{{ 'Yes' if account.settings else 'No' }}</td>
               <td>
@@ -135,10 +144,40 @@
               </td>
             </tr>
           {% else %}
-            <tr><td colspan="6">No accounts yet.</td></tr>
+            <tr><td colspan="7">No accounts yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <div class="admin-card">
+      <h2>New readers this week</h2>
+      <ul class="signup-chart" aria-label="Signups per day over the last seven days">
+        {% for d in signups %}
+          <li>
+            <span class="signup-bar" style="height: {{ (d.count * 18 + 2) if d.count else 2 }}px"></span>
+            <span class="signup-day">{{ d.day[5:] }}</span>
+            <span class="signup-count">{{ d.count }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="admin-card">
+      <h2>Top readers by XP</h2>
+      {% if top %}
+        <table>
+          <caption>Leaderboard across all readers</caption>
+          <thead><tr><th scope="col">Reader</th><th scope="col">XP</th><th scope="col">Streak</th></tr></thead>
+          <tbody>
+            {% for a in top %}
+              <tr><td>{{ a.username }}</td><td>{{ a.xp }}</td><td>{{ a.streak }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No readers yet.</p>
+      {% endif %}
     </div>
 
     <div class="admin-card">
