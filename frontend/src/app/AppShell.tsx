@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { FocusDrawer } from "./components/FocusDrawer";
 import { MainWorkspace } from "./components/MainWorkspace";
+import { ModalHost } from "./components/modals/ModalHost";
 import { TopBar } from "./components/TopBar";
 import type { ModalName } from "./components/TopBar";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
@@ -29,15 +31,14 @@ export function AppShell() {
         showTrace={showTrace}
         onToggleTrace={() => setShowTrace((value) => !value)}
       />
+      <FocusDrawer />
       <MainWorkspace workspace={workspace} showTrace={showTrace} />
-      {activeModal ? (
-        <div role="dialog" aria-modal="true" aria-label={activeModal}>
-          <p>{activeModal} dialog arrives in Phase 3.</p>
-          <button type="button" onClick={() => setActiveModal(null)}>
-            Close
-          </button>
-        </div>
-      ) : null}
+      <ModalHost
+        active={activeModal}
+        onClose={() => setActiveModal(null)}
+        openModal={setActiveModal}
+        workspace={workspace}
+      />
     </div>
   );
 }

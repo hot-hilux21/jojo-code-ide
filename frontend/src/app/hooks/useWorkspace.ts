@@ -128,7 +128,7 @@ export function useWorkspace() {
     result, running, status,
     answers, answer, setAnswer, answerQuestion,
     run, stop, clearOutput,
-    shellSession, shellOutput, shellInput, setShellInput,
+    shellSession, shellOutput, setShellOutput, shellInput, setShellInput,
     shellBusy, openShell, closeShell, execShell, resetShell,
   };
 }

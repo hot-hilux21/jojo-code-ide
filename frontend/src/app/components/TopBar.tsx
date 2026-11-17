@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { Workspace } from "../hooks/useWorkspace";
 import { useSettings } from "../providers/SettingsProvider";
+import { SpeakButton } from "./SpeakButton";
 
 export type ModalName =
   | "settings"
@@ -37,144 +38,83 @@ interface TopBarProps {
 const buttonClass =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-panel-border bg-panel px-3 text-sm text-foreground hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60";
 
+function saveToComputer(code: string): void {
+  const blob = new Blob([code], { type: "text/x-python" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "my_code.py";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+/** Top toolbar: one row, stable targets, every control speaks its own label. */
 export function TopBar({ workspace, openModal, showTrace, onToggleTrace }: TopBarProps) {
   const { settings, update } = useSettings();
   const focusOn = settings.focus_mode !== "off";
 
   return (
     <header className="top-bar" role="banner">
-      <button
-        type="button"
-        className={buttonClass}
-        onClick={() => void workspace.run()}
-        disabled={workspace.running}
-        aria-label="Run code"
-      >
+      <SpeakButton label="Run code" className={buttonClass} onClick={() => void workspace.run()} disabled={workspace.running}>
         <Play aria-hidden="true" size={18} />
         <span className="app-btn-label">Run</span>
-      </button>
-      <button
-        type="button"
-        className={buttonClass}
-        onClick={() => void workspace.stop()}
-        disabled={!workspace.running}
-        aria-label="Stop the running program"
-      >
+      </SpeakButton>
+      <SpeakButton label="Stop the running program" className={buttonClass} onClick={() => void workspace.stop()} disabled={!workspace.running}>
         <Square aria-hidden="true" size={18} />
         <span className="app-btn-label">Stop</span>
-      </button>
-      <button
-        type="button"
-        className={buttonClass}
-        onClick={workspace.clearOutput}
-        aria-label="Clear the output"
-      >
+      </SpeakButton>
+      <SpeakButton label="Clear the output" className={buttonClass} onClick={workspace.clearOutput}>
         <Eraser aria-hidden="true" size={18} />
         <span className="app-btn-label">Clear</span>
-      </button>
-      <button
-        type="button"
-        className={buttonClass}
-        onClick={() => openModal("dictionary")}
-        aria-label="Open the dictionary"
-      >
+      </SpeakButton>
+      <SpeakButton label="Open the dictionary" className={buttonClass} onClick={() => openModal("dictionary")}>
         <BookOpen aria-hidden="true" size={18} />
         <span className="app-btn-label">Dictionary</span>
-      </button>
+      </SpeakButton>
 
       <div className="ml-auto flex flex-wrap items-center gap-2" role="group" aria-label="Files and tools">
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => openModal("files")}
-          aria-label="Open my files"
-        >
+        <SpeakButton label="Open my files" className={buttonClass} onClick={() => openModal("files")}>
           <FolderOpen aria-hidden="true" size={18} />
           <span className="app-btn-label">My files</span>
-        </button>
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => {
-            const blob = new Blob([workspace.code], { type: "text/x-python" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "my_code.py";
-            link.click();
-            URL.revokeObjectURL(link.href);
-          }}
-          aria-label="Save the code to this computer"
-        >
+        </SpeakButton>
+        <SpeakButton label="Save the code to this computer" className={buttonClass} onClick={() => saveToComputer(workspace.code)}>
           <Save aria-hidden="true" size={18} />
           <span className="app-btn-label">Save</span>
-        </button>
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => void workspace.openShell()}
-          disabled={!!workspace.shellSession}
-          aria-label="Open the Python shell"
-        >
+        </SpeakButton>
+        <SpeakButton label="Open the Python shell" className={buttonClass} onClick={() => void workspace.openShell()} disabled={!!workspace.shellSession}>
           <Terminal aria-hidden="true" size={18} />
           <span className="app-btn-label">Shell</span>
-        </button>
+        </SpeakButton>
         {focusOn ? (
-          <button
-            type="button"
-            className={buttonClass}
-            onClick={() => void update({ focus_mode: "off" })}
-            aria-label="Exit focus mode"
-          >
+          <SpeakButton label="Exit focus mode" className={buttonClass} onClick={() => void update({ focus_mode: "off" })}>
             <X aria-hidden="true" size={18} />
             <span className="app-btn-label">Exit focus</span>
-          </button>
+          </SpeakButton>
         ) : null}
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => void update({ ui_backend: "flask" })}
-          aria-label="Switch back to the classic interface"
-        >
+        <SpeakButton label="Switch back to the classic interface" className={buttonClass} onClick={() => void update({ ui_backend: "flask" })}>
           <span className="app-btn-label">Classic UI</span>
-        </button>
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => openModal("feedback")}
-          aria-label="Send feedback"
-        >
+        </SpeakButton>
+        <SpeakButton label="Send feedback" className={buttonClass} onClick={() => openModal("feedback")}>
           <MessageSquare aria-hidden="true" size={18} />
           <span className="app-btn-label">Feedback</span>
-        </button>
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => openModal("settings")}
-          aria-label="Open settings"
-        >
+        </SpeakButton>
+        <SpeakButton label="Open settings" className={buttonClass} onClick={() => openModal("settings")}>
           <SettingsIcon aria-hidden="true" size={18} />
           <span className="app-btn-label">Settings</span>
-        </button>
-        <button
-          type="button"
-          className={buttonClass}
-          onClick={() => openModal("account")}
-          aria-label="Open account settings"
-        >
+        </SpeakButton>
+        <SpeakButton label="Open account settings" className={buttonClass} onClick={() => openModal("account")}>
           <UserRound aria-hidden="true" size={18} />
           <span className="app-btn-label">Account</span>
-        </button>
-        <button
-          type="button"
+        </SpeakButton>
+        <SpeakButton
+          label="Toggle the variable trace table"
           className={buttonClass}
-          aria-pressed={showTrace}
-          aria-label="Toggle the variable trace table"
-          disabled={!workspace.result.trace?.rows?.length}
           onClick={onToggleTrace}
+          disabled={!workspace.result.trace?.rows?.length}
+          pressed={showTrace}
         >
           <Table2 aria-hidden="true" size={18} />
           <span className="app-btn-label">Trace</span>
-        </button>
+        </SpeakButton>
       </div>
     </header>
   );

@@ -83,3 +83,20 @@ frontend/src/
   only. Components never set inline visual styles from settings.
 - Keep `App.tsx` working until Phase 2; Phase 1 adds the store and hook
   alongside it, then wraps the tree in `SettingsProvider`.
+
+## Phase status
+
+| Phase | State | Evidence |
+|---|---|---|
+| 1 Audit & state foundation | Done | `src/app/settings/*`, `useThemeSync.ts`, this audit |
+| 2 App shell & workspace | Done | `AppShell.tsx`, `TopBar.tsx`, `MainWorkspace.tsx`, `useWorkspace.ts`, `shell.css` |
+| 3 Radix modals | Done | `ModalHost.tsx` plus nine dialogs; `@radix-ui/react-dialog` installed |
+| 4 Speech, sound, shortcuts, cleanup | Done | `SpeechProvider.tsx`, `useSpeakable.ts`, `useKeyboardShortcuts.ts` |
+
+The classic UI remains the default through `ui_backend`. "Try the new UI"
+switches to the React shell; "Classic UI" switches back. A reviewer can verify
+each phase with `npm run build` and `npm run lint` in `frontend/`.
+
+Rule checks over `frontend/src/app`: no `document.querySelector`,
+`document.getElementById`, `getElementsBy`, or `style={{` overrides. Theme
+changes go through the single `useThemeSync` hook to `:root` custom properties.
