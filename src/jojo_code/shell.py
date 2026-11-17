@@ -222,8 +222,12 @@ class ShellSession:
             # output, in the # # the reader asked for.
             if isinstance(code, str) and code.strip().lower() == 'ay':
                 return {
-                    'output': '\n'.join(['# ay ay ay ay #'] * 8) + '\n',
+                    'output': '# ay ay ay ay #\n',
                     'error': '', 'error_type': '', 'ay': True,
+                }
+            if isinstance(code, str) and code.strip().lower() == 'stop ay':
+                return {
+                    'output': '', 'error': '', 'error_type': '', 'ay_stop': True,
                 }
             proc = self._send({'code': code})
             result = self._read_reply(proc, timeout or self._timeout)

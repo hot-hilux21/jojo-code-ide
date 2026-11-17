@@ -558,5 +558,6 @@
   "progress.streak": "연속일",
   "focus.drawer_open": "집중 설정 열기",
   "focus.drawer_close": "집중 설정 닫기",
-  "focus.drawer_tab": "집중 설정"
+  "focus.drawer_tab": "집중 설정",
+  "ay.stopped": "노래가 멈췄습니다."
 }

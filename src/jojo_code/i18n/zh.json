@@ -558,5 +558,6 @@
   "progress.streak": "连续天数",
   "focus.drawer_open": "打开专注设置",
   "focus.drawer_close": "关闭专注设置",
-  "focus.drawer_tab": "专注设置"
+  "focus.drawer_tab": "专注设置",
+  "ay.stopped": "吟唱已停止。"
 }

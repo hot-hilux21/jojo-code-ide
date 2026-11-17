@@ -6167,6 +6167,27 @@
 
   // Appended, never replaced. The point of a shell is being able to look
   // back at what you did three lines ago.
+  // The ay easter egg: one command starts a chant that keeps printing and
+  // playing until the reader types "stop ay" or stops the shell. It is a
+  // joke, so it never touches the saved code or the file store.
+  var ayTimer = null;
+  var ayAudio = null;
+  function stopAy() {
+    if (ayTimer) { clearInterval(ayTimer); ayTimer = null; }
+    if (ayAudio) { ayAudio.pause(); ayAudio.currentTime = 0; ayAudio = null; }
+  }
+  function startAy() {
+    stopAy();
+    shellSay('# ay ay ay ay #');
+    ayTimer = setInterval(function () { shellSay('# ay ay ay ay #'); }, 450);
+    try {
+      var src = (META.sfx || '/static/sfx/') + 'ay.wav';
+      ayAudio = new Audio(src);
+      ayAudio.loop = true;
+      ayAudio.play().catch(function () {});
+    } catch (e) { /* a blocked sound never blocks the words */ }
+  }
+
   function shellSay(text, isError) {
     if (text) {
       shellOutput.textContent += text + '\n';
@@ -6263,7 +6284,14 @@
     shellPost('/api/shell/exec', code)
       .then(function (data) {
         if (shellFail(data)) return;
-        shellSay(data.output);
+        if (data.ay) {
+          startAy();
+        } else if (data.ay_stop) {
+          stopAy();
+          shellSay(t('ay.stopped'));
+        } else {
+          shellSay(data.output);
+        }
         awardAchievement('first_shell');
         if (data.doom) awardAchievement('doom');
         if (data.doom) {

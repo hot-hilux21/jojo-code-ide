@@ -558,5 +558,6 @@
   "progress.streak": "連続日数",
   "focus.drawer_open": "フォーカス設定を開く",
   "focus.drawer_close": "フォーカス設定を閉じる",
-  "focus.drawer_tab": "フォーカス設定"
+  "focus.drawer_tab": "フォーカス設定",
+  "ay.stopped": "歌を止めました。"
 }

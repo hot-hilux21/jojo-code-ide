@@ -558,5 +558,6 @@
   "progress.streak": "Серия дней",
   "focus.drawer_open": "Открыть настройки фокуса",
   "focus.drawer_close": "Закрыть настройки фокуса",
-  "focus.drawer_tab": "Настройки фокуса"
+  "focus.drawer_tab": "Настройки фокуса",
+  "ay.stopped": "Песня остановлена."
 }

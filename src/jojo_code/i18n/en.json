@@ -558,5 +558,6 @@
   "progress.streak": "Day streak",
   "focus.drawer_open": "Open focus controls",
   "focus.drawer_close": "Close focus controls",
-  "focus.drawer_tab": "Focus controls"
+  "focus.drawer_tab": "Focus controls",
+  "ay.stopped": "Chant stopped."
 }

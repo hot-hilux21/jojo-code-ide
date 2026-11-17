@@ -1774,7 +1774,7 @@
        already in the reader's language before this script runs, and a
        language change reloads the page, so there is nothing to await. -->
   <script id="i18n-data" type="application/json">{{ catalogue | tojson }}</script>
-  <script id="i18n-meta" type="application/json">{{ {'locale': locale, 'direction': direction, 'audio': url_for('static', filename='audio/')} | tojson }}</script>
+  <script id="i18n-meta" type="application/json">{{ {'locale': locale, 'direction': direction, 'audio': url_for('static', filename='audio/'), 'sfx': url_for('static', filename='sfx/')} | tojson }}</script>
   <!-- Each theme's panel colour and the three token colours that sit on it, so
        the browser can work out the same painted tint the server worked out for
        the first paint. Embedded rather than fetched from /api/themes because a

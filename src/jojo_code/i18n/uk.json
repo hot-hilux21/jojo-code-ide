@@ -558,5 +558,6 @@
   "progress.streak": "Серія днів",
   "focus.drawer_open": "Відкрити елементи керування фокусом",
   "focus.drawer_close": "Закрити елементи керування фокусом",
-  "focus.drawer_tab": "Керування фокусом"
+  "focus.drawer_tab": "Керування фокусом",
+  "ay.stopped": "Співання зупинено."
 }

@@ -604,7 +604,7 @@ class ShellAyEggTests(unittest.TestCase):
         session = self._session()
         result = session.exec('ay')
         self.assertTrue(result['ay'])
-        self.assertIn('# ay ay ay ay #', result['output'])
+        self.assertEqual(result['output'], '# ay ay ay ay #\n')
         self.assertEqual(result['error'], '')
 
     def test_ay_is_case_and_space_insensitive(self):
@@ -612,6 +612,7 @@ class ShellAyEggTests(unittest.TestCase):
 
         session = self._session()
         self.assertTrue(session.exec('  AY  ')['ay'])
+        self.assertTrue(session.exec('  STOP AY  ')['ay_stop'])
         with mock.patch.object(session, '_send', return_value=None), \
              mock.patch.object(session, '_read_reply', return_value={'output': 'ay'}):
             self.assertFalse(session.exec('print("ay")').get('ay', False))

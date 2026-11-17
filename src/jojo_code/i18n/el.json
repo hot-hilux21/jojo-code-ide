@@ -558,5 +558,6 @@
   "progress.streak": "Σειρά ημερών",
   "focus.drawer_open": "Άνοιγμα ελέγχων εστίασης",
   "focus.drawer_close": "Κλείσιμο ελέγχων εστίασης",
-  "focus.drawer_tab": "Έλεγχοι εστίασης"
+  "focus.drawer_tab": "Έλεγχοι εστίασης",
+  "ay.stopped": "Το τραγούδι σταμάτησε."
 }

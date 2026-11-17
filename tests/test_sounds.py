@@ -37,6 +37,11 @@ class SoundEngineTest(unittest.TestCase):
                              'shipped clips should be gone; use sfx files')
 
 
+class AyClipTest(unittest.TestCase):
+    def test_the_ay_clip_is_shipped(self):
+        self.assertTrue((ROOT / 'static' / 'sfx' / 'ay.wav').is_file())
+
+
 class SoundSettingTest(unittest.TestCase):
     def test_sound_is_on_by_default(self):
         self.assertIs(routes.DEFAULT_CONFIG['sound_enabled'], True)
