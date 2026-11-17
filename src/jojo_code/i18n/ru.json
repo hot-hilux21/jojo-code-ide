@@ -537,5 +537,18 @@
   "rank.platinum": "Платина",
   "rank.diamond": "Алмаз",
   "rank.elite": "Элита",
-  "rank.unreal": "Нереальный"
+  "rank.unreal": "Нереальный",
+  "error.plain.exists": "Эта почта уже зарегистрирована. Войдите.",
+  "error.plain.bad_email": "Введите правильный адрес почты.",
+  "error.plain.short_password": "Не менее 8 символов.",
+  "error.plain.bad_code": "Код неверный или истёк. Запросите новый.",
+  "error.plain.no_code": "Сначала запросите код.",
+  "error.plain.no_user": "Аккаунт с такой почтой не найден.",
+  "error.plain.no_email": "У этого аккаунта ещё нет почты. Попросите администратора.",
+  "error.plain.mail_failed": "Не удалось отправить письмо. Попробуйте позже.",
+  "error.plain.invalid_credentials": "Неверная почта или пароль.",
+  "error.plain.bad_username": "От 3 до 20 букв, цифр, _ или -.",
+  "account.email_add": "Добавить почту",
+  "account.email_add_help": "У старых аккаунтов нет почты. Добавьте её для сброса пароля по коду.",
+  "account.send_code": "Отправить код"
 }

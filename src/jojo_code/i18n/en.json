@@ -537,5 +537,18 @@
   "rank.platinum": "Platinum",
   "rank.diamond": "Diamond",
   "rank.elite": "Elite",
-  "rank.unreal": "Unreal"
+  "rank.unreal": "Unreal",
+  "error.plain.exists": "That email is already registered. Try signing in.",
+  "error.plain.bad_email": "Enter a valid email address.",
+  "error.plain.short_password": "Use at least 8 characters.",
+  "error.plain.bad_code": "That code is wrong or has expired. Ask for a new one.",
+  "error.plain.no_code": "Ask for a code first.",
+  "error.plain.no_user": "No account found with that email.",
+  "error.plain.no_email": "That account has no email yet. Ask the maintainer to reset it.",
+  "error.plain.mail_failed": "The email could not be sent. Try again later.",
+  "error.plain.invalid_credentials": "Wrong email or password.",
+  "error.plain.bad_username": "Use 3 to 20 letters, numbers, _ or -.",
+  "account.email_add": "Add an email",
+  "account.email_add_help": "Older accounts have no email. Add one so you can reset your password by code.",
+  "account.send_code": "Send code"
 }

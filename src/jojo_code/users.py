@@ -419,6 +419,38 @@ def change_username(old, proposed):
     return True, 'ok', new
 
 
+def begin_add_email(username, email):
+    """Start verifying a new email on an account that has none yet."""
+    username = (username or '').strip().lower()
+    email = (email or '').strip().lower()
+    if not EMAIL_RE.match(email):
+        return False, 'bad_email'
+    users = load_users()
+    if username not in users:
+        return False, 'no_user'
+    if email_registered(email):
+        return False, 'exists'
+    outcome = _issue_code('email:' + username, email, {'purpose': 'email'})
+    return outcome == 'ok', outcome
+
+
+def confirm_add_email(username, email, code):
+    username = (username or '').strip().lower()
+    email = (email or '').strip().lower()
+    ok, reason, record = _check_code('email:' + username, code)
+    if not ok or record.get('purpose') != 'email':
+        return False, 'bad_code'
+    if email_registered(email):
+        return False, 'exists'
+    users = load_users()
+    if username not in users:
+        return False, 'no_user'
+    users[username]['email'] = email
+    users[username]['email_verified'] = True
+    save_users(users)
+    return True, 'ok'
+
+
 def begin_reset(identifier):
     username = resolve_username(identifier)
     record = load_users().get(username)

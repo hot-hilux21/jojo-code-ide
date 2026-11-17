@@ -537,5 +537,18 @@
   "rank.platinum": "प्लैटिनम",
   "rank.diamond": "हीरा",
   "rank.elite": "एलीट",
-  "rank.unreal": "अनरियल"
+  "rank.unreal": "अनरियल",
+  "error.plain.exists": "यह ईमेल पहले से पंजीकृत है। साइन इन करें।",
+  "error.plain.bad_email": "सही ईमेल पता दर्ज करें।",
+  "error.plain.short_password": "कम से कम 8 अक्षर लगाएँ।",
+  "error.plain.bad_code": "यह कोड गलत है या समाप्त हो गया। नया माँगें।",
+  "error.plain.no_code": "पहले कोड माँगें।",
+  "error.plain.no_user": "इस ईमेल से कोई खाता नहीं मिला।",
+  "error.plain.no_email": "इस खाते में अभी ईमेल नहीं है। Maintaintainer से रीसेट करवाएँ।",
+  "error.plain.mail_failed": "ईमेल नहीं भेजा जा सका। बाद में कोशिश करें।",
+  "error.plain.invalid_credentials": "ईमेल या पासवर्ड गलत है।",
+  "error.plain.bad_username": "3 से 20 अक्षर, अंक, _ या - इस्तेमाल करें।",
+  "account.email_add": "ईमेल जोड़ें",
+  "account.email_add_help": "पुराने खातों में ईमेल नहीं होता। कोड से पासवर्ड रीसेट करने के लिए एक जोड़ें।",
+  "account.send_code": "कोड भेजें"
 }

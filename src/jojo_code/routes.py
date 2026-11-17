@@ -2006,6 +2006,7 @@ def run_code():
         # when the program failed: a failing run is the one a reader most wants
         # to look at.
         trace = read_trace(trace_file)
+        _award_action_xp('code_run')
 
         if stop_path.exists():
             # The reader stopped this program. Said plainly rather than reported
@@ -2238,6 +2239,7 @@ def shell_exec():
     if error:
         error, error_line, _ = translate_error(error, t)
 
+    _award_action_xp('shell')
     return jsonify({
         'success': True,
         'output': result.get('output', ''),
@@ -2717,6 +2719,20 @@ def profile_apply_api():
     return jsonify({'success': True, 'config': config})
 
 
+def _award_action_xp(reason):
+    """XP is granted here, after the server performs the action.
+
+    The browser is never trusted to say an action happened: it could post to
+    a client-callable XP endpoint as fast as it liked. Each endpoint that
+    really runs code, saves a file, sends feedback and so on calls this.
+    """
+    from flask import session
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return
+    users.award_xp(username, reason)
+
+
 def admin_authorized():
     """Only the maintainer's signed-in session may open the dashboard."""
     from flask import session
@@ -2914,6 +2930,34 @@ def auth_reset_confirm_api():
     return jsonify({'success': True})
 
 
+@main_bp.route('/api/auth/email/request', methods=['POST'])
+def auth_email_request_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    data = request.get_json(silent=True) or {}
+    ok, reason = users.begin_add_email(username, data.get('email'))
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True, 'step': 'code'})
+
+
+@main_bp.route('/api/auth/email/confirm', methods=['POST'])
+def auth_email_confirm_api():
+    from flask import session
+    from . import users
+    username = (session.get('user_username') or '').strip().lower()
+    if not username:
+        return jsonify({'success': False, 'error': 'not logged in'}), 403
+    data = request.get_json(silent=True) or {}
+    ok, reason = users.confirm_add_email(username, data.get('email'), data.get('code'))
+    if not ok:
+        return jsonify({'success': False, 'error': reason}), 400
+    return jsonify({'success': True})
+
+
 @main_bp.route('/api/achievements', methods=['GET'])
 def achievements_get_api():
     from flask import session
@@ -2929,18 +2973,6 @@ def progress_get_api():
     from . import users
     username = (session.get('user_username') or '').strip().lower()
     return jsonify(users.progress(username))
-
-
-@main_bp.route('/api/xp/award', methods=['POST'])
-def xp_award_api():
-    from flask import session
-    from . import users
-    username = (session.get('user_username') or '').strip().lower()
-    if not username:
-        return jsonify({'success': False}), 403
-    data = request.get_json(silent=True) or {}
-    ok, total = users.award_xp(username, data.get('reason'))
-    return jsonify({'success': ok, 'xp': total})
 
 
 @main_bp.route('/api/achievements/award', methods=['POST'])
@@ -3175,6 +3207,7 @@ def user_avatar_api():
     if len(avatar) > 400000:
         return jsonify({'success': False, 'error': 'image too large'}), 400
     users.save_avatar(username, avatar)
+    _award_action_xp('avatar_uploaded')
     return jsonify({'success': True})
 
 
@@ -3198,6 +3231,7 @@ def user_files_api():
     stored = users.save_file(username, data.get('name', ''), code)
     if not stored:
         return jsonify({'success': False, 'error': 'bad file name'}), 400
+    _award_action_xp('file_saved')
     return jsonify({'success': True, 'name': stored})
 
 
@@ -3290,6 +3324,7 @@ def feedback_api():
             handle.write(json.dumps(entry) + '\n')
     except Exception:
         return jsonify({'success': False, 'error': 'could not save feedback'}), 500
+    _award_action_xp('feedback_sent')
     return jsonify({'success': True})
 
 

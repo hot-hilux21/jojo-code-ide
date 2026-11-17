@@ -537,5 +537,18 @@
   "rank.platinum": "Platino",
   "rank.diamond": "Diamante",
   "rank.elite": "Élite",
-  "rank.unreal": "Irreal"
+  "rank.unreal": "Irreal",
+  "error.plain.exists": "Ese correo ya está registrado. Inicia sesión.",
+  "error.plain.bad_email": "Escribe un correo válido.",
+  "error.plain.short_password": "Usa al menos 8 caracteres.",
+  "error.plain.bad_code": "Ese código es incorrecto o ha caducado. Pide uno nuevo.",
+  "error.plain.no_code": "Pide un código primero.",
+  "error.plain.no_user": "No hay ninguna cuenta con ese correo.",
+  "error.plain.no_email": "Esa cuenta aún no tiene correo. Pide al responsable.",
+  "error.plain.mail_failed": "No se pudo enviar el correo. Inténtalo de nuevo.",
+  "error.plain.invalid_credentials": "Correo o contraseña incorrectos.",
+  "error.plain.bad_username": "Usa de 3 a 20 letras, números, _ o -.",
+  "account.email_add": "Añadir correo",
+  "account.email_add_help": "Las cuentas antiguas no tienen correo. Añade uno para restaurar con código.",
+  "account.send_code": "Enviar código"
 }

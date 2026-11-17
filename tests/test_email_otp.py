@@ -90,6 +90,25 @@ class EmailOtpTests(unittest.TestCase):
         self.assertTrue(users.verify(username, 'a newer passphrase'))
         self.assertFalse(users.verify(username, 'a long passphrase'))
 
+    def test_an_old_account_can_add_and_verify_an_email(self):
+        # Older accounts predate email and hold only a password hash.
+        saved = users.load_users()
+        saved['old_reader'] = {'created': 1}
+        users.save_users(saved)
+        with self.client.session_transaction() as session:
+            session['user_username'] = 'old_reader'
+        request = self.client.post('/api/auth/email/request',
+                                   json={'email': 'old@example.com'})
+        self.assertEqual(request.status_code, 200, request.get_data(as_text=True))
+        confirm = self.client.post('/api/auth/email/confirm', json={
+            'email': 'old@example.com', 'code': CODE,
+        })
+        self.assertEqual(confirm.status_code, 200, confirm.get_data(as_text=True))
+        record = users.load_users()['old_reader']
+        self.assertEqual(record['email'], 'old@example.com')
+        self.assertTrue(record['email_verified'])
+        self.assertEqual(users.resolve_username('old@example.com'), 'old_reader')
+
     def test_a_wrong_code_never_creates_the_account(self):
         self.client.post('/api/auth/register', json={
             'email': 'ada@example.com', 'password': 'a long passphrase',

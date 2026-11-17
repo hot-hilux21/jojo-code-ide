@@ -537,5 +537,18 @@
   "rank.platinum": "Платина",
   "rank.diamond": "Діамант",
   "rank.elite": "Еліта",
-  "rank.unreal": "Нереальний"
+  "rank.unreal": "Нереальний",
+  "error.plain.exists": "Цю пошту вже зареєстровано. Увійдіть.",
+  "error.plain.bad_email": "Введіть правильну адресу пошти.",
+  "error.plain.short_password": "Використовуйте щонайменше 8 символів.",
+  "error.plain.bad_code": "Код неправильний або закінчився. Запитайте новий.",
+  "error.plain.no_code": "Спочатку запросіть код.",
+  "error.plain.no_user": "Акаунта з цією поштою не знайдено.",
+  "error.plain.no_email": "Цей акаунт ще без пошти. Попросіть адміністратора.",
+  "error.plain.mail_failed": "Не вдалося надіслати пошту. Спробуйте пізніше.",
+  "error.plain.invalid_credentials": "Неправильна пошта або пароль.",
+  "error.plain.bad_username": "Використовуйте від 3 до 20 літер, цифр, _ або -.",
+  "account.email_add": "Додати пошту",
+  "account.email_add_help": "Старі акаунти не мають пошти. Додайте її для скидання пароля кодом.",
+  "account.send_code": "Надіслати код"
 }

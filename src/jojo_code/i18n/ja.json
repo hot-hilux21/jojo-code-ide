@@ -537,5 +537,18 @@
   "rank.platinum": "プラチナ",
   "rank.diamond": "ダイヤモンド",
   "rank.elite": "エリート",
-  "rank.unreal": "アンリアル"
+  "rank.unreal": "アンリアル",
+  "error.plain.exists": "このメールは既に登録されています。ログインしてください。",
+  "error.plain.bad_email": "正しいメールアドレスを入力してください。",
+  "error.plain.short_password": "8文字以上で入力してください。",
+  "error.plain.bad_code": "コードが正しくないか期限切れです。新しいコードを請求してください。",
+  "error.plain.no_code": "まずコードを請求してください。",
+  "error.plain.no_user": "このメールのアカウントが見つかりません。",
+  "error.plain.no_email": "このアカウントにはまだメールがありません。管理者に連絡してください。",
+  "error.plain.mail_failed": "メールを送信できませんでした。後で試してください。",
+  "error.plain.invalid_credentials": "メールまたはパスワードが違います。",
+  "error.plain.bad_username": "3〜20文字の英字、数字、_、- を使ってください。",
+  "account.email_add": "メールを追加",
+  "account.email_add_help": "古いアカウントにはメールがありません。コードで再設定するために追加してください。",
+  "account.send_code": "コードを送る"
 }

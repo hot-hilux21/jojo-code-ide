@@ -537,5 +537,18 @@
   "rank.platinum": "بلاتين",
   "rank.diamond": "ألماس",
   "rank.elite": "نخبة",
-  "rank.unreal": "أنريل"
+  "rank.unreal": "أنريل",
+  "error.plain.exists": "هذا البريد مسجل بالفعل. سجل الدخول.",
+  "error.plain.bad_email": "أدخل بريدًا إلكترونيًا صحيحًا.",
+  "error.plain.short_password": "استخدم 8 أحرف على الأقل.",
+  "error.plain.bad_code": "الرمز غير صحيح أو منتهي. اطلب رمزًا جديدًا.",
+  "error.plain.no_code": "اطلب رمزًا أولًا.",
+  "error.plain.no_user": "لا يوجد حساب بهذا البريد.",
+  "error.plain.no_email": "هذا الحساب ليس لديه بريد بعد. اطلب من المشرف إعادة التعيين.",
+  "error.plain.mail_failed": "تعذر إرسال البريد. حاول لاحقًا.",
+  "error.plain.invalid_credentials": "البريد أو كلمة المرور غير صحيحة.",
+  "error.plain.bad_username": "استخدم من 3 إلى 20 حرفًا أو رقمًا أو _ أو -.",
+  "account.email_add": "أضف بريدًا",
+  "account.email_add_help": "الحسابات القديمة ليس لها بريد. أضف واحدًا لإعادة التعيين بالرمز.",
+  "account.send_code": "أرسل الرمز"
 }

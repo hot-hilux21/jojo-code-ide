@@ -537,5 +537,18 @@
   "rank.platinum": "플래티넘",
   "rank.diamond": "다이아몬드",
   "rank.elite": "엘리트",
-  "rank.unreal": "언리얼"
+  "rank.unreal": "언리얼",
+  "error.plain.exists": "이 이메일은 이미 등록되었습니다. 로그인하세요.",
+  "error.plain.bad_email": "올바른 이메일 주소를 입력하세요.",
+  "error.plain.short_password": "8자 이상 입력하세요.",
+  "error.plain.bad_code": "코드가 틀렸거나 만료되었습니다. 새 코드를 요청하세요.",
+  "error.plain.no_code": "먼저 코드를 요청하세요.",
+  "error.plain.no_user": "이 이메일로 계정을 찾을 수 없습니다.",
+  "error.plain.no_email": "이 계정에는 아직 이메일이 없습니다. 관리자에게 문의하세요.",
+  "error.plain.mail_failed": "이메일을 보낼 수 없습니다. 나중에 다시 시도하세요.",
+  "error.plain.invalid_credentials": "이메일 또는 비밀번호가 틀렸습니다.",
+  "error.plain.bad_username": "3~20자의 글자, 숫자, _ 또는 -를 사용하세요.",
+  "account.email_add": "이메일 추가",
+  "account.email_add_help": "오래된 계정에는 이메일이 없습니다. 코드로 비밀번호를 재설정하려면 추가하세요.",
+  "account.send_code": "코드 보내기"
 }

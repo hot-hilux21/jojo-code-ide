@@ -537,5 +537,18 @@
   "rank.platinum": "Platine",
   "rank.diamond": "Diamant",
   "rank.elite": "Élite",
-  "rank.unreal": "Unreal"
+  "rank.unreal": "Unreal",
+  "error.plain.exists": "Cet e-mail est déjà inscrit. Connectez-vous.",
+  "error.plain.bad_email": "Saisissez une adresse e-mail valide.",
+  "error.plain.short_password": "Utilisez au moins 8 caractères.",
+  "error.plain.bad_code": "Ce code est incorrect ou a expiré. Demandez-en un nouveau.",
+  "error.plain.no_code": "Demandez d’abord un code.",
+  "error.plain.no_user": "Aucun compte trouvé avec cet e-mail.",
+  "error.plain.no_email": "Ce compte n’a pas encore d’e-mail. Demandez au responsable.",
+  "error.plain.mail_failed": "L’e-mail n’a pas pu être envoyé. Réessayez.",
+  "error.plain.invalid_credentials": "E-mail ou mot de passe incorrect.",
+  "error.plain.bad_username": "Utilisez 3 à 20 lettres, chiffres, _ ou -.",
+  "account.email_add": "Ajouter un e-mail",
+  "account.email_add_help": "Les anciens comptes n’ont pas d’e-mail. Ajoutez-en un pour réinitialiser par code.",
+  "account.send_code": "Envoyer le code"
 }

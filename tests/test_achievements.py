@@ -58,14 +58,20 @@ class AchievementTests(unittest.TestCase):
         self.assertEqual(state["level"], 5)
         self.assertEqual(state["next_rank"], "platinum")
 
-    def test_api_awards_xp_and_reports_progress(self):
+    def test_no_client_callable_xp_endpoint(self):
         users.register("ada", "a long passphrase")
         with self.client.session_transaction() as session:
             session['user_username'] = 'ada'
-        self.assertEqual(self.client.post('/api/xp/award', json={'reason': 'shell'}).status_code, 200)
-        state = self.client.get('/api/progress').get_json()
-        self.assertEqual(state['xp'], 5)
-        self.assertEqual(state['rank'], 'bronze')
+        self.assertEqual(self.client.post('/api/xp/award', json={'reason': 'shell'}).status_code, 404)
+
+    def test_saving_a_file_awards_xp_server_side(self):
+        users.register("ada", "a long passphrase")
+        with self.client.session_transaction() as session:
+            session['user_username'] = 'ada'
+        self.assertEqual(self.client.post('/api/user/files', json={
+            'name': 'work.py', 'code': 'print(1)',
+        }).status_code, 200)
+        self.assertEqual(users.progress('ada')['xp'], 20)
 
     def test_api_returns_the_full_list_with_earned_flags(self):
         users.register("ada", "a long passphrase")

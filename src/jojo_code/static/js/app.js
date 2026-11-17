@@ -289,17 +289,6 @@
     elite: t('rank.elite'), unreal: t('rank.unreal')
   };
 
-  function awardXp(reason) {
-    if (!window.CURRENT_USER) return;
-    fetch('/api/xp/award', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason: reason }),
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.success) loadProgress();
-    }).catch(function () {});
-  }
-
   function loadProgress() {
     var summary = document.getElementById('progress-summary');
     var track = document.getElementById('progress-track');
@@ -1762,7 +1751,6 @@
         if (response.ok) {
           recordEvent('feedback_sent');
           awardAchievement('first_feedback');
-          awardXp('feedback_sent');
           if (feedbackPositive) feedbackPositive.value = '';
           if (feedbackNegative) feedbackNegative.value = '';
         }
@@ -1810,9 +1798,24 @@
     if (acctStatus) acctStatus.textContent = '';
   }
 
+  // The server answers with short machine codes. Readers get a sentence.
+  var plainError = {
+    'exists': t('error.plain.exists'),
+    'bad_email': t('error.plain.bad_email'),
+    'short_password': t('error.plain.short_password'),
+    'bad_code': t('error.plain.bad_code'),
+    'no_code': t('error.plain.no_code'),
+    'no_user': t('error.plain.no_user'),
+    'no_email': t('error.plain.no_email'),
+    'mail_failed': t('error.plain.mail_failed'),
+    'invalid credentials': t('error.plain.invalid_credentials'),
+    'bad_username': t('error.plain.bad_username')
+  };
+
   function acctError(data) {
-    if (data.error === 'bad_code' || data.error === 'no_code') return t('account.code_wrong');
-    return data.error || t('account.failed');
+    var code = data && data.error;
+    if (code && plainError[code]) return plainError[code];
+    return code || t('account.failed');
   }
 
   function showOtp(isReset) {
@@ -1880,6 +1883,23 @@
     acctPost('/api/auth/username', { username: field.value }).then(function (r) {
       if (status) status.textContent = r.ok ? t('settings.saved') : acctError(r.data);
       if (r.ok) field.value = r.data.username;
+    });
+  });
+  var acctEmailSend = document.getElementById('acct-email-send');
+  var acctEmailConfirm = document.getElementById('acct-email-confirm');
+  if (acctEmailSend) acctEmailSend.addEventListener('click', function () {
+    var field = document.getElementById('acct-new-email');
+    var status = document.getElementById('acct-email-status');
+    acctPost('/api/auth/email/request', { email: field.value }).then(function (r) {
+      if (status) status.textContent = r.ok ? t('account.code_sent') : acctError(r.data);
+    });
+  });
+  if (acctEmailConfirm) acctEmailConfirm.addEventListener('click', function () {
+    var email = (document.getElementById('acct-new-email') || {}).value;
+    var code = (document.getElementById('acct-email-code') || {}).value;
+    var status = document.getElementById('acct-email-status');
+    acctPost('/api/auth/email/confirm', { email: email, code: code }).then(function (r) {
+      if (status) status.textContent = r.ok ? t('settings.saved') : acctError(r.data);
     });
   });
   var acctPasswordChange = document.getElementById('acct-password-change');
@@ -2013,7 +2033,6 @@
         if (acctFileName) acctFileName.value = '';
         loadAccountFiles();
         recordEvent('file_saved');
-        awardXp('file_saved');
         sayServerStatus(t('account.file_saved'));
       }).catch(function () { sayServerStatus(t('account.failed')); });
     });
@@ -2284,7 +2303,6 @@
         }
         showAccountAvatar(dataUrl);
         recordEvent('avatar_uploaded');
-        awardXp('avatar_uploaded');
         if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_saved');
       }).catch(function () {
         if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
@@ -3474,7 +3492,6 @@
     answersForCode = null;
     recordEvent('code_run');
     awardAchievement('first_run');
-    awardXp('code_run');
     startRun();
   }
 
@@ -4247,7 +4264,6 @@
       syncAutosaveButton();
       updateLastSaved();
       recordEvent('cloud_saved');
-      awardXp('cloud_saved');
       awardAchievement('first_cloud');
     }).catch(function () {});
   }
@@ -6260,7 +6276,6 @@
         if (shellFail(data)) return;
         shellSay(data.output);
         awardAchievement('first_shell');
-        awardXp('shell');
         if (data.doom) awardAchievement('doom');
         if (data.doom) {
           var overlay = document.createElement('div');

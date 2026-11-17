@@ -217,6 +217,32 @@ const KNOWN_IDS = new Set([
   // both on the way in, so a missing id here would leave the control silently
   // absent while every check below still passed.
   'btn-hide-icons', 'hide-icons-state',
+  // Feedback form, pane tools, account and profile controls, packages, the
+  // toolbar buttons and the footer credits. All of these are looked up on the
+  // way in; an id missing here makes app.js report it as unknown even though
+  // the real index.html provides it.
+  'btn-feedback', 'btn-feedback-close', 'btn-feedback-send', 'feedback-dialog',
+  'feedback-name', 'feedback-email', 'feedback-positive', 'feedback-negative',
+  'feedback-status',
+  'pane-indent-add', 'pane-indent-fix', 'pane-cleanup',
+  'acct-username', 'acct-username-label', 'acct-email', 'acct-email-row',
+  'acct-password', 'acct-status', 'account-heading', 'acct-login', 'acct-create',
+  'acct-otp-row', 'acct-code', 'acct-otp-confirm', 'acct-reset-password-row',
+  'acct-reset-password', 'acct-forgot', 'acct-username-save', 'acct-email-send',
+  'acct-email-confirm', 'acct-password-change', 'acct-file-name', 'acct-file-save',
+  'acct-file-list', 'acct-files-empty', 'acct-settings-save', 'acct-settings-load',
+  'acct-autosave-name', 'acct-autosave-name-save',
+  'packages-btn', 'packages-modal', 'packages-close', 'pkg-name', 'pkg-install',
+  'pkg-status', 'pkg-list', 'pkg-empty',
+  'account-btn', 'account-modal', 'account-close', 'account-menu', 'menu-signin',
+  'menu-files', 'menu-profile', 'menu-signout', 'files-modal', 'files-close',
+  'profile-modal', 'profile-close', 'acct-picture', 'acct-picture-status',
+  'avatar-drop', 'account-avatar', 'account-name', 'glossary-focus',
+  'btn-undo', 'btn-redo', 'btn-autosave', 'btn-save-cloud',
+  'theme-preset', 'theme-preset-apply', 'admin-dot', 'jojo-credit',
+  'progress-summary', 'progress-track', 'progress-fill',
+  'achievement-list', 'achievement-status', 'acct-new-username',
+  'acct-new-email', 'acct-email-code', 'acct-username-status',
 ]);
 
 const numericIds = new Set([
@@ -747,8 +773,8 @@ const setupSwatchRegistrations = [];
 
 function makeSetupSwatchCells() {
   return ['dark'].map((themeKey) =>
-    makeElement(`setup-swatch-${themeKey}-bg`,
-      { 'data-theme': themeKey, 'data-role': 'bg' },
+    makeElement(`setup-theme-swatch-${themeKey}-bg`,
+      { 'data-custom-key': 'bg', value: SANDBOX_THEMES[themeKey].bg },
       { value: SANDBOX_THEMES[themeKey].bg }));
 }
 
@@ -759,7 +785,7 @@ const SETUP_DIALOG = makeElement('setup-dialog', {}, {
   querySelectorAll: (selector) => {
     if (selector === '.setup-panel') return SETUP_PANELS;
     if (selector === 'input[name="setup-theme"]') return SETUP_THEME_RADIOS;
-    if (selector === '.setup-swatch-cell') {
+    if (selector === 'input[name^="setup-theme-swatch-"]') {
       const cells = makeSetupSwatchCells();
       setupSwatchRegistrations.push(cells[0]);
       return cells;
@@ -1202,6 +1228,10 @@ function makePage(locale, shared, bodyAttrs) {
       // how the update checks tell the two apart.
       close: () => { closeAttempts += 1; },
     },
+    // Theme transitions schedule their cleanup on the next frame. Without a
+    // stub the callback throws and breaks whatever check is running then.
+    requestAnimationFrame: (cb) => { cb(0); return 0; },
+    cancelAnimationFrame: noop,
   };
   context.window.document = doc;
   context.globalThis = context;
@@ -3474,12 +3504,13 @@ function runSetupChecks() {
   if (setupFocusLog.length !== swatchFocusBefore) {
     failed = true;
     console.log('FAIL picking a setup preset colour moved focus back to the heading');
-  } else if (!configPosts.slice(swatchConfigBefore).some((p) => p.theme === 'custom')) {
+  } else if (!configPosts.slice(swatchConfigBefore).some(
+      (p) => p.theme_custom_bg === SANDBOX_THEMES.dark.bg)) {
     failed = true;
-    console.log('FAIL picking a setup preset colour did not start the reader theme: ' +
+    console.log('FAIL picking a setup preset colour did not save its colours: ' +
                 JSON.stringify(configPosts.slice(swatchConfigBefore)));
   } else {
-    console.log('     a preset colour square starts the reader theme without moving focus');
+    console.log('     a preset colour square saves its colours without moving focus');
   }
 
   // The last one to finish: send the flag, then reload so the page is drawn

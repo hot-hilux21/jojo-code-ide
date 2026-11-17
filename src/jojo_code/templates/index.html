@@ -1884,6 +1884,17 @@
         </div>
       </div>
       <div class="field">
+        <h3>{{ t('account.email_add') }}</h3>
+        <p class="field-help">{{ t('account.email_add_help') }}</p>
+        <label for="acct-new-email">{{ t('feedback.email') }}</label>
+        <input id="acct-new-email" type="email" style="width:100%" autocomplete="email">
+        <button class="btn btn-small" type="button" id="acct-email-send">{{ t('account.send_code') }}</button>
+        <label for="acct-email-code">{{ t('account.code') }}</label>
+        <input id="acct-email-code" type="text" inputmode="numeric" autocomplete="one-time-code" style="width:100%">
+        <button class="btn btn-small" type="button" id="acct-email-confirm">{{ t('account.confirm_code') }}</button>
+        <p id="acct-email-status" class="acct-status" aria-live="polite"></p>
+      </div>
+      <div class="field">
         <h3>{{ t('achievement.title') }}</h3>
         <ul id="achievement-list" class="badge-list"></ul>
         <p id="achievement-status" class="acct-status" aria-live="polite"></p>

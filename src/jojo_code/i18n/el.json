@@ -537,5 +537,18 @@
   "rank.platinum": "Πλατίνα",
   "rank.diamond": "Διαμάντι",
   "rank.elite": "Ελίτ",
-  "rank.unreal": "Απίστευτο"
+  "rank.unreal": "Απίστευτο",
+  "error.plain.exists": "Αυτό το email είναι ήδη εγγεγραμμένο. Συνδεθείτε.",
+  "error.plain.bad_email": "Εισαγάγετε έγκυρη διεύθυνση email.",
+  "error.plain.short_password": "Χρησιμοποιήστε τουλάχιστον 8 χαρακτήρες.",
+  "error.plain.bad_code": "Ο κωδικός είναι λάθος ή έχει λήξει. Ζητήστε νέο.",
+  "error.plain.no_code": "Ζητήστε πρώτα κωδικό.",
+  "error.plain.no_user": "Δεν βρέθηκε λογαριασμός με αυτό το email.",
+  "error.plain.no_email": "Ο λογαριασμός δεν έχει ακόμη email. Ρωτήστε τον διαχειριστή.",
+  "error.plain.mail_failed": "Δεν ήταν δυνατή η αποστολή. Δοκιμάστε αργότερα.",
+  "error.plain.invalid_credentials": "Λάθος email ή κωδικός.",
+  "error.plain.bad_username": "Χρησιμοποιήστε 3 έως 20 γράμματα, αριθμούς, _ ή -.",
+  "account.email_add": "Προσθήκη email",
+  "account.email_add_help": "Οι παλιοί λογαριασμοί δεν έχουν email. Προσθέστε ένα για επαναφορά με κωδικό.",
+  "account.send_code": "Αποστολή κωδικού"
 }
