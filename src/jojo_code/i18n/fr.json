@@ -559,5 +559,7 @@
   "focus.drawer_open": "Ouvrir les réglages de concentration",
   "focus.drawer_close": "Fermer les réglages de concentration",
   "focus.drawer_tab": "Concentration",
-  "ay.stopped": "« ay ay ay ay » n’est plus « ay ay ay ay-ing »."
+  "ay.stopped": "« ay ay ay ay » n’est plus « ay ay ay ay-ing ».",
+  "focus.exit": "Quitter le mode concentration",
+  "feedback.from_account": "Envoyé en tant que {0}. Votre nom et votre e-mail viennent de votre compte."
 }

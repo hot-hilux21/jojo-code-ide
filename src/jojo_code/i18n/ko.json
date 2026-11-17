@@ -559,5 +559,7 @@
   "focus.drawer_open": "집중 설정 열기",
   "focus.drawer_close": "집중 설정 닫기",
   "focus.drawer_tab": "집중 설정",
-  "ay.stopped": "\"ay ay ay ay\"가 더 이상 \"ay ay ay ay-ing\"이 아닙니다."
+  "ay.stopped": "\"ay ay ay ay\"가 더 이상 \"ay ay ay ay-ing\"이 아닙니다.",
+  "focus.exit": "집중 모드 종료",
+  "feedback.from_account": "{0}(으)로 보냈습니다. 이름과 이메일은 계정에서 가져옵니다."
 }

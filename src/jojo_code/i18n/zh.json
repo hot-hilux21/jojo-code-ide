@@ -559,5 +559,7 @@
   "focus.drawer_open": "打开专注设置",
   "focus.drawer_close": "关闭专注设置",
   "focus.drawer_tab": "专注设置",
-  "ay.stopped": "\"ay ay ay ay\" 不再是 \"ay ay ay ay-ing\"。"
+  "ay.stopped": "\"ay ay ay ay\" 不再是 \"ay ay ay ay-ing\"。",
+  "focus.exit": "退出专注模式",
+  "feedback.from_account": "以 {0} 身份发送。姓名和邮箱来自你的账号。"
 }

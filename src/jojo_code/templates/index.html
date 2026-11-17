@@ -194,6 +194,11 @@
         </button>
       </div>
 
+      <button type="button" id="btn-exit-focus" class="btn btn-toggle" hidden
+              title="{{ t('focus.exit') }}" aria-label="{{ t('focus.exit') }}">
+        <span class="btn-icon" aria-hidden="true">{{ icon('eye-off') }}</span><span class="btn-label">{{ t('focus.exit') }}</span>
+      </button>
+
       <input type="file" id="file-input" accept=".py,.txt" class="visually-hidden">
 
       {# The dictionary and Settings are reference and configuration rather
@@ -285,7 +290,7 @@
   {# The fade control sits at the top right of the editor strip: a mode
      dropdown plus the sliders that mode shows, independent of Settings
      but writing the same values, so the two views cannot disagree. #}
-  <button type="button" id="focus-drawer-tab" class="focus-drawer-tab" hidden
+  <button type="button" id="focus-drawer-tab" class="focus-drawer-tab"
           aria-label="{{ t('focus.drawer_open') }}" title="{{ t('focus.drawer_open') }}">{{ t('focus.drawer_tab') }}</button>
   <div class="pane-fade" id="pane-fade" role="group" aria-labelledby="pane-fade-mode-label">
     <button type="button" id="focus-drawer-close" class="focus-drawer-close"
@@ -1339,14 +1344,19 @@
                 aria-label="{{ t('settings.close_label') }}">{{ t('settings.close') }}</button>
       </header>
       <div class="settings-body">
-        <div class="field">
-          <label for="feedback-name">{{ t('feedback.name') }}</label>
-          <input id="feedback-name" type="text" style="width:100%">
-        </div>
-        <div class="field">
-          <label for="feedback-email">{{ t('feedback.email') }}</label>
-          <input id="feedback-email" type="email" style="width:100%">
-        </div>
+        {% if current_user %}
+          <p class="field-help" id="feedback-account">{{ t('feedback.from_account', current_user) }}</p>
+          <input id="feedback-name" type="hidden" value="{{ current_user }}">
+        {% else %}
+          <div class="field">
+            <label for="feedback-name">{{ t('feedback.name') }}</label>
+            <input id="feedback-name" type="text" style="width:100%">
+          </div>
+          <div class="field">
+            <label for="feedback-email">{{ t('feedback.email') }}</label>
+            <input id="feedback-email" type="email" style="width:100%">
+          </div>
+        {% endif %}
         <fieldset class="star-rating" aria-label="{{ t('feedback.rating') }}">
           <legend class="visually-hidden">{{ t('feedback.rating') }}</legend>
           <input type="radio" name="feedback-rating" value="5" id="fr5"><label for="fr5">{{ '★' }}</label>

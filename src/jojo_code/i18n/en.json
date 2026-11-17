@@ -559,5 +559,7 @@
   "focus.drawer_open": "Open focus controls",
   "focus.drawer_close": "Close focus controls",
   "focus.drawer_tab": "Focus controls",
-  "ay.stopped": "\"ay ay ay ay\" is no longer \"ay ay ay ay-ing\"."
+  "ay.stopped": "\"ay ay ay ay\" is no longer \"ay ay ay ay-ing\".",
+  "focus.exit": "Exit focus mode",
+  "feedback.from_account": "Sent as {0}. Your name and email come from your account."
 }

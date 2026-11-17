@@ -1383,6 +1383,7 @@
 
   function applyFocusMode(mode) {
     body.setAttribute('data-focus-mode', mode);
+    syncFocusChrome();
     // Hide the gutter through CodeMirror's native option rather than CSS
     // display:none. Toggling lineNumbers makes CodeMirror re-measure and
     // drop the gutter column, so the numbers never ghost over the code.
@@ -5396,19 +5397,33 @@
   // never has controls sitting on top of its centre.
   var focusDrawerTab = document.getElementById('focus-drawer-tab');
   var focusDrawerClose = document.getElementById('focus-drawer-close');
-  function setFocusDrawer(open) {
-    document.body.setAttribute('data-focus-drawer', open ? 'open' : 'closed');
-    if (focusDrawerClose) focusDrawerClose.focus();
+  var btnExitFocus = document.getElementById('btn-exit-focus');
+  function syncFocusChrome() {
+    var mode = body.getAttribute('data-focus-mode') || 'off';
+    if (btnExitFocus) btnExitFocus.hidden = mode === 'off';
   }
+  function setFocusDrawer(open, moveFocus) {
+    document.body.setAttribute('data-focus-drawer', open ? 'open' : 'closed');
+    if (focusDrawerTab) focusDrawerTab.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (moveFocus && open && focusDrawerClose) focusDrawerClose.focus();
+    if (moveFocus && !open && focusDrawerTab) focusDrawerTab.focus();
+  }
+  // The drawer starts closed; the tab on the left is the way in at any time.
+  setFocusDrawer(false, false);
+  syncFocusChrome();
   if (focusDrawerClose) {
-    focusDrawerClose.addEventListener('click', function () {
-      setFocusDrawer(false);
-      if (focusDrawerTab) focusDrawerTab.focus();
-    });
+    focusDrawerClose.addEventListener('click', function () { setFocusDrawer(false, true); });
   }
   if (focusDrawerTab) {
-    focusDrawerTab.addEventListener('click', function () { setFocusDrawer(true); });
+    focusDrawerTab.addEventListener('click', function () { setFocusDrawer(true, true); });
   }
+  if (btnExitFocus) btnExitFocus.addEventListener('click', function () {
+    applyFocusMode('off');
+    saveConfig({ focus_mode: 'off' });
+    syncFocusChrome();
+    setFocusDrawer(false, false);
+    if (btnSettings) btnSettings.focus();
+  });
   if (paneEditorBlur) {
     paneEditorBlur.addEventListener('input', function () {
       applyBlurIntensity(parseFloat(paneEditorBlur.value), paneEditorBlur);

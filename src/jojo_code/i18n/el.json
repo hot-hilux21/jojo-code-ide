@@ -559,5 +559,7 @@
   "focus.drawer_open": "Άνοιγμα ελέγχων εστίασης",
   "focus.drawer_close": "Κλείσιμο ελέγχων εστίασης",
   "focus.drawer_tab": "Έλεγχοι εστίασης",
-  "ay.stopped": "Το « ay ay ay ay » δεν είναι πια « ay ay ay ay-ing »."
+  "ay.stopped": "Το « ay ay ay ay » δεν είναι πια « ay ay ay ay-ing ».",
+  "focus.exit": "Έξοδος από τη λειτουργία εστίασης",
+  "feedback.from_account": "Αποστέλλεται ως {0}. Το όνομα και το email προέρχονται από τον λογαριασμό σας."
 }
