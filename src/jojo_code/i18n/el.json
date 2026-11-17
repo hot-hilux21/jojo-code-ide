@@ -516,5 +516,7 @@
   "account.code_sent": "Ο κωδικός στάλθηκε. Ελέγξτε το email σας.",
   "account.code_wrong": "Ο κωδικός είναι λάθος ή έχει λήξει.",
   "account.confirm_code": "Επιβεβαίωση κωδικού",
-  "account.username_or_email": "Όνομα χρήστη ή email"
+  "account.username_or_email": "Όνομα χρήστη ή email",
+  "account.picture_drop": "Αφήστε μια εικόνα εδώ ή πατήστε Enter για επιλογή",
+  "nav.save_cloud": "Αποθήκευση στο cloud"
 }

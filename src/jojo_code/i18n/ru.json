@@ -516,5 +516,7 @@
   "account.code_sent": "Код отправлен. Проверьте почту.",
   "account.code_wrong": "Неверный код или истёк срок действия.",
   "account.confirm_code": "Подтвердить код",
-  "account.username_or_email": "Имя пользователя или электронная почта"
+  "account.username_or_email": "Имя пользователя или электронная почта",
+  "account.picture_drop": "Перетащите изображение сюда или нажмите Enter, чтобы выбрать",
+  "nav.save_cloud": "Сохранить в облако"
 }

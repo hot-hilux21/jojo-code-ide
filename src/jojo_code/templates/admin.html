@@ -2,32 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Jojo Code</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    body { margin: 0; background: var(--bg, #111); color: var(--fg, #eee); font-family: inherit; }
-    .admin-wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-    .admin-card { background: var(--panel, #1a1a1a); border: 1px solid var(--panel-border, #333); border-radius: var(--radius-sm, 8px); padding: 1rem; margin-bottom: 1rem; }
-    .entry { border-top: 1px solid var(--panel-border, #333); padding-top: 0.75rem; margin-top: 0.75rem; }
-    .meta { color: var(--muted, #aaa); font-size: 0.9rem; }
-    .stars { color: #b38e00; }
+    @font-face {
+      font-family: 'Atkinson Hyperlegible';
+      src: url('{{ url_for('main.serve_font', filename='AtkinsonHyperlegible-Regular.ttf') }}') format('truetype');
+      font-weight: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Atkinson Hyperlegible';
+      src: url('{{ url_for('main.serve_font', filename='AtkinsonHyperlegible-Bold.ttf') }}') format('truetype');
+      font-weight: bold;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'OpenDyslexic3';
+      src: url('{{ url_for('main.serve_font', filename='OpenDyslexic3-Regular.ttf') }}') format('truetype');
+      font-weight: normal;
+      font-display: swap;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-ui);
+      line-height: 1.6;
+    }
+    .admin-wrap { max-width: 1000px; margin: 0 auto; padding: var(--space-3); }
+    .admin-head { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+    .admin-controls { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: end; }
+    .admin-controls label { display: block; font-size: 0.9rem; color: var(--muted); }
+    .admin-controls select { min-height: 44px; padding: var(--space-1) var(--space-2); }
+    .admin-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--radius-sm); padding: var(--space-3); margin-bottom: var(--space-3); }
+    .admin-card h2 { margin-top: 0; font-size: 1.25rem; }
+    .entry { border-top: 1px solid var(--panel-border); padding-top: var(--space-2); margin-top: var(--space-2); }
+    .meta { color: var(--muted); font-size: 0.9rem; }
+    .stars { color: var(--accent); }
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--panel-border, #333); }
-    caption { text-align: left; padding-bottom: 0.5rem; color: var(--muted, #aaa); }
-    .admin-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; margin: 0 0 1rem; padding: 0; list-style: none; }
-    .admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    th, td { text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--panel-border); vertical-align: top; overflow-wrap: anywhere; }
+    caption { text-align: left; padding-bottom: var(--space-2); color: var(--muted); }
+    .admin-stats { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); margin: 0 0 var(--space-3); padding: 0; list-style: none; }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
     .admin-actions form { margin: 0; }
-    .admin-form label { display: block; margin-top: 0.5rem; }
-    .admin-form input { display: block; margin-bottom: 0.5rem; }
+    .admin-form input { display: block; min-height: 44px; margin-bottom: var(--space-2); max-width: 24rem; }
+    .admin-form label { display: block; margin-top: var(--space-2); }
+    [aria-pressed="true"] { border-color: var(--accent); }
   </style>
 </head>
-<body>
+<body data-theme="light">
   <div class="admin-wrap">
-    <h1>Admin dashboard</h1>
+    <div class="admin-head">
+      <h1>Admin dashboard</h1>
+      <div class="admin-controls">
+        <div>
+          <span id="theme-label">Appearance</span>
+          <div role="group" aria-labelledby="theme-label">
+            <button class="btn btn-small" type="button" id="admin-light" aria-pressed="true">Light</button>
+            <button class="btn btn-small" type="button" id="admin-dark" aria-pressed="false">Dark</button>
+          </div>
+        </div>
+        <div>
+          <label for="admin-font">Reading font</label>
+          <select id="admin-font">
+            <option value="atkinson">Atkinson Hyperlegible</option>
+            <option value="dyslexic">OpenDyslexic</option>
+            <option value="system">System</option>
+          </select>
+        </div>
+        <form method="post" action="/admin/logout">
+          <button class="btn btn-small" type="submit">Log out</button>
+        </form>
+      </div>
+    </div>
+
     <p id="admin-status" role="status">{{ message }}</p>
-    <form method="post" action="/admin/logout" style="margin-bottom:1rem;">
-      <button class="btn btn-small" type="submit">Log out</button>
-    </form>
 
     <div class="admin-card">
       <h2>My password</h2>
@@ -43,7 +94,7 @@
     <div class="admin-card">
       <h2>Accounts</h2>
       <ul class="admin-stats">
-        <li><strong>{{ stats.accounts }}</strong> registered accounts</li>
+        <li><strong>{{ stats.accounts }}</strong> registered readers</li>
         <li><strong>{{ stats.new_week }}</strong> signed up in the last 7 days</li>
         <li><strong>{{ stats.files }}</strong> saved files</li>
         <li><strong>{{ stats.feedback }}</strong> feedback messages</li>
@@ -94,10 +145,13 @@
       <h2>Analytics</h2>
       {% if analytics %}
         <table>
-          <tr><th>Event</th><th>Count</th></tr>
-          {% for key, value in analytics.items() %}
-            <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
-          {% endfor %}
+          <caption>Events recorded on this server</caption>
+          <thead><tr><th scope="col">Event</th><th scope="col">Count</th></tr></thead>
+          <tbody>
+            {% for key, value in analytics.items() %}
+              <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+            {% endfor %}
+          </tbody>
         </table>
       {% else %}
         <p>No analytics recorded yet.</p>
@@ -124,5 +178,41 @@
       {% endif %}
     </div>
   </div>
+
+  <script>
+    (function () {
+      var body = document.body;
+      var light = document.getElementById('admin-light');
+      var dark = document.getElementById('admin-dark');
+      var font = document.getElementById('admin-font');
+      var stacks = {
+        atkinson: '"Atkinson Hyperlegible", "Segoe UI", sans-serif',
+        dyslexic: '"OpenDyslexic3", "Atkinson Hyperlegible", sans-serif',
+        system: 'system-ui, -apple-system, "Segoe UI", sans-serif'
+      };
+      function setTheme(name) {
+        body.setAttribute('data-theme', name);
+        light.setAttribute('aria-pressed', String(name === 'light'));
+        dark.setAttribute('aria-pressed', String(name === 'dark'));
+        try { localStorage.setItem('jojo_admin_theme', name); } catch (e) {}
+      }
+      function setFont(name) {
+        document.documentElement.style.setProperty('--font-ui', stacks[name]);
+        try { localStorage.setItem('jojo_admin_font', name); } catch (e) {}
+      }
+      try {
+        var savedTheme = localStorage.getItem('jojo_admin_theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') setTheme(savedTheme);
+        var savedFont = localStorage.getItem('jojo_admin_font');
+        if (savedFont && stacks[savedFont]) {
+          font.value = savedFont;
+          setFont(savedFont);
+        }
+      } catch (e) {}
+      light.addEventListener('click', function () { setTheme('light'); });
+      dark.addEventListener('click', function () { setTheme('dark'); });
+      font.addEventListener('change', function () { setFont(font.value); });
+    })();
+  </script>
 </body>
 </html>

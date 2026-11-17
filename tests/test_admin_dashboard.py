@@ -36,7 +36,7 @@ class AdminDashboardTests(unittest.TestCase):
         html = self.client.get("/admin").get_data(as_text=True)
         self.assertIn("ada@example.com", html)
         self.assertIn("Registered accounts", html)
-        self.assertIn("registered accounts", html)
+        self.assertIn("registered readers", html)
         self.assertNotIn("password_hash", html)
         self.assertNotIn("scrypt:", html)
         self.assertNotIn("pbkdf2:", html)
@@ -119,7 +119,7 @@ class AdminDashboardTests(unittest.TestCase):
         })
         self._login_as_admin()
         html = self.client.get("/admin").get_data(as_text=True)
-        self.assertIn("<strong>1</strong> registered accounts", html)
+        self.assertIn("<strong>1</strong> registered readers", html)
         self.assertIn("<strong>1</strong> signed up in the last 7 days", html)
         self.assertIn("<strong>1</strong> feedback messages", html)
 

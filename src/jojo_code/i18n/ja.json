@@ -516,5 +516,7 @@
   "account.code_sent": "コードを送信しました。メールを確認してください。",
   "account.code_wrong": "コードが正しくないか、有効期限が切れています。",
   "account.confirm_code": "コードを確認",
-  "account.username_or_email": "ユーザー名またはメールアドレス"
+  "account.username_or_email": "ユーザー名またはメールアドレス",
+  "account.picture_drop": "ここに画像をドロップするか、Enter キーで選択してください",
+  "nav.save_cloud": "クラウドに保存"
 }

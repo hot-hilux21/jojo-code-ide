@@ -516,5 +516,7 @@
   "account.code_sent": "कोड भेज गया। अपना ईमेल देखें।",
   "account.code_wrong": "यह कोड गलत है या समाप्त हो गया।",
   "account.confirm_code": "कोड की पुष्टि करें",
-  "account.username_or_email": "उपयोगकर्ता नाम या ईमेल"
+  "account.username_or_email": "उपयोगकर्ता नाम या ईमेल",
+  "account.picture_drop": "यहाँ चित्र छोड़ें, या चुनने के लिए Enter दबाएँ",
+  "nav.save_cloud": "क्लाउड में सहेजें"
 }

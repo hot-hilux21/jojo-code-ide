@@ -516,5 +516,7 @@
   "account.code_sent": "验证码已发送。请查看邮件。",
   "account.code_wrong": "验证码错误或已过期。",
   "account.confirm_code": "确认验证码",
-  "account.username_or_email": "用户名或邮箱"
+  "account.username_or_email": "用户名或邮箱",
+  "account.picture_drop": "将图片拖到这里，或按 Enter 选择",
+  "nav.save_cloud": "保存到云端"
 }

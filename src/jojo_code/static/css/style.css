@@ -3321,3 +3321,34 @@ dialog[open] { animation: dialog-arrive var(--motion-med) var(--ease) both; }
    control in the app uses, so the override is gone. Two rules for one
    height is how the topbar and the setup screen drifted apart to begin
    with. The wizard's own answer rows are still set below. */
+
+/* Account picture. The drop box is the control; the file input stays in the
+   DOM only so a keyboard press or a click can open the picker. */
+.drop-zone {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border: 2px dashed var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-bg);
+  color: var(--fg);
+  text-align: center;
+  cursor: pointer;
+}
+.drop-zone:hover,
+.drop-zone.is-over {
+  border-color: var(--accent, var(--fg));
+}
+.drop-zone:focus-visible {
+  outline: 3px solid var(--accent, var(--fg));
+  outline-offset: 2px;
+}
+#account-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12ch;
+}

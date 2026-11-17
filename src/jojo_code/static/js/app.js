@@ -266,6 +266,15 @@
     return false;
   }
 
+  // A few counts on the maintainer's dashboard. Nothing leaves this server.
+  function recordEvent(event) {
+    fetch('/api/analytics/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: event, access_code: accessCode }),
+    }).catch(function () {});
+  }
+
   // ---------- CodeMirror setup ----------
   var editor = CodeMirror(editorEl, {
     mode: 'python',
@@ -298,6 +307,19 @@
       localStorage.setItem('jojo_code_autosave_name', autosaveName);
     } catch (e) { /* a blocked store is not worth a dialog */ }
   }
+  // Cloud autosave is offered only after the reader has made one explicit
+  // save. Until then there is no file to autosave into, and no reason to
+  // overwrite code that was never sent to the server.
+  var cloudSaveDone = (function () {
+    try { return localStorage.getItem('jojo_code_cloud_saved') === '1'; } catch (e) { return false; }
+  })();
+  function markCloudSaved() {
+    cloudSaveDone = true;
+    try { localStorage.setItem('jojo_code_cloud_saved', '1'); } catch (e) {}
+    var toggle = document.getElementById('btn-autosave');
+    if (toggle) toggle.hidden = false;
+  }
+  if (cloudSaveDone && window.CURRENT_USER) markCloudSaved();
   (function () {
     var AUTOSAVE_KEY = 'jojo_code_autosave';
     try {
@@ -319,20 +341,20 @@
      var timer = null;
      function pushCode() {
        var name = autosaveName;
-       if (!name) return;
+       if (!cloudSaveDone || !autosaveEnabled || !name) return;
        fetch('/api/user/files', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({ name: name, code: editor.getValue() }),
-       }).catch(function () {});
+       }).then(function () { updateLastSaved(); }).catch(function () {});
      }
      editor.on('change', function () {
        if (timer) clearTimeout(timer);
        timer = setTimeout(pushCode, 2000);
      });
-     // The saved file comes back on load, so the reader finds their work
-     // where they left it.
-     var saved = autosaveName;
+     // Only restore a cloud copy after an explicit save. On a first visit
+     // the local code must win.
+     var saved = cloudSaveDone ? autosaveName : '';
      if (!saved) return;
      fetch('/api/user/files/' + encodeURIComponent(saved)).then(function (r) { return r.json(); }).then(function (d) {
        if (d && d.success && typeof d.code === 'string' && d.code.trim()) {
@@ -1652,6 +1674,7 @@
           feedbackStatus.textContent = response.ok ? t('settings.saved') : t('settings.save_failed');
         }
         if (response.ok) {
+          recordEvent('feedback_sent');
           if (feedbackPositive) feedbackPositive.value = '';
           if (feedbackNegative) feedbackNegative.value = '';
         }
@@ -1735,7 +1758,7 @@
     acctPost('/api/auth/login', { username: acctUsername.value, password: acctPassword.value })
       .then(function (r) {
         if (acctStatus) acctStatus.textContent = r.ok ? t('account.status_logged_in') : acctError(r.data);
-        if (r.ok) window.location.reload();
+        if (r.ok) { recordEvent('login'); window.location.reload(); }
       });
   });
   var acctForgot = document.getElementById('acct-forgot');
@@ -1755,7 +1778,7 @@
     var done = otpPurpose === 'register' ? 'account.status_registered' : 'account.password_changed';
     acctPost(url, body).then(function (r) {
       if (acctStatus) acctStatus.textContent = r.ok ? t(done) : acctError(r.data);
-      if (r.ok && otpPurpose === 'register') window.location.reload();
+      if (r.ok && otpPurpose === 'register') { recordEvent('signup'); window.location.reload(); }
     });
   });
   var acctUsernameSave = document.getElementById('acct-username-save');
@@ -1897,6 +1920,7 @@
         }
         if (acctFileName) acctFileName.value = '';
         loadAccountFiles();
+        recordEvent('file_saved');
         sayServerStatus(t('account.file_saved'));
       }).catch(function () { sayServerStatus(t('account.failed')); });
     });
@@ -2039,7 +2063,10 @@
   var profileClose = document.getElementById('profile-close');
   var accountPicture = document.getElementById('acct-picture');
   var accountPictureStatus = document.getElementById('acct-picture-status');
+  var avatarDrop = document.getElementById('avatar-drop');
   var accountAvatar = document.getElementById('account-avatar');
+  var accountName = document.getElementById('account-name');
+  var accountButtonIcon = document.querySelector('#account-btn .btn-icon');
 
   function closeAccountMenu() {
     if (!accountMenu) return;
@@ -2122,9 +2149,16 @@
     if (dataUrl) {
       accountAvatar.src = dataUrl;
       accountAvatar.style.display = '';
+      if (accountButtonIcon) accountButtonIcon.hidden = true;
+      if (accountName) {
+        accountName.textContent = window.CURRENT_USER || '';
+        accountName.hidden = !window.CURRENT_USER;
+      }
     } else {
       accountAvatar.removeAttribute('src');
       accountAvatar.style.display = 'none';
+      if (accountButtonIcon) accountButtonIcon.hidden = false;
+      if (accountName) accountName.hidden = true;
     }
   }
 
@@ -2135,37 +2169,64 @@
     }).catch(function () {});
   }
 
+  function uploadAvatarFile(file) {
+    if (!file) return;
+    if (file.size > 300000) {
+      if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_too_big');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var dataUrl = reader.result;
+      fetch('/api/user/avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: dataUrl }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || !d.success) {
+          if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+          return;
+        }
+        showAccountAvatar(dataUrl);
+        recordEvent('avatar_uploaded');
+        if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_saved');
+      }).catch(function () {
+        if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+      });
+    };
+    reader.onerror = function () {
+      if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
+    };
+    reader.readAsDataURL(file);
+  }
+
   if (accountPicture) {
     accountPicture.addEventListener('change', function () {
-      var file = accountPicture.files && accountPicture.files[0];
-      if (!file) return;
-      if (file.size > 300000) {
-        if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_too_big');
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function () {
-        var dataUrl = reader.result;
-        fetch('/api/user/avatar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ avatar: dataUrl }),
-        }).then(function (r) { return r.json(); }).then(function (d) {
-          if (!d || !d.success) {
-            if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
-            return;
-          }
-          showAccountAvatar(dataUrl);
-          if (accountPictureStatus) accountPictureStatus.textContent = t('account.picture_saved');
-        }).catch(function () {
-          if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
-        });
-      };
-      reader.onerror = function () {
-        if (accountPictureStatus) accountPictureStatus.textContent = t('account.failed');
-      };
-      reader.readAsDataURL(file);
+      uploadAvatarFile(accountPicture.files && accountPicture.files[0]);
       accountPicture.value = '';
+    });
+  }
+  if (avatarDrop) {
+    avatarDrop.addEventListener('click', function () {
+      if (accountPicture) accountPicture.click();
+    });
+    avatarDrop.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (accountPicture) accountPicture.click();
+      }
+    });
+    avatarDrop.addEventListener('dragover', function (event) {
+      event.preventDefault();
+      avatarDrop.classList.add('is-over');
+    });
+    avatarDrop.addEventListener('dragleave', function () {
+      avatarDrop.classList.remove('is-over');
+    });
+    avatarDrop.addEventListener('drop', function (event) {
+      event.preventDefault();
+      avatarDrop.classList.remove('is-over');
+      uploadAvatarFile(event.dataTransfer && event.dataTransfer.files[0]);
     });
   }
 
@@ -3315,6 +3376,7 @@
   function runCode() {
     pendingAnswers = [];
     answersForCode = null;
+    recordEvent('code_run');
     startRun();
   }
 
@@ -4054,24 +4116,50 @@
   var btnUndo = document.getElementById('btn-undo');
   var btnRedo = document.getElementById('btn-redo');
   var btnAutoSave = document.getElementById('btn-autosave');
+  var btnSaveCloud = document.getElementById('btn-save-cloud');
   if (btnUndo) btnUndo.addEventListener('click', function () { if (editor) editor.undo(); });
   if (btnRedo) btnRedo.addEventListener('click', function () { if (editor) editor.redo(); });
-  if (btnAutoSave) btnAutoSave.addEventListener('click', function () {
-    // Autosave writes to a named file on the server, so a name is needed
-    // before it can be turned on. Without one the button opens the account
-    // box on that field rather than switching on something that saves
-    // nowhere.
-    if (autosaveEnabled && !autosaveName) {
-      // already on but nothing to save: turn it off again
-      setAutosaveEnabled(false);
+
+  function syncAutosaveButton() {
+    if (!btnAutoSave) return;
+    btnAutoSave.setAttribute('aria-pressed', autosaveEnabled ? 'true' : 'false');
+    btnAutoSave.classList.toggle('active', autosaveEnabled);
+  }
+  syncAutosaveButton();
+
+  function saveToCloud() {
+    if (!window.CURRENT_USER) {
+      if (accountModal) accountModal.style.display = 'flex';
       return;
     }
-    if (!autosaveEnabled && !autosaveName) {
+    var name = autosaveName;
+    if (!name) {
+      if (accountModal) accountModal.style.display = 'flex';
+      if (acctAutosaveName) acctAutosaveName.focus();
+      return;
+    }
+    fetch('/api/user/files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, code: editor.getValue() }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.success) return;
+      markCloudSaved();
+      setAutosaveEnabled(true);
+      syncAutosaveButton();
+      updateLastSaved();
+      recordEvent('cloud_saved');
+    }).catch(function () {});
+  }
+  if (btnSaveCloud) btnSaveCloud.addEventListener('click', saveToCloud);
+  if (btnAutoSave) btnAutoSave.addEventListener('click', function () {
+    if (!cloudSaveDone || !autosaveName) {
       if (accountModal) accountModal.style.display = 'flex';
       if (acctAutosaveName) acctAutosaveName.focus();
       return;
     }
     setAutosaveEnabled(!autosaveEnabled);
+    syncAutosaveButton();
   });
 
   // Save and open. The save button had no listener at all in this branch,

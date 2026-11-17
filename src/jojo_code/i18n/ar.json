@@ -516,5 +516,7 @@
   "account.code_sent": "تم إرسال الرمز. تحقق من بريدك الإلكتروني.",
   "account.code_wrong": "الرمز غير صحيح أو منتهي الصلاحية.",
   "account.confirm_code": "تأكيد الرمز",
-  "account.username_or_email": "اسم المستخدم أو البريد الإلكتروني"
+  "account.username_or_email": "اسم المستخدم أو البريد الإلكتروني",
+  "account.picture_drop": "أفلت صورة هنا أو اضغط Enter لاختيار صورة",
+  "nav.save_cloud": "حفظ في السحابة"
 }

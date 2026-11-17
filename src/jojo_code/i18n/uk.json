@@ -516,5 +516,7 @@
   "account.code_sent": "Код надіслано. Перевірте пошту.",
   "account.code_wrong": "Неправильний код або термін дії минув.",
   "account.confirm_code": "Підтвердити код",
-  "account.username_or_email": "Ім'я користувача або електронна пошта"
+  "account.username_or_email": "Ім'я користувача або електронна пошта",
+  "account.picture_drop": "Перетягніть зображення сюди або натисніть Enter, щоб вибрати",
+  "nav.save_cloud": "Зберегти в хмару"
 }

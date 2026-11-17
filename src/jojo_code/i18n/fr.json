@@ -516,5 +516,7 @@
   "account.code_sent": "Code envoyé. Vérifiez vos e-mails.",
   "account.code_wrong": "Ce code est incorrect ou a expiré.",
   "account.confirm_code": "Confirmer le code",
-  "account.username_or_email": "Nom d'utilisateur ou e-mail"
+  "account.username_or_email": "Nom d'utilisateur ou e-mail",
+  "account.picture_drop": "Déposez une image ici, ou appuyez sur Entrée pour en choisir une",
+  "nav.save_cloud": "Enregistrer dans le cloud"
 }

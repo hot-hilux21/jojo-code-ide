@@ -327,8 +327,10 @@
               title="{{ t('nav.undo_title') }}" aria-label="{{ t('nav.undo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('undo') }}</span><span class="btn-label">{{ t('nav.undo') }}</span></button>
       <button type="button" class="btn btn-small pane-indent" id="btn-redo"
               title="{{ t('nav.redo_title') }}" aria-label="{{ t('nav.redo') }}"><span class="btn-icon" aria-hidden="true">{{ icon('redo') }}</span><span class="btn-label">{{ t('nav.redo') }}</span></button>
-      <button type="button" class="btn btn-small pane-indent" id="btn-autosave"
+      <button type="button" class="btn btn-small pane-indent" id="btn-save-cloud"
               {% if not current_user %}hidden{% endif %}
+              title="{{ t('nav.save_cloud') }}" aria-label="{{ t('nav.save_cloud') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.save_cloud') }}</span></button>
+      <button type="button" class="btn btn-small pane-indent" id="btn-autosave" hidden
               title="{{ t('nav.autosave_title') }}" aria-label="{{ t('nav.autosave') }}"><span class="btn-icon" aria-hidden="true">{{ icon('save') }}</span><span class="btn-label">{{ t('nav.autosave') }}</span></button>
       <span class="pane-gutter-label" id="last-saved-time">{{ t('nav.last_saved_never') }}</span>
     </span>
@@ -1790,6 +1792,7 @@
             style="display:inline-flex;align-items:center;gap:0.3rem;padding:var(--space-1) var(--space-3);">
       <span class="btn-icon" aria-hidden="true">{{ icon('user') }}</span>
       <img id="account-avatar" alt="" width="18" height="18" style="display:none;border-radius:50%;object-fit:cover;">
+      <span id="account-name" hidden></span>
     </button>
   </div>
   {# The profile menu. Signed out it offers the way in; signed in it offers
@@ -1880,9 +1883,13 @@
         <p id="acct-username-status" class="acct-status" aria-live="polite"></p>
       </div>
       <div class="field">
-        <label for="acct-picture">{{ t('account.picture') }}</label>
-        <input id="acct-picture" type="file" accept="image/*">
-        <p class="field-help">{{ t('account.picture_help') }}</p>
+        <span id="picture-label">{{ t('account.picture') }}</span>
+        <div id="avatar-drop" class="drop-zone" role="button" tabindex="0"
+             aria-labelledby="picture-label" aria-describedby="picture-help">
+          {{ t('account.picture_drop') }}
+        </div>
+        <input id="acct-picture" type="file" accept="image/*" hidden>
+        <p class="field-help" id="picture-help">{{ t('account.picture_help') }}</p>
         <p id="acct-picture-status" aria-live="polite"></p>
       </div>
       <div class="field">
