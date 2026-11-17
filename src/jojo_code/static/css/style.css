@@ -1188,7 +1188,19 @@ body[data-focus-drawer="open"] .pane-fade .mini-field {
   align-items: stretch;
   gap: var(--space-1);
 }
-body[data-focus-drawer="open"] .focus-drawer-close { display: inline-flex; }
+body[data-focus-drawer="open"] .focus-drawer-close {
+  display: inline-flex;
+  align-self: flex-end;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-bg);
+  color: var(--fg);
+  border: 1px solid var(--panel-border);
+}
+body[data-focus-drawer="open"] .focus-drawer-close:hover,
+body[data-focus-drawer="open"] .focus-drawer-close:focus-visible { color: var(--accent); }
 body[data-focus-drawer="closed"] .pane-fade { display: none; }
 body[data-focus-drawer="closed"] .focus-drawer-tab {
   display: flex;
@@ -3435,6 +3447,45 @@ dialog[open] { animation: dialog-arrive var(--motion-med) var(--ease) both; }
   border-radius: var(--radius-sm);
   color: var(--muted);
 }
+/* Native file inputs draw a white "Choose File" button that ignores the
+   theme. Style the selector button with the same tokens as every other
+   control so it reads in dark mode and keeps the 44px target. */
+input[type="file"] {
+  color: var(--fg);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  max-width: 100%;
+}
+input[type="file"]::file-selector-button {
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  margin-right: var(--space-2);
+  color: var(--fg);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover,
+input[type="file"]::file-selector-button:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+input[type="file"]::-webkit-file-upload-button {
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  margin-right: var(--space-2);
+  color: var(--fg);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  cursor: pointer;
+}
+
 .badge.earned { color: var(--fg); border-color: var(--accent); }
 .progress-track {
   height: 12px;

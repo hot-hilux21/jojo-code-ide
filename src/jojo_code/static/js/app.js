@@ -5415,8 +5415,23 @@
     focusDrawerClose.addEventListener('click', function () { setFocusDrawer(false, true); });
   }
   if (focusDrawerTab) {
-    focusDrawerTab.addEventListener('click', function () { setFocusDrawer(true, true); });
+    focusDrawerTab.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setFocusDrawer(true, true);
+    });
   }
+  // A click outside the drawer closes it, the way a popover does. The tab and
+  // the drawer stop the event so their own controls do not close it.
+  document.addEventListener('click', function (e) {
+    if (body.getAttribute('data-focus-drawer') !== 'open') return;
+    if (e.target.closest && e.target.closest('#pane-fade, #focus-drawer-tab')) return;
+    setFocusDrawer(false, false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && body.getAttribute('data-focus-drawer') === 'open') {
+      setFocusDrawer(false, true);
+    }
+  });
   if (btnExitFocus) btnExitFocus.addEventListener('click', function () {
     applyFocusMode('off');
     saveConfig({ focus_mode: 'off' });
