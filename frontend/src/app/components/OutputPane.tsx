@@ -1,0 +1,43 @@
+import type { Workspace } from "../hooks/useWorkspace";
+
+export function OutputPane({ workspace }: { workspace: Workspace }) {
+  const { result, answer, setAnswer, answerQuestion, status } = workspace;
+  return (
+    <section className="workspace-pane" aria-labelledby="output-heading">
+      <header id="output-heading" className="font-semibold">
+        Output
+      </header>
+      <div className="pane-scroll" role="log" aria-live="polite">
+        <div>{result.output || (result.stopped ? "Stopped." : "")}</div>
+        {result.error ? <div className="error-text">{result.error}</div> : null}
+        {status ? <div className="error-text">{status}</div> : null}
+        {result.awaiting_answer ? (
+          <form
+            className="mt-3 flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void answerQuestion();
+            }}
+          >
+            <label className="sr-only" htmlFor="answer-input">
+              Answer the program's question
+            </label>
+            <input
+              id="answer-input"
+              className="min-h-11 flex-1 rounded-md border border-panel-border bg-background px-2 text-foreground"
+              value={answer}
+              onChange={(event) => setAnswer(event.target.value)}
+              autoComplete="off"
+            />
+            <button
+              type="submit"
+              className="min-h-11 rounded-md border border-panel-border bg-panel px-3 text-foreground"
+            >
+              Send
+            </button>
+          </form>
+        ) : null}
+      </div>
+    </section>
+  );
+}

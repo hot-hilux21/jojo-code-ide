@@ -1,0 +1,150 @@
+/* Locked viewport shell. Only panes scroll; the controls never move. */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-shell {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.app-btn-label {
+  display: var(--btn-label-display, inline);
+}
+
+.top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  min-height: 56px;
+}
+
+.workspace {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-3, 0.75rem);
+  overflow: hidden;
+}
+
+.workspace-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm, 9px);
+  background: var(--panel-bg);
+  overflow: hidden;
+}
+
+.workspace-pane > header {
+  flex: 0 0 auto;
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.workspace-pane > .pane-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-3, 0.75rem);
+  font-family: var(--font-output, var(--font-mono, monospace));
+  font-size: var(--font-size, 16px);
+  line-height: var(--line-height, 1.5);
+  letter-spacing: var(--letter-spacing, 0.5px);
+  word-spacing: var(--word-spacing, 0.5px);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.editor-pane {
+  flex: 1 1 55%;
+}
+.editor-pane .pane-scroll {
+  padding: 0;
+  overflow: hidden;
+  font-family: var(--font-code, sans-serif);
+}
+
+.right-column {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* CodeMirror reads the same tokens as the rest of the app. */
+.editor-pane .cm-editor {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-code, sans-serif);
+  font-size: var(--font-size, 16px);
+  line-height: var(--line-height, 1.5);
+  letter-spacing: var(--letter-spacing, 0.5px);
+  word-spacing: var(--word-spacing, 0.5px);
+}
+.editor-pane .cm-gutters {
+  background: var(--gutter-bg, var(--panel-bg));
+  color: var(--gutter-fg, var(--muted));
+  border-right: 1px solid var(--panel-border);
+}
+.editor-pane .cm-activeLine,
+.editor-pane .cm-activeLineGutter {
+  background: var(--highlight, var(--panel-bg));
+}
+.editor-pane .cm-content {
+  caret-color: var(--cursor, var(--fg));
+}
+.editor-pane .cm-selectionBackground {
+  background: var(--selection, var(--accent)) !important;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.data-table th,
+.data-table td {
+  padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+  border-bottom: 1px solid var(--panel-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.error-text {
+  color: var(--accent, var(--fg));
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    flex-direction: column;
+  }
+  .editor-pane,
+  .right-column {
+    flex: 1 1 50%;
+  }
+}
+
+/* Reduced motion is a preference from Settings, mirrored on :root. */
+:root[data-reduce-motion="true"] * {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}

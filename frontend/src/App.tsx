@@ -516,6 +516,14 @@ export default function App() {
               <CardDescription>Your code, ready to run.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => void saveConfig({ ui_backend: "react" })}
+                >
+                  Try the new UI
+                </Button>
+              </div>
               <div className="flex gap-2">
                 <ShimmerButton
                   onClick={async () => {
