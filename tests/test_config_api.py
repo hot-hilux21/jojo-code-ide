@@ -19,10 +19,6 @@ import re
 import sys
 import tempfile
 import unittest
-from tests.legacy_ui import use_legacy_ui
-
-use_legacy_ui(globals())
-
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = str(REPO_ROOT / "src")
 if SRC not in sys.path:
