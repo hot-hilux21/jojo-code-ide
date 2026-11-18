@@ -101,8 +101,6 @@
   "focus.lines": "Atenuar las otras líneas al pasar el cursor",
   "focus.mode": "Modo enfoque",
   "focus.off": "Desactivado",
-  "focus.scope": "Alcance del desenfoque",
-  "focus.scope_help": "Elige si el desenfoque cubre solo el editor o todos los paneles. Desactivado mantiene todo nítido.",
   "focus.type": "Estilo de desvanecimiento",
   "focus.type_blur": "Desenfoque",
   "focus.type_fade": "Atenuar",

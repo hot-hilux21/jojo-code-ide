@@ -94,7 +94,6 @@ CONFIG_LABELS = {
     "theme": "colours.theme",
     "focus_mode": "focus.mode",
     "blur_intensity": "focus.fade",
-    "blur_scope": "focus.scope",
     "contrast": "colours.contrast",
     "reduce_motion": "motion.label",
     "glass_material": "glass.material_label",

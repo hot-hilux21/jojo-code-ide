@@ -101,8 +101,6 @@
   "focus.lines": "Code only",
   "focus.mode": "Focus mode",
   "focus.off": "Off",
-  "focus.scope": "Blur scope",
-  "focus.scope_help": "Choose whether blur covers only the editor or every pane. Off keeps everything sharp.",
   "focus.type": "Fade style",
   "focus.type_blur": "Blur",
   "focus.type_fade": "Dim",

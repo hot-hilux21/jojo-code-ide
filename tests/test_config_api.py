@@ -119,30 +119,31 @@ class NewSettingsTests(ConfigApiTestCase):
         self.assertEqual(stored["letter_spacing"], 1.5)
         self.assertEqual(stored["blur_intensity"], 0.75)
 
-    def test_blur_scope_defaults_off_and_round_trips(self):
-        self.assertEqual(self.get_settings()["blur_scope"], "off")
-        for value in ("off", "code", "all"):
-            with self.subTest(blur_scope=value):
-                response = self.post_settings(blur_scope=value)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(self.get_settings()["blur_scope"], value)
-
-    def test_blur_scope_rejects_an_unknown_value(self):
-        response = self.post_settings(blur_scope="everywhere")
+    def test_blur_scope_is_no_longer_a_setting(self):
+        # Focus mode alone decides whether fading shows. A stale saved scope
+        # must not be accepted as a valid setting again.
+        self.assertNotIn("blur_scope", routes.DEFAULT_CONFIG)
+        self.assertNotIn("blur_scope", routes.CONFIG_TYPES)
+        response = self.post_settings(blur_scope="all")
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(self.get_settings()["blur_scope"], "off")
+        self.assertNotIn("blur_scope", self.get_settings())
 
 
-class BlurScopeMigrationTests(ConfigApiTestCase):
-    def test_an_old_focus_mode_keeps_its_old_reach(self):
-        # A reader who had already chosen fading must not wake up to a sharp
-        # screen because a new setting appeared with an off default.
-        for mode, scope in (("lines", "code"), ("fade", "all"), ("gutter", "off")):
-            with self.subTest(focus_mode=mode):
-                routes.CONFIG_FILE.write_text(
-                    json.dumps({"focus_mode": mode}), encoding="utf-8"
-                )
-                self.assertEqual(routes.load_config()["blur_scope"], scope)
+class FocusModeOnlyTests(ConfigApiTestCase):
+    def test_a_saved_scope_cannot_override_focus_mode(self):
+        # A file from the old build may still carry blur_scope. It is ignored
+        # by the app and dropped from exported backups; focus mode is what
+        # turns the saved fade style and amount on.
+        routes.CONFIG_FILE.write_text(
+            json.dumps({"focus_mode": "fade", "blur_scope": "off"}), encoding="utf-8"
+        )
+        config = routes.load_config()
+        self.assertEqual(config["focus_mode"], "fade")
+        self.assertEqual(config["blur_type"], "fade")
+        exported = json.loads(
+            self.client.get("/api/config/export").get_data(as_text=True)
+        )
+        self.assertNotIn("blur_scope", exported["config"])
 
 
 class SetupWizardSettingsTests(ConfigApiTestCase):

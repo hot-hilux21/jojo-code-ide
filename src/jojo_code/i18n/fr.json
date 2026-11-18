@@ -101,8 +101,6 @@
   "focus.lines": "Estomper les autres lignes au survol",
   "focus.mode": "Mode concentration",
   "focus.off": "Désactivé",
-  "focus.scope": "Portée du flou",
-  "focus.scope_help": "Choisissez si le flou couvre uniquement l'éditeur ou tous les panneaux. Désactivé garde tout net.",
   "focus.type": "Style d'estompage",
   "focus.type_blur": "Flou",
   "focus.type_fade": "Atténuer",

@@ -9,9 +9,11 @@ the one being released.
 
 ## Unreleased
 
-- Blur scope: off by default, with code-only and all-panes choices. The same
-  control sits in Settings → Focus and in the editor's focus drawer, so blur
-  can be limited without changing the remembered focus mode.
+- Focus mode is now the only switch for fading. The blur scope dropdown was
+  removed: it could leave blur on while focus was off. The chosen fade style
+  and amount stay saved and come back when focus is turned on again.
+- Settings export drops keys from older builds, so a saved backup can always
+  be loaded again.
 - Automated accessibility checks for dialog names, live regions and control
   labels. A human screen-reader pass is still open.
 - Documentation now matches the app: the web app has email accounts and

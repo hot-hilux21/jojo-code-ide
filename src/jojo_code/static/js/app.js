@@ -95,12 +95,9 @@
   var themeSelect = document.getElementById('theme-select');
   var contrastSelect = document.getElementById('contrast-select');
   var focusMode = document.getElementById('focus-mode');
-  // The blur scope is a master switch: off, code only or all panes. It has a
-  // copy in Settings and in the editor strip; both write one saved value.
-  var blurScope = document.getElementById('blur-scope');
-  var paneBlurScope = document.getElementById('pane-blur-scope');
   // Fade style: dim everything back, or soften it with a blur. One saved
-  // value, with a copy in the editor strip.
+  // value, with a copy in the editor strip. Focus mode alone decides when
+  // it shows; off and gutter leave the screen sharp.
   var blurType = document.getElementById('blur-type');
   var paneBlurType = document.getElementById('pane-blur-type');
   // The fade dropdown in the editor strip's top right, plus the sliders that
@@ -1392,12 +1389,6 @@
   // otherwise a reader who hid the numbers while using "fade other lines"
   // would get plain "off" back and lose a setting they never touched.
   var lastVisibleFocusMode = 'off';
-
-  function applyBlurScope(scope) {
-    body.setAttribute('data-blur-scope', scope);
-    if (blurScope && blurScope.value !== scope) blurScope.value = scope;
-    if (paneBlurScope && paneBlurScope.value !== scope) paneBlurScope.value = scope;
-  }
 
   // The two style dropdowns are views of one setting. Whichever the reader
   // uses, both land on the same saved value and the body tells the
@@ -5419,16 +5410,6 @@
     });
   }
 
-  // Both copies of the scope write the one value, so the Settings panel and
-  // the editor strip cannot describe two different screens.
-  [blurScope, paneBlurScope].forEach(function (select) {
-    if (!select) return;
-    select.addEventListener('change', function () {
-      applyBlurScope(select.value);
-      saveConfig({ blur_scope: select.value });
-    });
-  });
-
   [blurType, paneBlurType].forEach(function (select) {
     if (!select) return;
     select.addEventListener('change', function () {
@@ -6785,7 +6766,6 @@
   applyWordSpacing(body.getAttribute('data-word-spacing') || '0.5');
   paintStepperLimits();
   applyBlurIntensity(parseFloat(body.getAttribute('data-blur-intensity') || '0.5'));
-  applyBlurScope(body.getAttribute('data-blur-scope') || 'off');
   applyBlurType(body.getAttribute('data-blur-type') || 'fade');
   applyFocusMode(body.getAttribute('data-focus-mode') || 'off');
   syncBlurField();

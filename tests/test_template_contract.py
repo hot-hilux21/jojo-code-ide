@@ -55,7 +55,6 @@ REQUIRED_SETTINGS_IDS = (
     "blur-intensity",
     "blur-intensity-label",
     "blur-field",
-    "blur-scope",
     "theme-select",
     "contrast-select",
     "theme-gradient",
@@ -572,18 +571,14 @@ class AccessibilityMarkupTests(RenderedPageFixture):
         self.assertIn('aria-live="polite"', self.html)
         self.assertIn('role="alert"', self.html)
 
-    def test_blur_scope_controls_are_labelled_and_offered_twice(self):
-        for control in ("blur-scope", "pane-blur-scope"):
-            with self.subTest(control=control):
-                self.assertIn(control, self.html_ids)
-                self.assertIn(f'<label for="{control}"', self.html)
-        select = re.search(
-            r'<select id="blur-scope"[^>]*>.*?</select>', self.html, re.S
-        )
-        self.assertIsNotNone(select)
-        assert select is not None
-        for value in ("off", "code", "all"):
-            self.assertIn(f'value="{value}"', select.group(0))
+    def test_no_blur_scope_control_remains(self):
+        # Focus mode is the only switch. A second scope dropdown was the
+        # source of "blur on, focus off" screens that never focused.
+        self.assertNotIn("blur-scope", self.html_ids)
+        self.assertNotIn("pane-blur-scope", self.html_ids)
+        self.assertNotIn("data-blur-scope", self.html)
+        self.assertNotIn("blur-scope", self.css)
+        self.assertNotIn("blur-scope", self.js)
 
 
 class UpdatePanelTests(RenderedPageFixture):

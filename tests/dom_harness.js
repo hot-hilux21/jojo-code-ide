@@ -57,7 +57,6 @@ const KNOWN_IDS = new Set([
   'ui-backend', 'ui-backend-help',
   'blur-intensity', 'blur-intensity-label',
   'blur-field', 'theme-select', 'contrast-select', 'focus-mode',
-  'blur-scope', 'pane-blur-scope',
   'blur-type', 'pane-blur-type',
   'pane-fade-mode', 'pane-editor-blur', 'pane-editor-blur-label',
   'fade-output', 'fade-output-label', 'fade-shell', 'fade-shell-label',
@@ -415,7 +414,6 @@ function makeElement(id, extraAttributes = {}, extraProps = {}) {
     'data-line-height': '1.6',
     'data-letter-spacing': '0.5',
     'data-blur-intensity': '0.5',
-    'data-blur-scope': 'off',
     'data-blur-type': 'fade',
     'data-focus-mode': 'off',
     'data-contrast': 'normal',
@@ -1733,26 +1731,6 @@ if (missingAttrs.length) {
   console.log('     body received ' + savedSettings.join(', '));
 }
 
-// Blur scope has a copy in Settings and in the editor strip. Changing one
-// has to move the other and save the one value the server validates.
-const scopeSelect = elements.get('pane-blur-scope');
-if (!scopeSelect) {
-  failed = true;
-  console.log('FAIL the editor strip has no blur scope control');
-} else {
-  scopeSelect.value = 'all';
-  for (const handler of scopeSelect.__listeners['change'] || []) handler(fakeEvent);
-  const settingsSelect = elements.get('blur-scope');
-  if (documentStub.body.__attributes['data-blur-scope'] !== 'all' ||
-      !settingsSelect || settingsSelect.value !== 'all' ||
-      !configPosts.some((post) => post.blur_scope === 'all')) {
-    failed = true;
-    console.log('FAIL blur scope did not move both controls and save');
-  } else {
-    console.log('     blur scope keeps both controls in step and saves');
-  }
-}
-
 // Fade style has a copy in Settings and in the strip as well. Changing
 // either must move the other and save the one value the server validates.
 const typeSelect = elements.get('pane-blur-type');
@@ -1771,6 +1749,15 @@ if (!typeSelect) {
   } else {
     console.log('     fade style keeps both controls in step and saves');
   }
+}
+
+// Focus mode is the only switch for fading. No scope attribute may be
+// written, so an old "blur on, focus off" combination cannot happen.
+if ('data-blur-scope' in documentStub.body.__attributes) {
+  failed = true;
+  console.log('FAIL a blur scope attribute was written to the page');
+} else {
+  console.log('     no blur scope: focus mode alone controls the fade');
 }
 
 const missing = [...KNOWN_IDS].filter((id) => !lookups.includes(id));

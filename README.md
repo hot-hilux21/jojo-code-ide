@@ -42,7 +42,7 @@ Jump to any section:
 - **Execution** — built-in Python runner (10-second safety timeout)
 - **Fonts** — OpenDyslexic by default, plus Atkinson Hyperlegible, Lexend, Nunito and Andika for dyslexia-friendly reading. Calibri, Arial, Comic Sans and Courier New come from your own computer.
 - **Languages** — English, Hindi, French, Spanish, Portuguese, Russian, Korean, Japanese, Chinese, Greek, Arabic, Hijazi Arabic and Ukrainian, with right-to-left layout for Arabic.
-- **Focus mode** — hide the gutter, or blur every line except the one you are on; blur scope sets off, code only or all panes, and fade style chooses dim or blur, from Settings or the editor strip
+- **Focus mode** — hide the gutter, or blur every line except the one you are on; focus mode is the only switch for fading, and fade style chooses dim or blur, from Settings or the editor strip
 - **Themes** — 15 presets (high contrast, dark, pastel, light, ocean, forest, white, AMOLED, red, orange, yellow, green, blue, indigo, violet), a custom theme builder with a hex colour grid, and a per-colour reset
 - **Text size and spacing** — separate size, line height and letter spacing for the editor, output and shell
 - **Reading ruler** — a shaded band follows your pointer over the code, so one line stays easy to follow without moving the caret
@@ -488,7 +488,7 @@ Coming next:
 
 ## Roadmap
 
-- **Now** — editor, runner, save/open, fonts, focus mode, blur scope, themes, plain errors, error line highlighting
+- **Now** — editor, runner, save/open, fonts, focus mode, themes, plain errors, error line highlighting
 - **Next** — more text-to-speech options, automated and human accessibility checks
 - **Later** — multi-file projects and Linux packaging, if users ask for them; linter, Jupyter and plugins are open ideas, not promises
 

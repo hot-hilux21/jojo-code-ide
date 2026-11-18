@@ -101,8 +101,6 @@
   "focus.lines": "只看代码",
   "focus.mode": "专注模式",
   "focus.off": "关",
-  "focus.scope": "模糊范围",
-  "focus.scope_help": "选择模糊只应用于编辑器还是所有面板。关闭时所有内容保持清晰。",
   "focus.type": "淡出样式",
   "focus.type_blur": "模糊",
   "focus.type_fade": "变暗",

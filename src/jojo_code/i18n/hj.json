@@ -101,8 +101,6 @@
   "focus.lines": "الشيفرة فقط",
   "focus.mode": "وضع التركيز",
   "focus.off": "إيقاف",
-  "focus.scope": "نطاق التمويه",
-  "focus.scope_help": "اختر إذا التمويه يغطي المحرر بس أو كل اللوحات. إيقافه يخلي كل شيء واضح.",
   "focus.type": "طريقة التلاشي",
   "focus.type_blur": "تمويه",
   "focus.type_fade": "تعتيم",

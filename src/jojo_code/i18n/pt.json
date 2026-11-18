@@ -101,8 +101,6 @@
   "focus.lines": "Somente o código",
   "focus.mode": "Modo Foco",
   "focus.off": "Desligado",
-  "focus.scope": "Escopo do desfoque",
-  "focus.scope_help": "Escolha se o desfoque cobre apenas o editor ou todos os painéis. Desativado mantém tudo nítido.",
   "focus.type": "Estilo de esmaecimento",
   "focus.type_blur": "Desfoque",
   "focus.type_fade": "Escurecer",

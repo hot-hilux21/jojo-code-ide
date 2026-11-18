@@ -101,8 +101,6 @@
   "focus.lines": "코드만",
   "focus.mode": "집중 모드",
   "focus.off": "꺼짐",
-  "focus.scope": "블러 범위",
-  "focus.scope_help": "블러를 편집기에만 적용할지 모든 창에 적용할지 선택하세요. 끄면 모든 것이 선명하게 유지됩니다.",
   "focus.type": "흐리게 표시하는 방식",
   "focus.type_blur": "블러",
   "focus.type_fade": "흐리게",

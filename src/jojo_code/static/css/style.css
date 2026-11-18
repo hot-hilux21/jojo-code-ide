@@ -1244,33 +1244,33 @@ body[data-focus-drawer="closed"] .focus-drawer-tab:focus-visible { color: var(--
    control itself stays bright as well: its sliders are what bring the
    other surfaces back up, and it would not do for them to go murky
    along with everything they adjust. */
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]) {
+body[data-focus-mode="fade"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]) {
   opacity: 0.4;
   transition: opacity var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):hover,
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus,
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus-within {
+body[data-focus-mode="fade"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):hover,
+body[data-focus-mode="fade"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus,
+body[data-focus-mode="fade"][data-blur-type="fade"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus-within {
   opacity: 1;
 }
 /* The blur style keeps every element opaque and softens it instead. The
    amount comes from the same slider, capped low so nested elements do not
    compound into an unreadable smear. */
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]) {
+body[data-focus-mode="fade"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]) {
   filter: blur(var(--blur-px, 1.25px));
   transition: filter var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):hover,
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus,
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus-within {
+body[data-focus-mode="fade"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):hover,
+body[data-focus-mode="fade"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus,
+body[data-focus-mode="fade"][data-blur-type="blur"] :not(.CodeMirror):not(.CodeMirror-gutter):not(.output-pane):not(.shell-pane):not(.pane-fade):not([role="dialog"]):not(dialog[open]):focus-within {
   filter: none;
 }
 /* A control is one thing under the pointer. Light up the whole box when
    any part of it is hovered - icon, words or empty space - rather than
    leaving the glyph the pointer missed faded. :has does the same for focus
    moving between a button and the words inside it. */
-body[data-focus-mode="fade"][data-blur-scope="all"] :is(.btn, .tool-group, .pane-mini):has(:hover),
-body[data-focus-mode="fade"][data-blur-scope="all"] :is(.btn, .tool-group, .pane-mini):has(:hover) * {
+body[data-focus-mode="fade"] :is(.btn, .tool-group, .pane-mini):has(:hover),
+body[data-focus-mode="fade"] :is(.btn, .tool-group, .pane-mini):has(:hover) * {
   opacity: 1 !important;
   filter: none !important;
 }
@@ -1288,29 +1288,29 @@ body[data-focus-mode="fade"] .pane-fade * {
    slider: the reader's number dimmed against the stylesheet floor. The
    Settings dialog is dimmed with the rest - it holds its own slider, so
    the reader can always bring it back up. */
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] .output-pane {
+body[data-focus-mode="fade"][data-blur-type="fade"] .output-pane {
   opacity: clamp(0.15, var(--fade-output, 0.57), 1);
   transition: opacity var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] .shell-pane {
+body[data-focus-mode="fade"][data-blur-type="fade"] .shell-pane {
   opacity: clamp(0.15, var(--fade-shell, 0.57), 1);
   transition: opacity var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="fade"] .settings[open] {
+body[data-focus-mode="fade"][data-blur-type="fade"] .settings[open] {
   opacity: clamp(0.15, var(--fade-settings, 0.57), 1);
   transition: opacity var(--motion-med) var(--ease);
 }
 /* The blur style softens each surface by its own amount instead. Zero is
    sharp, so a surface the reader never faded stays easy to read. */
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] .output-pane {
+body[data-focus-mode="fade"][data-blur-type="blur"] .output-pane {
   filter: blur(calc((1 - var(--fade-output, 1)) * 2.5px));
   transition: filter var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] .shell-pane {
+body[data-focus-mode="fade"][data-blur-type="blur"] .shell-pane {
   filter: blur(calc((1 - var(--fade-shell, 1)) * 2.5px));
   transition: filter var(--motion-med) var(--ease);
 }
-body[data-focus-mode="fade"][data-blur-scope="all"][data-blur-type="blur"] .settings[open] {
+body[data-focus-mode="fade"][data-blur-type="blur"] .settings[open] {
   filter: blur(calc((1 - var(--fade-settings, 1)) * 2.5px));
   transition: filter var(--motion-med) var(--ease);
 }
@@ -1440,15 +1440,6 @@ body[data-focus-mode="lines"][data-blur-type="blur"] .CodeMirror-lines:hover .Co
 body[data-focus-mode="lines"][data-blur-type="blur"] .CodeMirror-lines:hover .CodeMirror-code > div:hover .CodeMirror-linebackground,
 body[data-focus-mode="lines"][data-blur-type="blur"] .CodeMirror-lines:hover .CodeMirror-code > div:hover .CodeMirror-gutter-wrapper {
   filter: none;
-}
-
-/* The scope is the last word. A reader who turns blur off keeps a clear
-   editor even when an older focus mode is still remembered. */
-body[data-blur-scope="off"] .CodeMirror-line,
-body[data-blur-scope="off"] .CodeMirror-linebackground,
-body[data-blur-scope="off"] .CodeMirror-gutter-wrapper {
-  opacity: 1 !important;
-  filter: none !important;
 }
 
 /* ---------- Output pane ---------- */
